@@ -1,6 +1,5 @@
 import { Button, Paper, Select, Stack, TextInput, Textarea, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
 
 type PublishStatus = "draft" | "published" | "archived";
 
@@ -47,13 +46,6 @@ export function CourseForm({
       slug: (value) => (value.trim() ? null : "Slug is required"),
     },
   });
-
-  useEffect(() => {
-    if (initialValue) {
-      form.setValues(initialValue);
-      form.resetDirty(initialValue);
-    }
-  }, [form, initialValue]);
 
   return (
     <Paper withBorder p="md" radius="sm">

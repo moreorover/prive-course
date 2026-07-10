@@ -385,7 +385,7 @@ Use route guards:
 - [x] Course CRUD.
 - [x] Lesson CRUD.
 - [ ] Lesson ordering.
-- [ ] Draft/published states.
+- [x] Draft/published states.
 
 ### Phase 5: Stream Upload
 

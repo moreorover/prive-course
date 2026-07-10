@@ -65,6 +65,10 @@ export const adminRouter = router({
     return ctx.db.select().from(course).orderBy(desc(course.updatedAt));
   }),
 
+  getCourse: adminProcedure.input(z.object({ id: z.string().min(1) })).query(({ ctx, input }) => {
+    return getCourseOrThrow(ctx.db, input.id);
+  }),
+
   createCourse: adminProcedure.input(courseInputSchema).mutation(async ({ ctx, input }) => {
     const id = crypto.randomUUID();
 

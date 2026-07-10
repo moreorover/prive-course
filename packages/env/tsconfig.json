@@ -1,0 +1,3 @@
+{
+  "extends": "@prive-course/config/tsconfig.base.json"
+}

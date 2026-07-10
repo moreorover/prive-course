@@ -397,7 +397,7 @@ Use route guards:
 
 - [x] Add database schema for lesson progress.
 - [x] Granted courses list.
-- [x] Course detail API.
+- [x] Course detail page.
 - [x] Lesson viewer.
 - Progress tracking.
 

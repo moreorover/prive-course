@@ -51,6 +51,9 @@ coverage
 
 # Misc
 *.tgz
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 .cache
 tmp
 temp

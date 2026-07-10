@@ -104,6 +104,8 @@ Completed:
 - Visible account watermark added to protected lesson playback.
 - API authorization tests added for protected routes, admin-only routes, manual course access, and playback session conflict enforcement.
 - Manual smoke test checklist added in `SMOKE_TEST.md`.
+- Local D1 migration workflow confirmed with Wrangler; expected auth, course, progress, passkey, and playback tables exist locally.
+- Local service health checks confirmed: API `/` returns `OK` and the web app serves `http://localhost:3001`.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.
@@ -397,7 +399,8 @@ Use route guards:
 - [x] Add Drizzle migrations for auth/admin/passkey schema.
 - [x] Add Drizzle migrations for course-domain schema.
 - [ ] Create/bind real Cloudflare D1 resource.
-- [ ] Confirm local and remote D1 migration workflow.
+- [x] Confirm local D1 migration workflow.
+- [ ] Confirm remote D1 migration workflow.
 
 ### Phase 3: Auth
 

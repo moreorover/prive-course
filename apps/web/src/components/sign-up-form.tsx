@@ -30,7 +30,17 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
           name: value.name,
         },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            const passkey = await authClient.passkey.addPasskey({
+              name: "Primary passkey",
+            });
+
+            if (passkey.error) {
+              toast.error(passkey.error.message || passkey.error.statusText);
+            } else {
+              toast.success("Passkey added");
+            }
+
             navigate({
               to: "/dashboard",
             });

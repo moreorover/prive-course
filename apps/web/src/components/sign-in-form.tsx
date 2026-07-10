@@ -3,6 +3,7 @@ import { Input } from "@prive-course/ui/components/input";
 import { Label } from "@prive-course/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -14,7 +15,27 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
   const navigate = useNavigate({
     from: "/",
   });
+  const [isPasskeyPending, setIsPasskeyPending] = useState(false);
   const { isPending } = authClient.useSession();
+
+  async function signInWithPasskey() {
+    setIsPasskeyPending(true);
+    try {
+      const result = await authClient.signIn.passkey();
+
+      if (result.error) {
+        toast.error(result.error.message || result.error.statusText);
+        return;
+      }
+
+      navigate({
+        to: "/dashboard",
+      });
+      toast.success("Sign in successful");
+    } finally {
+      setIsPasskeyPending(false);
+    }
+  }
 
   const form = useForm({
     defaultValues: {
@@ -55,6 +76,15 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
   return (
     <div className="mx-auto w-full mt-10 max-w-md p-6">
       <h1 className="mb-6 text-center text-3xl font-bold">Welcome Back</h1>
+
+      <Button
+        type="button"
+        className="mb-4 w-full"
+        disabled={isPasskeyPending}
+        onClick={signInWithPasskey}
+      >
+        {isPasskeyPending ? "Waiting for passkey..." : "Sign in with passkey"}
+      </Button>
 
       <form
         onSubmit={(e) => {

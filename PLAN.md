@@ -77,6 +77,7 @@ Completed:
 - Better Auth admin plugin added server-side and client-side.
 - Better Auth passkey plugin added server-side and client-side.
 - Better Auth schema updated for admin fields, session impersonation, and passkeys.
+- Passkey sign-in, post-sign-up passkey registration, and account-menu passkey registration UI added.
 - Mantine v9 packages installed and `MantineProvider` wired in the root route.
 - Course-domain Drizzle schema added.
 - Drizzle migrations generated.
@@ -118,7 +119,6 @@ All commands pass. The web build emits only the generated app's large chunk warn
 
 Main remaining v1 work:
 
-- Passkey-first account UI.
 - Cloudflare Stream processing state UI.
 - Signed playback tokens, playback heartbeat, and active playback enforcement.
 - Authorization tests, smoke testing, and deployment notes.
@@ -399,7 +399,7 @@ Use route guards:
 - [x] Add admin plugin.
 - [x] Add client plugins for passkey/admin.
 - [x] Add required Drizzle schema fields/tables.
-- [ ] Add passkey-first UI flows.
+- [x] Add passkey-first UI flows.
 - [x] Add admin route/API protection.
 - [x] Add first-admin bootstrap path or documented seed command.
 

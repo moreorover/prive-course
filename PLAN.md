@@ -88,6 +88,7 @@ Completed:
 - Admin course list and edit routes preload data with TanStack Router loaders.
 - Admin lesson list, new-lesson, and edit-lesson screens added under each course.
 - Admin lesson create/update forms implemented with Mantine forms.
+- Admin lesson ordering added with up/down controls.
 - Student granted-course list, course detail, and lesson viewer routes added.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
@@ -400,7 +401,7 @@ Use route guards:
 - [x] Admin lesson list under course edit.
 - [x] Separate new-lesson and edit-lesson screens.
 - [x] Mantine form implementation for lesson create/update.
-- [ ] Lesson ordering.
+- [x] Lesson ordering.
 - [x] Draft/published states.
 
 ### Phase 5: Stream Upload

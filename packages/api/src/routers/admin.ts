@@ -1,6 +1,6 @@
 import { course, courseAccess, lesson, user } from "@prive-course/db/schema";
 import { TRPCError } from "@trpc/server";
-import { and, asc, desc, eq, isNull, like, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
 
 import { adminProcedure, router } from "../index";
@@ -161,6 +161,50 @@ export const adminRouter = router({
       }
 
       return foundLesson;
+    }),
+
+  reorderLessons: adminProcedure
+    .input(
+      z.object({
+        courseId: z.string().min(1),
+        lessonIds: z.array(z.string().min(1)).min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await getCourseOrThrow(ctx.db, input.courseId);
+
+      const uniqueLessonIds = new Set(input.lessonIds);
+      if (uniqueLessonIds.size !== input.lessonIds.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Lesson order contains duplicate lessons",
+        });
+      }
+
+      const existingLessons = await ctx.db
+        .select({ id: lesson.id })
+        .from(lesson)
+        .where(and(eq(lesson.courseId, input.courseId), inArray(lesson.id, input.lessonIds)));
+
+      if (existingLessons.length !== input.lessonIds.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Lesson order contains lessons outside this course",
+        });
+      }
+
+      for (const [position, lessonId] of input.lessonIds.entries()) {
+        await ctx.db
+          .update(lesson)
+          .set({ position, updatedAt: new Date() })
+          .where(and(eq(lesson.id, lessonId), eq(lesson.courseId, input.courseId)));
+      }
+
+      return ctx.db
+        .select()
+        .from(lesson)
+        .where(eq(lesson.courseId, input.courseId))
+        .orderBy(asc(lesson.position));
     }),
 
   searchUsers: adminProcedure

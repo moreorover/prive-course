@@ -101,6 +101,7 @@ Completed:
 - Student granted-course list, course detail, and lesson viewer routes added.
 - Student lesson progress save UI and API added.
 - Signed Stream playback token API, playback session enforcement, heartbeat API, and protected lesson player UI added.
+- API authorization tests added for protected routes, admin-only routes, manual course access, and playback session conflict enforcement.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.
@@ -464,7 +465,7 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Fix current React Doctor findings.
 - [x] Loading, error, and empty states for initial admin/student routes.
 - [x] Basic responsive layout for initial admin/student routes.
-- [ ] API tests for authorization boundaries.
+- [x] API tests for authorization boundaries.
 - [ ] Smoke test admin and student flows.
 - [x] Deployment notes.
 

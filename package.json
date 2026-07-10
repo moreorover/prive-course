@@ -17,6 +17,7 @@
     "react-doctor": "react-doctor --no-telemetry -y",
     "react-doctor:staged": "react-doctor --staged --no-telemetry -y",
     "staged": "vp staged",
+    "test": "vp run -r test",
     "hooks:setup": "vp config",
     "admin:bootstrap:local": "vp run --filter server admin:bootstrap:local",
     "dev:web": "vp run --filter web dev",

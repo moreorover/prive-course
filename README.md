@@ -113,6 +113,7 @@ prive-course/
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run db:generate`: Generate database client/types
 - `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
+- `pnpm run test`: Run workspace tests
 - `pnpm run lint`: Run Vite+ lint checks
 - `pnpm run format`: Run Vite+ formatting
 - `pnpm run staged`: Run Vite+ checks against staged files

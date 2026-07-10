@@ -1,6 +1,6 @@
 import { Button, Paper, Stack, Text } from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
@@ -11,7 +11,6 @@ export const Route = createFileRoute("/_auth/admin/courses/$courseId")({
 });
 
 function EditCourseRoute() {
-  const { session } = Route.useRouteContext();
   const { courseId } = Route.useParams();
   const course = useQuery(trpc.admin.getCourse.queryOptions({ id: courseId }));
   const updateCourse = useMutation(
@@ -30,10 +29,6 @@ function EditCourseRoute() {
       },
     }),
   );
-
-  if (session.data?.user.role !== "admin") {
-    return <Navigate to="/dashboard" />;
-  }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">

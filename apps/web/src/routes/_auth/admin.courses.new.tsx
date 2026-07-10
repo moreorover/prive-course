@@ -1,6 +1,6 @@
 import { Button, Stack } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
-import { Link, Navigate, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
@@ -11,7 +11,6 @@ export const Route = createFileRoute("/_auth/admin/courses/new")({
 });
 
 function NewCourseRoute() {
-  const { session } = Route.useRouteContext();
   const navigate = useNavigate();
 
   const createCourse = useMutation(
@@ -26,10 +25,6 @@ function NewCourseRoute() {
       },
     }),
   );
-
-  if (session.data?.user.role !== "admin") {
-    return <Navigate to="/dashboard" />;
-  }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8">

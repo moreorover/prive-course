@@ -414,6 +414,10 @@ Use route guards:
 - [x] Basic upload UI.
 - [ ] Processing state UI.
 
+TODO: The current Stream flow follows Cloudflare's direct creator upload docs for basic POST
+uploads, which are intended for files under 200 MB. Larger uploads should use tus later:
+https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
+
 ### Phase 6: Student Experience
 
 - [x] Add database schema for lesson progress.

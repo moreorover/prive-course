@@ -82,6 +82,13 @@ Completed:
 - Drizzle migrations generated.
 - Initial tRPC course, lesson, admin, and manual access APIs added with server-side authorization checks.
 - `.pnpm-store` ignored.
+- First-admin bootstrap helper added for local development.
+- Admin course list moved to its own route, with separate new-course and edit-course routes.
+- Admin course create/update forms implemented with Mantine forms.
+- Admin course list and edit routes preload data with TanStack Router loaders.
+- Student granted-course list, course detail, and lesson viewer routes added.
+- React Doctor added as a project script and pre-commit check.
+- Full React Doctor scan currently reports 0 issues.
 
 Generated migrations:
 
@@ -95,9 +102,10 @@ Current validation:
 ```txt
 vp check
 vp run -r check-types
+vp exec react-doctor --no-telemetry -y --verbose
 ```
 
-Both commands pass. The web build emits only the generated app's large chunk warning.
+All commands pass. The web build emits only the generated app's large chunk warning.
 
 ## Security Model
 
@@ -384,6 +392,9 @@ Use route guards:
 - [x] Add database schema for courses and lessons.
 - [x] Course CRUD.
 - [x] Lesson CRUD.
+- [x] Separate course list, new-course, and edit-course screens.
+- [x] Mantine form implementation for course create/update.
+- [x] Route-loader prefetching for admin course list and edit screens.
 - [ ] Lesson ordering.
 - [x] Draft/published states.
 
@@ -399,7 +410,7 @@ Use route guards:
 - [x] Granted courses list.
 - [x] Course detail page.
 - [x] Lesson viewer.
-- Progress tracking.
+- [ ] Progress tracking.
 
 ### Phase 7: Access Control
 
@@ -418,11 +429,14 @@ Use route guards:
 
 ### Phase 9: Verification And Polish
 
-- Loading, error, and empty states.
-- Basic responsive layout.
-- API tests for authorization boundaries.
-- Smoke test admin and student flows.
-- Deployment notes.
+- [x] Add React Doctor script.
+- [x] Run React Doctor before each commit.
+- [x] Fix current React Doctor findings.
+- [x] Loading, error, and empty states for initial admin/student routes.
+- [x] Basic responsive layout for initial admin/student routes.
+- [ ] API tests for authorization boundaries.
+- [ ] Smoke test admin and student flows.
+- [ ] Deployment notes.
 
 ## Credentials Needed Later
 

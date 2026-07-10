@@ -6,6 +6,7 @@
     "build": "tsdown",
     "check-types": "tsc -b",
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+    "db:execute:local": "wrangler d1 execute DB --local --config wrangler.jsonc",
     "db:migrate:local": "wrangler d1 migrations apply DB --local --config wrangler.jsonc",
     "dev": "wrangler dev src/index.ts --config wrangler.jsonc --port 3000 --env-file .env"
   },

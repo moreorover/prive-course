@@ -18,6 +18,7 @@
     "hooks:setup": "vp config",
     "dev:web": "vp run --filter web dev",
     "dev:server": "vp run --filter server dev",
+    "db:execute:local": "vp run --filter server db:execute:local",
     "db:migrate:local": "vp run --filter server db:migrate:local",
     "db:generate": "vp run --filter @prive-course/db db:generate",
     "deploy": "vp run --filter @prive-course/infra deploy",

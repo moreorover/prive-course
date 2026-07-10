@@ -100,6 +100,7 @@ Completed:
 - Admin course access management screen added for user search, grant, and revoke.
 - Student granted-course list, course detail, and lesson viewer routes added.
 - Student lesson progress save UI and API added.
+- Signed Stream playback token API, playback session enforcement, heartbeat API, and protected lesson player UI added.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 
@@ -450,9 +451,9 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 ### Phase 8: Playback Protection
 
 - [x] Add database schema for playback sessions.
-- [ ] Signed playback token endpoint.
-- [ ] Active playback session enforcement.
-- [ ] Heartbeat endpoint.
+- [x] Signed playback token endpoint.
+- [x] Active playback session enforcement.
+- [x] Heartbeat endpoint.
 - [ ] Optional watermark.
 
 ### Phase 9: Verification And Polish

@@ -14,6 +14,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
+import { LessonPlayer } from "@/features/course/lesson-player";
 import { queryClient, trpc } from "@/utils/trpc";
 
 function lessonQueryOptions(courseSlug: string, lessonSlug: string) {
@@ -77,19 +78,7 @@ function LessonRoute() {
               <Text c="dimmed">{lesson.data.course.title}</Text>
             </div>
 
-            <Paper withBorder radius="sm" p="md">
-              <div className="grid aspect-video place-items-center border border-dashed">
-                <Stack align="center" gap="xs">
-                  <Text fw={600}>
-                    {lesson.data.lesson.videoUid ? "Video playback pending" : "No video uploaded"}
-                  </Text>
-                  <Text c="dimmed" ta="center" maw={480}>
-                    The lesson route is access-controlled. Cloudflare Stream playback will be wired
-                    after the signed token endpoint is implemented.
-                  </Text>
-                </Stack>
-              </div>
-            </Paper>
+            <LessonPlayer lessonId={lesson.data.lesson.id} videoUid={lesson.data.lesson.videoUid} />
 
             {lesson.data.lesson.description ? (
               <Paper withBorder radius="sm" p="md">

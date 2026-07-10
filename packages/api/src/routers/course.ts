@@ -1,6 +1,13 @@
-import { course, courseAccess, lesson, lessonProgress } from "@prive-course/db/schema";
+import {
+  course,
+  courseAccess,
+  lesson,
+  lessonProgress,
+  playbackSession,
+} from "@prive-course/db/schema";
+import { env } from "@prive-course/env/server";
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { protectedProcedure, router } from "../index";
@@ -38,6 +45,47 @@ async function assertCourseAccess(db: ContextDb, userId: string, courseId: strin
 }
 
 type ContextDb = ReturnType<typeof import("@prive-course/db").createDb>;
+
+const streamTokenResponseSchema = z.object({
+  success: z.boolean(),
+  errors: z.array(z.unknown()).default([]),
+  result: z.object({
+    token: z.string().min(1),
+  }),
+});
+
+const playbackHeartbeatWindowMs = 90_000;
+const playbackTokenTtlSeconds = 60 * 60;
+
+async function getPublishedLessonForUser(db: ContextDb, userId: string, lessonId: string) {
+  const rows = await db
+    .select({
+      lesson,
+      course,
+    })
+    .from(lesson)
+    .innerJoin(course, eq(course.id, lesson.courseId))
+    .where(
+      and(eq(lesson.id, lessonId), eq(lesson.status, "published"), eq(course.status, "published")),
+    )
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Lesson not found",
+    });
+  }
+
+  await assertCourseAccess(db, userId, row.course.id);
+
+  return row;
+}
+
+function getAuthSessionId(session: { session?: { id?: string } }) {
+  return session.session?.id ?? null;
+}
 
 export const courseRouter = router({
   listGranted: protectedProcedure.query(async ({ ctx }) => {
@@ -148,31 +196,7 @@ export const courseRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const rows = await ctx.db
-        .select({
-          lesson,
-          course,
-        })
-        .from(lesson)
-        .innerJoin(course, eq(course.id, lesson.courseId))
-        .where(
-          and(
-            eq(lesson.id, input.lessonId),
-            eq(lesson.status, "published"),
-            eq(course.status, "published"),
-          ),
-        )
-        .limit(1);
-
-      const row = rows[0];
-      if (!row) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Lesson not found",
-        });
-      }
-
-      await assertCourseAccess(ctx.db, ctx.session.user.id, row.course.id);
+      await getPublishedLessonForUser(ctx.db, ctx.session.user.id, input.lessonId);
 
       const completedAt = input.completed ? new Date() : null;
       const existingProgress = await ctx.db
@@ -217,5 +241,142 @@ export const courseRouter = router({
         .limit(1);
 
       return progressRows[0];
+    }),
+
+  createPlaybackToken: protectedProcedure
+    .input(z.object({ lessonId: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const row = await getPublishedLessonForUser(ctx.db, ctx.session.user.id, input.lessonId);
+
+      if (!row.lesson.videoUid) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Lesson video is not uploaded",
+        });
+      }
+
+      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_API_TOKEN) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Cloudflare Stream credentials are not configured",
+        });
+      }
+
+      const authSessionId = getAuthSessionId(ctx.session);
+      const now = new Date();
+      const heartbeatCutoff = new Date(Date.now() - playbackHeartbeatWindowMs);
+      const activeSessions = await ctx.db
+        .select({
+          id: playbackSession.id,
+          authSessionId: playbackSession.authSessionId,
+        })
+        .from(playbackSession)
+        .where(
+          and(
+            eq(playbackSession.userId, ctx.session.user.id),
+            gt(playbackSession.expiresAt, now),
+            gt(playbackSession.lastHeartbeatAt, heartbeatCutoff),
+          ),
+        );
+
+      const conflictingSession = activeSessions.find(
+        (session) => session.authSessionId !== authSessionId,
+      );
+
+      if (conflictingSession) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "This account is already playing a lesson in another session",
+        });
+      }
+
+      const tokenExpiresAt = new Date(Date.now() + playbackTokenTtlSeconds * 1000);
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/${row.lesson.videoUid}/token`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.CLOUDFLARE_STREAM_API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            exp: Math.floor(tokenExpiresAt.getTime() / 1000),
+          }),
+        },
+      );
+      const body = await response.json();
+      const payload = streamTokenResponseSchema.safeParse(body);
+
+      if (!response.ok || !payload.success || !payload.data.success) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "Failed to create Cloudflare Stream playback token",
+        });
+      }
+
+      const playbackSessionId = crypto.randomUUID();
+      await ctx.db.insert(playbackSession).values({
+        id: playbackSessionId,
+        userId: ctx.session.user.id,
+        lessonId: input.lessonId,
+        authSessionId,
+        lastHeartbeatAt: now,
+        expiresAt: new Date(Date.now() + playbackHeartbeatWindowMs),
+      });
+
+      return {
+        playbackSessionId,
+        token: payload.data.result.token,
+        iframeUrl: `https://iframe.videodelivery.net/${payload.data.result.token}`,
+        tokenExpiresAt,
+        heartbeatExpiresAt: new Date(Date.now() + playbackHeartbeatWindowMs),
+      };
+    }),
+
+  heartbeatPlayback: protectedProcedure
+    .input(z.object({ playbackSessionId: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const rows = await ctx.db
+        .select()
+        .from(playbackSession)
+        .where(
+          and(
+            eq(playbackSession.id, input.playbackSessionId),
+            eq(playbackSession.userId, ctx.session.user.id),
+          ),
+        )
+        .limit(1);
+      const foundSession = rows[0];
+
+      if (!foundSession) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Playback session not found",
+        });
+      }
+
+      const authSessionId = getAuthSessionId(ctx.session);
+      if (foundSession.authSessionId !== authSessionId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Playback session belongs to another auth session",
+        });
+      }
+
+      const now = new Date();
+      const expiresAt = new Date(Date.now() + playbackHeartbeatWindowMs);
+      await ctx.db
+        .update(playbackSession)
+        .set({
+          lastHeartbeatAt: now,
+          expiresAt,
+        })
+        .where(eq(playbackSession.id, input.playbackSessionId));
+
+      return {
+        playbackSessionId: input.playbackSessionId,
+        heartbeatAt: now,
+        expiresAt,
+      };
     }),
 });

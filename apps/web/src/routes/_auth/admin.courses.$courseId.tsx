@@ -6,13 +6,20 @@ import { toast } from "sonner";
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
 import { queryClient, trpc } from "@/utils/trpc";
 
+function courseQueryOptions(courseId: string) {
+  return trpc.admin.getCourse.queryOptions({ id: courseId });
+}
+
 export const Route = createFileRoute("/_auth/admin/courses/$courseId")({
   component: EditCourseRoute,
+  loader: async ({ context, params }) => {
+    await context.queryClient.ensureQueryData(courseQueryOptions(params.courseId));
+  },
 });
 
 function EditCourseRoute() {
   const { courseId } = Route.useParams();
-  const course = useQuery(trpc.admin.getCourse.queryOptions({ id: courseId }));
+  const course = useQuery(courseQueryOptions(courseId));
   const updateCourse = useMutation(
     trpc.admin.updateCourse.mutationOptions({
       onSuccess: async () => {

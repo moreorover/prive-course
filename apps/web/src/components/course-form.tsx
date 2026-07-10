@@ -1,5 +1,6 @@
 import { Button, Paper, Select, Stack, TextInput, Textarea, Title } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
 
 type PublishStatus = "draft" | "published" | "archived";
 
@@ -33,61 +34,59 @@ export function CourseForm({
   title,
   onSubmit,
 }: CourseFormProps) {
-  const [form, setForm] = useState<CourseFormValue>(
-    initialValue ?? {
+  const form = useForm<CourseFormValue>({
+    mode: "uncontrolled",
+    initialValues: initialValue ?? {
       title: "",
       slug: "",
       description: "",
       status: "draft",
     },
-  );
+    validate: {
+      title: (value) => (value.trim() ? null : "Title is required"),
+      slug: (value) => (value.trim() ? null : "Slug is required"),
+    },
+  });
 
   useEffect(() => {
     if (initialValue) {
-      setForm(initialValue);
+      form.setValues(initialValue);
+      form.resetDirty(initialValue);
     }
   }, [initialValue]);
 
   return (
     <Paper withBorder p="md" radius="sm">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSubmit(form);
-        }}
-      >
+      <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="md">
           <Title order={1} size="h3">
             {title}
           </Title>
           <TextInput
             label="Title"
-            value={form.title}
+            key={form.key("title")}
+            {...form.getInputProps("title")}
             onChange={(event) => {
               const nextTitle = event.currentTarget.value;
-              setForm((current) => ({
-                ...current,
-                title: nextTitle,
-                slug: current.slug ? current.slug : slugify(nextTitle),
-              }));
+              form.setFieldValue("title", nextTitle);
+              if (!form.getValues().slug) {
+                form.setFieldValue("slug", slugify(nextTitle));
+              }
             }}
             required
           />
           <TextInput
             label="Slug"
-            value={form.slug}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, slug: slugify(event.currentTarget.value) }))
-            }
+            key={form.key("slug")}
+            {...form.getInputProps("slug")}
+            onChange={(event) => form.setFieldValue("slug", slugify(event.currentTarget.value))}
             required
           />
           <Textarea
             label="Description"
-            value={form.description}
             minRows={4}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, description: event.currentTarget.value }))
-            }
+            key={form.key("description")}
+            {...form.getInputProps("description")}
           />
           <Select
             label="Status"
@@ -96,15 +95,17 @@ export function CourseForm({
               { value: "published", label: "Published" },
               { value: "archived", label: "Archived" },
             ]}
-            value={form.status}
+            key={form.key("status")}
+            {...form.getInputProps("status")}
             onChange={(value) =>
-              setForm((current) => ({
-                ...current,
-                status: (value as PublishStatus | null) ?? "draft",
-              }))
+              form.setFieldValue("status", (value as PublishStatus | null) ?? "draft")
             }
           />
-          <Button type="submit" loading={isSubmitting} disabled={!form.title || !form.slug}>
+          <Button
+            type="submit"
+            loading={isSubmitting}
+            disabled={!form.getValues().title || !form.getValues().slug}
+          >
             {submitLabel}
           </Button>
         </Stack>

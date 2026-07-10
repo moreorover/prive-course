@@ -4,12 +4,17 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { trpc } from "@/utils/trpc";
 
+const coursesQueryOptions = trpc.admin.listCourses.queryOptions();
+
 export const Route = createFileRoute("/_auth/admin/")({
   component: AdminCourses,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(coursesQueryOptions);
+  },
 });
 
 function AdminCourses() {
-  const courses = useQuery(trpc.admin.listCourses.queryOptions());
+  const courses = useQuery(coursesQueryOptions);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">

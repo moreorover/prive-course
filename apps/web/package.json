@@ -15,6 +15,7 @@
     "@better-auth/passkey": "^1.6.23",
     "@hookform/resolvers": "^5.4.0",
     "@mantine/core": "^9.4.1",
+    "@mantine/form": "^9.4.1",
     "@mantine/hooks": "^9.4.1",
     "@prive-course/api": "workspace:*",
     "@prive-course/env": "workspace:*",

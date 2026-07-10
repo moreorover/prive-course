@@ -53,6 +53,9 @@ export default function UserMenu() {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link to="/profile">Profile</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={addPasskey}>Add passkey</DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"

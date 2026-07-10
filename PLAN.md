@@ -78,6 +78,7 @@ Completed:
 - Better Auth passkey plugin added server-side and client-side.
 - Better Auth schema updated for admin fields, session impersonation, and passkeys.
 - Passkey sign-in, post-sign-up passkey registration, and account-menu passkey registration UI added.
+- Profile page added for name updates, password changes, passkey management, and session management.
 - Mantine v9 packages installed and `MantineProvider` wired in the root route.
 - Course-domain Drizzle schema added.
 - Drizzle migrations generated.
@@ -400,6 +401,7 @@ Use route guards:
 - [x] Add client plugins for passkey/admin.
 - [x] Add required Drizzle schema fields/tables.
 - [x] Add passkey-first UI flows.
+- [x] Add focused profile page.
 - [x] Add admin route/API protection.
 - [x] Add first-admin bootstrap path or documented seed command.
 

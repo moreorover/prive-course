@@ -53,7 +53,7 @@ export function CourseForm({
       form.setValues(initialValue);
       form.resetDirty(initialValue);
     }
-  }, [initialValue]);
+  }, [form, initialValue]);
 
   return (
     <Paper withBorder p="md" radius="sm">

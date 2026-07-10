@@ -3,8 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { trpc } from "@/utils/trpc";
 
+const healthCheckQueryOptions = trpc.healthCheck.queryOptions();
+
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(healthCheckQueryOptions);
+  },
 });
 
 const TITLE_TEXT = `
@@ -24,7 +29,7 @@ const TITLE_TEXT = `
  `;
 
 function HomeComponent() {
-  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
+  const healthCheck = useQuery(healthCheckQueryOptions);
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">

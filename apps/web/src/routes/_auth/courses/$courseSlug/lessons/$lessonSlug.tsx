@@ -4,18 +4,25 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { trpc } from "@/utils/trpc";
 
+function lessonQueryOptions(courseSlug: string, lessonSlug: string) {
+  return trpc.courses.lessonBySlug.queryOptions({
+    courseSlug,
+    lessonSlug,
+  });
+}
+
 export const Route = createFileRoute("/_auth/courses/$courseSlug/lessons/$lessonSlug")({
   component: LessonRoute,
+  loader: async ({ context, params }) => {
+    await context.queryClient.ensureQueryData(
+      lessonQueryOptions(params.courseSlug, params.lessonSlug),
+    );
+  },
 });
 
 function LessonRoute() {
   const { courseSlug, lessonSlug } = Route.useParams();
-  const lesson = useQuery(
-    trpc.courses.lessonBySlug.queryOptions({
-      courseSlug,
-      lessonSlug,
-    }),
-  );
+  const lesson = useQuery(lessonQueryOptions(courseSlug, lessonSlug));
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8">

@@ -1,4 +1,6 @@
 import { Toaster } from "@prive-course/ui/components/sonner";
+import { MantineProvider, createTheme } from "@mantine/core";
+import "@mantine/core/styles.css";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
@@ -36,6 +38,14 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 });
 
+const theme = createTheme({
+  primaryColor: "teal",
+  fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+  headings: {
+    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+  },
+});
+
 function RootComponent() {
   return (
     <>
@@ -46,11 +56,13 @@ function RootComponent() {
         disableTransitionOnChange
         storageKey="vite-ui-theme"
       >
-        <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header />
-          <Outlet />
-        </div>
-        <Toaster richColors />
+        <MantineProvider defaultColorScheme="dark" theme={theme}>
+          <div className="grid grid-rows-[auto_1fr] h-svh">
+            <Header />
+            <Outlet />
+          </div>
+          <Toaster richColors />
+        </MantineProvider>
       </ThemeProvider>
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />

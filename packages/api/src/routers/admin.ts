@@ -107,6 +107,22 @@ export const adminRouter = router({
         .orderBy(asc(lesson.position));
     }),
 
+  getLesson: adminProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const rows = await ctx.db.select().from(lesson).where(eq(lesson.id, input.id)).limit(1);
+      const foundLesson = rows[0];
+
+      if (!foundLesson) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Lesson not found",
+        });
+      }
+
+      return foundLesson;
+    }),
+
   createLesson: adminProcedure.input(lessonInputSchema).mutation(async ({ ctx, input }) => {
     await getCourseOrThrow(ctx.db, input.courseId);
 

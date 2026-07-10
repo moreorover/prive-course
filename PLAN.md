@@ -86,6 +86,8 @@ Completed:
 - Admin course list moved to its own route, with separate new-course and edit-course routes.
 - Admin course create/update forms implemented with Mantine forms.
 - Admin course list and edit routes preload data with TanStack Router loaders.
+- TanStack route files grouped into nested folders instead of flat dotted route files.
+- Route-level page data preloaded through TanStack Router loaders across current admin and student routes.
 - Admin lesson list, new-lesson, and edit-lesson screens added under each course.
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
@@ -112,6 +114,14 @@ vp exec react-doctor --no-telemetry -y --verbose
 ```
 
 All commands pass. The web build emits only the generated app's large chunk warning.
+
+Main remaining v1 work:
+
+- Passkey-first account UI.
+- Cloudflare Stream processing state UI.
+- Signed playback tokens, playback heartbeat, and active playback enforcement.
+- Admin user access management screens.
+- Authorization tests, smoke testing, and deployment notes.
 
 ## Security Model
 
@@ -436,10 +446,10 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 ### Phase 8: Playback Protection
 
 - [x] Add database schema for playback sessions.
-- Signed playback token endpoint.
-- Active playback session enforcement.
-- Heartbeat endpoint.
-- Optional watermark.
+- [ ] Signed playback token endpoint.
+- [ ] Active playback session enforcement.
+- [ ] Heartbeat endpoint.
+- [ ] Optional watermark.
 
 ### Phase 9: Verification And Polish
 

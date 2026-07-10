@@ -24,6 +24,8 @@ export const server = await Worker("server", {
     CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
     BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET!,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
+    CLOUDFLARE_ACCOUNT_ID: alchemy.env.CLOUDFLARE_ACCOUNT_ID!,
+    CLOUDFLARE_STREAM_API_TOKEN: alchemy.secret.env.CLOUDFLARE_STREAM_API_TOKEN!,
   },
   dev: {
     port: 3000,

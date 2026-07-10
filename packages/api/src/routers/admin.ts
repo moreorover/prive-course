@@ -1,4 +1,5 @@
 import { course, courseAccess, lesson, user } from "@prive-course/db/schema";
+import { env } from "@prive-course/env/server";
 import { TRPCError } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
@@ -44,6 +45,15 @@ const lessonInputSchema = z.object({
   status: publishStatusSchema.default("draft"),
 });
 
+const streamDirectUploadResponseSchema = z.object({
+  success: z.boolean(),
+  errors: z.array(z.unknown()).default([]),
+  result: z.object({
+    uploadURL: z.string().url(),
+    uid: z.string().min(1),
+  }),
+});
+
 async function getCourseOrThrow(db: ContextDb, courseId: string) {
   const rows = await db.select().from(course).where(eq(course.id, courseId)).limit(1);
   const foundCourse = rows[0];
@@ -59,6 +69,20 @@ async function getCourseOrThrow(db: ContextDb, courseId: string) {
 }
 
 type ContextDb = ReturnType<typeof import("@prive-course/db").createDb>;
+
+async function getLessonOrThrow(db: ContextDb, lessonId: string) {
+  const rows = await db.select().from(lesson).where(eq(lesson.id, lessonId)).limit(1);
+  const foundLesson = rows[0];
+
+  if (!foundLesson) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Lesson not found",
+    });
+  }
+
+  return foundLesson;
+}
 
 export const adminRouter = router({
   listCourses: adminProcedure.query(({ ctx }) => {
@@ -107,21 +131,9 @@ export const adminRouter = router({
         .orderBy(asc(lesson.position));
     }),
 
-  getLesson: adminProcedure
-    .input(z.object({ id: z.string().min(1) }))
-    .query(async ({ ctx, input }) => {
-      const rows = await ctx.db.select().from(lesson).where(eq(lesson.id, input.id)).limit(1);
-      const foundLesson = rows[0];
-
-      if (!foundLesson) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Lesson not found",
-        });
-      }
-
-      return foundLesson;
-    }),
+  getLesson: adminProcedure.input(z.object({ id: z.string().min(1) })).query(({ ctx, input }) => {
+    return getLessonOrThrow(ctx.db, input.id);
+  }),
 
   createLesson: adminProcedure.input(lessonInputSchema).mutation(async ({ ctx, input }) => {
     await getCourseOrThrow(ctx.db, input.courseId);
@@ -205,6 +217,58 @@ export const adminRouter = router({
         .from(lesson)
         .where(eq(lesson.courseId, input.courseId))
         .orderBy(asc(lesson.position));
+    }),
+
+  createLessonUploadUrl: adminProcedure
+    .input(
+      z.object({
+        lessonId: z.string().min(1),
+        maxDurationSeconds: z.number().int().positive().max(86_400).default(3600),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const foundLesson = await getLessonOrThrow(ctx.db, input.lessonId);
+      await getCourseOrThrow(ctx.db, foundLesson.courseId);
+
+      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_API_TOKEN) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Cloudflare Stream credentials are not configured",
+        });
+      }
+
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/direct_upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.CLOUDFLARE_STREAM_API_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            maxDurationSeconds: input.maxDurationSeconds,
+          }),
+        },
+      );
+      const body = await response.json();
+      const payload = streamDirectUploadResponseSchema.safeParse(body);
+
+      if (!response.ok || !payload.success || !payload.data.success) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "Failed to create Cloudflare Stream upload URL",
+        });
+      }
+
+      await ctx.db
+        .update(lesson)
+        .set({
+          videoUid: payload.data.result.uid,
+          updatedAt: new Date(),
+        })
+        .where(eq(lesson.id, input.lessonId));
+
+      return payload.data.result;
     }),
 
   searchUsers: adminProcedure

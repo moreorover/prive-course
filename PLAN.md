@@ -89,6 +89,8 @@ Completed:
 - Admin lesson list, new-lesson, and edit-lesson screens added under each course.
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
+- Cloudflare Stream direct upload URL API and admin upload control added.
+- Lesson video UID persistence added.
 - Student granted-course list, course detail, and lesson viewer routes added.
 - Student lesson progress save UI and API added.
 - React Doctor added as a project script and pre-commit check.
@@ -407,9 +409,10 @@ Use route guards:
 
 ### Phase 5: Stream Upload
 
-- Cloudflare Stream direct upload URL endpoint.
-- Lesson video UID persistence.
-- Upload and processing state UI.
+- [x] Cloudflare Stream direct upload URL endpoint.
+- [x] Lesson video UID persistence.
+- [x] Basic upload UI.
+- [ ] Processing state UI.
 
 ### Phase 6: Student Experience
 
@@ -453,6 +456,7 @@ Deployment and Stream integration will need:
 
 ```txt
 CLOUDFLARE_ACCOUNT_ID
+CLOUDFLARE_STREAM_API_TOKEN
 CLOUDFLARE_API_TOKEN
 BETTER_AUTH_SECRET
 BETTER_AUTH_URL

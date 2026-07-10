@@ -138,4 +138,84 @@ export const courseRouter = router({
 
       return row;
     }),
+
+  updateProgress: protectedProcedure
+    .input(
+      z.object({
+        lessonId: z.string().min(1),
+        progressSeconds: z.number().int().nonnegative(),
+        completed: z.boolean().default(false),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const rows = await ctx.db
+        .select({
+          lesson,
+          course,
+        })
+        .from(lesson)
+        .innerJoin(course, eq(course.id, lesson.courseId))
+        .where(
+          and(
+            eq(lesson.id, input.lessonId),
+            eq(lesson.status, "published"),
+            eq(course.status, "published"),
+          ),
+        )
+        .limit(1);
+
+      const row = rows[0];
+      if (!row) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Lesson not found",
+        });
+      }
+
+      await assertCourseAccess(ctx.db, ctx.session.user.id, row.course.id);
+
+      const completedAt = input.completed ? new Date() : null;
+      const existingProgress = await ctx.db
+        .select({ id: lessonProgress.id })
+        .from(lessonProgress)
+        .where(
+          and(
+            eq(lessonProgress.userId, ctx.session.user.id),
+            eq(lessonProgress.lessonId, input.lessonId),
+          ),
+        )
+        .limit(1);
+
+      if (existingProgress[0]) {
+        await ctx.db
+          .update(lessonProgress)
+          .set({
+            progressSeconds: input.progressSeconds,
+            completedAt,
+            updatedAt: new Date(),
+          })
+          .where(eq(lessonProgress.id, existingProgress[0].id));
+      } else {
+        await ctx.db.insert(lessonProgress).values({
+          id: crypto.randomUUID(),
+          userId: ctx.session.user.id,
+          lessonId: input.lessonId,
+          progressSeconds: input.progressSeconds,
+          completedAt,
+        });
+      }
+
+      const progressRows = await ctx.db
+        .select()
+        .from(lessonProgress)
+        .where(
+          and(
+            eq(lessonProgress.userId, ctx.session.user.id),
+            eq(lessonProgress.lessonId, input.lessonId),
+          ),
+        )
+        .limit(1);
+
+      return progressRows[0];
+    }),
 });

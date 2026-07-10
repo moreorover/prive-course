@@ -90,6 +90,7 @@ Completed:
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
 - Student granted-course list, course detail, and lesson viewer routes added.
+- Student lesson progress save UI and API added.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 
@@ -416,7 +417,7 @@ Use route guards:
 - [x] Granted courses list.
 - [x] Course detail page.
 - [x] Lesson viewer.
-- [ ] Progress tracking.
+- [x] Progress tracking.
 
 ### Phase 7: Access Control
 

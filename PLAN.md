@@ -73,12 +73,14 @@ Completed:
 - pnpm is installed through Vite+ managed tooling.
 - Baseline `vp check` passes.
 - Baseline `vp run -r check-types` passes.
+- Local `vp run dev` starts the web and Worker dev servers together.
 - Better Auth admin plugin added server-side and client-side.
 - Better Auth passkey plugin added server-side and client-side.
 - Better Auth schema updated for admin fields, session impersonation, and passkeys.
 - Mantine v9 packages installed and `MantineProvider` wired in the root route.
 - Course-domain Drizzle schema added.
 - Drizzle migrations generated.
+- Initial tRPC course, lesson, admin, and manual access APIs added with server-side authorization checks.
 - `.pnpm-store` ignored.
 
 Generated migrations:
@@ -374,14 +376,14 @@ Use route guards:
 - [x] Add client plugins for passkey/admin.
 - [x] Add required Drizzle schema fields/tables.
 - [ ] Add passkey-first UI flows.
-- [ ] Add admin route/API protection.
+- [x] Add admin route/API protection.
 - [ ] Add first-admin bootstrap path or documented seed command.
 
 ### Phase 4: Course Admin
 
 - [x] Add database schema for courses and lessons.
-- [ ] Course CRUD.
-- [ ] Lesson CRUD.
+- [x] Course CRUD.
+- [x] Lesson CRUD.
 - [ ] Lesson ordering.
 - [ ] Draft/published states.
 
@@ -394,17 +396,17 @@ Use route guards:
 ### Phase 6: Student Experience
 
 - [x] Add database schema for lesson progress.
-- Granted courses list.
-- Course detail page.
+- [x] Granted courses list.
+- [x] Course detail API.
 - Lesson viewer.
 - Progress tracking.
 
 ### Phase 7: Access Control
 
 - [x] Add database schema for manual course access.
-- Admin user search.
-- Grant/revoke access UI.
-- Server-side access checks across all relevant APIs.
+- [x] Admin user search API.
+- [x] Grant/revoke access API.
+- [x] Server-side access checks across initial course and lesson APIs.
 
 ### Phase 8: Playback Protection
 

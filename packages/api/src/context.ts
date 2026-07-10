@@ -1,4 +1,5 @@
 import { createAuth } from "@prive-course/auth";
+import { createDb } from "@prive-course/db";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {
@@ -11,6 +12,7 @@ export async function createContext({ context }: CreateContextOptions) {
   });
   return {
     auth: null,
+    db: createDb(),
     session,
   };
 }

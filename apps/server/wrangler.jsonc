@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prive-course-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "prive-course-database-mselvenis",
+      "database_id": "local-prive-course-database",
+      "migrations_dir": "../../packages/db/src/migrations",
+    },
+  ],
+}

@@ -103,6 +103,7 @@ Completed:
 - Signed Stream playback token API, playback session enforcement, heartbeat API, and protected lesson player UI added.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
+- Deployment notes added in `DEPLOYMENT.md`.
 
 Generated migrations:
 
@@ -465,7 +466,7 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Basic responsive layout for initial admin/student routes.
 - [ ] API tests for authorization boundaries.
 - [ ] Smoke test admin and student flows.
-- [ ] Deployment notes.
+- [x] Deployment notes.
 
 ## Credentials Needed Later
 

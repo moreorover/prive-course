@@ -10,6 +10,7 @@ export default function Header() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/courses", label: "Courses" },
     ...(session?.user.role === "admin" ? [{ to: "/admin", label: "Admin" }] : []),
   ] as const;
 

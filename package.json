@@ -16,6 +16,7 @@
     "format": "vp fmt",
     "staged": "vp staged",
     "hooks:setup": "vp config",
+    "admin:bootstrap:local": "vp run --filter server admin:bootstrap:local",
     "dev:web": "vp run --filter web dev",
     "dev:server": "vp run --filter server dev",
     "db:execute:local": "vp run --filter server db:execute:local",

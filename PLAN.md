@@ -377,7 +377,7 @@ Use route guards:
 - [x] Add required Drizzle schema fields/tables.
 - [ ] Add passkey-first UI flows.
 - [x] Add admin route/API protection.
-- [ ] Add first-admin bootstrap path or documented seed command.
+- [x] Add first-admin bootstrap path or documented seed command.
 
 ### Phase 4: Course Admin
 

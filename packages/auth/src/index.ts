@@ -1,8 +1,10 @@
 import { createDb } from "@prive-course/db";
 import * as schema from "@prive-course/db/schema/auth";
 import { env } from "@prive-course/env/server";
+import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin } from "better-auth/plugins";
 
 export function createAuth() {
   const db = createDb();
@@ -17,6 +19,12 @@ export function createAuth() {
     emailAndPassword: {
       enabled: true,
     },
+    plugins: [
+      admin(),
+      passkey({
+        rpName: "Prive Course",
+      }),
+    ],
     // uncomment cookieCache setting when ready to deploy to Cloudflare using *.workers.dev domains
     // session: {
     //   cookieCache: {

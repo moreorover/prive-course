@@ -398,7 +398,7 @@ Use route guards:
 - [x] Add database schema for lesson progress.
 - [x] Granted courses list.
 - [x] Course detail API.
-- Lesson viewer.
+- [x] Lesson viewer.
 - Progress tracking.
 
 ### Phase 7: Access Control

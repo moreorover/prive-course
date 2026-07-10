@@ -46,7 +46,14 @@ function CourseDetailRoute() {
                     {course.data.lessons.map((lesson) => (
                       <Table.Tr key={lesson.id}>
                         <Table.Td>{lesson.position + 1}</Table.Td>
-                        <Table.Td>{lesson.title}</Table.Td>
+                        <Table.Td>
+                          <Link
+                            to="/courses/$courseSlug/lessons/$lessonSlug"
+                            params={{ courseSlug, lessonSlug: lesson.slug }}
+                          >
+                            {lesson.title}
+                          </Link>
+                        </Table.Td>
                         <Table.Td>
                           {lesson.durationSeconds
                             ? `${Math.round(lesson.durationSeconds / 60)} min`

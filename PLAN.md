@@ -77,8 +77,9 @@ Completed:
 - Better Auth admin plugin added server-side and client-side.
 - Better Auth passkey plugin added server-side and client-side.
 - Better Auth schema updated for admin fields, session impersonation, and passkeys.
-- Passkey sign-in, post-sign-up passkey registration, and account-menu passkey registration UI added.
+- Passkey sign-in and post-sign-up passkey registration UI added.
 - Profile page added for name updates, password changes, passkey management, and session management.
+- Account menu profile navigation fixed and duplicate passkey action removed from the menu.
 - Mantine v9 packages installed and `MantineProvider` wired in the root route.
 - Course-domain Drizzle schema added.
 - Drizzle migrations generated.
@@ -94,6 +95,7 @@ Completed:
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
 - Cloudflare Stream direct upload URL API and admin upload control added.
+- Cloudflare Stream video status API and admin processing status UI added.
 - Lesson video UID persistence added.
 - Admin course access management screen added for user search, grant, and revoke.
 - Student granted-course list, course detail, and lesson viewer routes added.
@@ -120,7 +122,6 @@ All commands pass. The web build emits only the generated app's large chunk warn
 
 Main remaining v1 work:
 
-- Cloudflare Stream processing state UI.
 - Signed playback tokens, playback heartbeat, and active playback enforcement.
 - Authorization tests, smoke testing, and deployment notes.
 
@@ -424,7 +425,7 @@ Use route guards:
 - [x] Cloudflare Stream direct upload URL endpoint.
 - [x] Lesson video UID persistence.
 - [x] Basic upload UI.
-- [ ] Processing state UI.
+- [x] Processing state UI.
 
 TODO: The current Stream flow follows Cloudflare's direct creator upload docs for basic POST
 uploads, which are intended for files under 200 MB. Larger uploads should use tus later:

@@ -54,6 +54,25 @@ const streamDirectUploadResponseSchema = z.object({
   }),
 });
 
+const streamVideoDetailsResponseSchema = z.object({
+  success: z.boolean(),
+  errors: z.array(z.unknown()).default([]),
+  result: z.object({
+    uid: z.string().min(1),
+    duration: z.number().nullable().optional(),
+    readyToStream: z.boolean().optional(),
+    status: z
+      .object({
+        state: z.string().optional(),
+        pctComplete: z.string().nullable().optional(),
+        errorReasonCode: z.string().nullable().optional(),
+        errorReasonText: z.string().nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+  }),
+});
+
 async function getCourseOrThrow(db: ContextDb, courseId: string) {
   const rows = await db.select().from(course).where(eq(course.id, courseId)).limit(1);
   const foundCourse = rows[0];
@@ -269,6 +288,55 @@ export const adminRouter = router({
         .where(eq(lesson.id, input.lessonId));
 
       return payload.data.result;
+    }),
+
+  getLessonVideoStatus: adminProcedure
+    .input(z.object({ lessonId: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const foundLesson = await getLessonOrThrow(ctx.db, input.lessonId);
+
+      if (!foundLesson.videoUid) {
+        return {
+          configured: false,
+          videoUid: null,
+          readyToStream: false,
+          duration: null,
+          status: null,
+        };
+      }
+
+      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_API_TOKEN) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Cloudflare Stream credentials are not configured",
+        });
+      }
+
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/${foundLesson.videoUid}`,
+        {
+          headers: {
+            Authorization: `Bearer ${env.CLOUDFLARE_STREAM_API_TOKEN}`,
+          },
+        },
+      );
+      const body = await response.json();
+      const payload = streamVideoDetailsResponseSchema.safeParse(body);
+
+      if (!response.ok || !payload.success || !payload.data.success) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "Failed to load Cloudflare Stream video status",
+        });
+      }
+
+      return {
+        configured: true,
+        videoUid: payload.data.result.uid,
+        readyToStream: payload.data.result.readyToStream ?? false,
+        duration: payload.data.result.duration ?? null,
+        status: payload.data.result.status ?? null,
+      };
     }),
 
   searchUsers: adminProcedure

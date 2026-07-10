@@ -18,6 +18,7 @@
     "react-doctor:staged": "react-doctor --staged --no-telemetry -y",
     "staged": "vp staged",
     "test": "vp run -r test",
+    "smoke:checklist": "node -e \"console.log('Open SMOKE_TEST.md and run the checklist against vp run dev')\"",
     "hooks:setup": "vp config",
     "admin:bootstrap:local": "vp run --filter server admin:bootstrap:local",
     "dev:web": "vp run --filter web dev",

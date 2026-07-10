@@ -114,6 +114,7 @@ prive-course/
 - `pnpm run db:generate`: Generate database client/types
 - `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
 - `pnpm run test`: Run workspace tests
+- `pnpm run smoke:checklist`: Print the manual smoke-test checklist location
 - `pnpm run lint`: Run Vite+ lint checks
 - `pnpm run format`: Run Vite+ formatting
 - `pnpm run staged`: Run Vite+ checks against staged files

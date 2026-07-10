@@ -103,6 +103,7 @@ Completed:
 - Signed Stream playback token API, playback session enforcement, heartbeat API, and protected lesson player UI added.
 - Visible account watermark added to protected lesson playback.
 - API authorization tests added for protected routes, admin-only routes, manual course access, and playback session conflict enforcement.
+- Manual smoke test checklist added in `SMOKE_TEST.md`.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.

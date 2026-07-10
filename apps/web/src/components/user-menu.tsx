@@ -10,22 +10,8 @@ import {
 } from "@prive-course/ui/components/dropdown-menu";
 import { Skeleton } from "@prive-course/ui/components/skeleton";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
-
-async function addPasskey() {
-  const result = await authClient.passkey.addPasskey({
-    name: "Account passkey",
-  });
-
-  if (result.error) {
-    toast.error(result.error.message || result.error.statusText);
-    return;
-  }
-
-  toast.success("Passkey added");
-}
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -53,10 +39,13 @@ export default function UserMenu() {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link to="/profile">Profile</Link>
+          <DropdownMenuItem
+            onClick={() => {
+              navigate({ to: "/profile" });
+            }}
+          >
+            Profile
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={addPasskey}>Add passkey</DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
             onClick={() => {

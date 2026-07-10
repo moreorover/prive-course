@@ -93,6 +93,7 @@ Completed:
 - Admin lesson ordering added with up/down controls.
 - Cloudflare Stream direct upload URL API and admin upload control added.
 - Lesson video UID persistence added.
+- Admin course access management screen added for user search, grant, and revoke.
 - Student granted-course list, course detail, and lesson viewer routes added.
 - Student lesson progress save UI and API added.
 - React Doctor added as a project script and pre-commit check.
@@ -120,7 +121,6 @@ Main remaining v1 work:
 - Passkey-first account UI.
 - Cloudflare Stream processing state UI.
 - Signed playback tokens, playback heartbeat, and active playback enforcement.
-- Admin user access management screens.
 - Authorization tests, smoke testing, and deployment notes.
 
 ## Security Model
@@ -442,6 +442,7 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Admin user search API.
 - [x] Grant/revoke access API.
 - [x] Server-side access checks across initial course and lesson APIs.
+- [x] Admin course access management screen.
 
 ### Phase 8: Playback Protection
 

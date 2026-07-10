@@ -104,6 +104,12 @@ function EditCourseRoute() {
 
         {course.data ? (
           <>
+            <Group justify="flex-end">
+              <Link to="/admin/courses/$courseId/access" params={{ courseId }}>
+                <Button variant="light">Manage access</Button>
+              </Link>
+            </Group>
+
             <CourseForm
               title="Edit course"
               submitLabel="Save changes"

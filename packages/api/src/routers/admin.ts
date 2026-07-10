@@ -291,6 +291,28 @@ export const adminRouter = router({
         .limit(25);
     }),
 
+  listCourseAccess: adminProcedure
+    .input(z.object({ courseId: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      await getCourseOrThrow(ctx.db, input.courseId);
+
+      return ctx.db
+        .select({
+          id: courseAccess.id,
+          userId: courseAccess.userId,
+          courseId: courseAccess.courseId,
+          grantedAt: courseAccess.grantedAt,
+          userName: user.name,
+          userEmail: user.email,
+          userRole: user.role,
+          userBanned: user.banned,
+        })
+        .from(courseAccess)
+        .innerJoin(user, eq(user.id, courseAccess.userId))
+        .where(and(eq(courseAccess.courseId, input.courseId), isNull(courseAccess.revokedAt)))
+        .orderBy(asc(user.email));
+    }),
+
   grantCourseAccess: adminProcedure
     .input(
       z.object({

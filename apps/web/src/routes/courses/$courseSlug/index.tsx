@@ -9,7 +9,7 @@ function courseQueryOptions(courseSlug: string) {
   return trpc.courses.bySlug.queryOptions({ slug: courseSlug });
 }
 
-export const Route = createFileRoute("/_auth/courses/$courseSlug/")({
+export const Route = createFileRoute("/courses/$courseSlug/")({
   component: CourseDetailRoute,
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(courseQueryOptions(params.courseSlug));

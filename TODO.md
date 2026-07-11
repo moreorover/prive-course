@@ -29,7 +29,7 @@ reviewable steps; each checkbox should leave the app in a working state.
   - Scope: Return course summary fields for guests and include active access state when a session exists.
   - Acceptance: Draft and archived courses are excluded; guest responses do not require authentication; active access is computed server-side for signed-in users.
   - Validate: `vp run check` and `vp run test`.
-- [ ] Update `/courses` to show the public catalog.
+- [x] Update `/courses` to show the public catalog.
   - Scope: Replace the granted-only listing with all published courses and clear access state labels.
   - Acceptance: Guests can see every published course; signed-in users can also tell which courses they already have access to.
   - Validate: `vp run check`, `vp run test`, and React Doctor.

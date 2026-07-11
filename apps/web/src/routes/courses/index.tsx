@@ -5,31 +5,31 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
-const grantedCoursesQueryOptions = trpc.courses.listGranted.queryOptions();
+const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
 
-export const Route = createFileRoute("/_auth/courses/")({
+export const Route = createFileRoute("/courses/")({
   component: CoursesRoute,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(grantedCoursesQueryOptions);
+    await context.queryClient.ensureQueryData(publishedCoursesQueryOptions);
   },
 });
 
 function CoursesRoute() {
-  const courses = useQuery(grantedCoursesQueryOptions);
+  const courses = useQuery(publishedCoursesQueryOptions);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
       <Stack gap="lg">
         <div>
           <Title order={1}>Courses</Title>
-          <Text c="dimmed">Courses you have access to.</Text>
+          <Text c="dimmed">Explore all published courses.</Text>
         </div>
 
         {courses.data?.length === 0 ? (
           <Paper withBorder radius="sm">
             <EmptyState
-              title="No courses yet"
-              description="This account does not have access to any courses. Ask an admin to grant access to a course."
+              title="No published courses"
+              description="Courses will appear here after an admin publishes them."
             />
           </Paper>
         ) : null}
@@ -42,13 +42,15 @@ function CoursesRoute() {
                   <Title order={2} size="h4">
                     {course.title}
                   </Title>
-                  <Badge variant="light">{course.status}</Badge>
+                  <Badge color={course.hasActiveAccess ? "teal" : "gray"} variant="light">
+                    {course.hasActiveAccess ? "Access granted" : "Account access required"}
+                  </Badge>
                 </Group>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>
                 <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button>Open course</Button>
+                  <Button>{course.hasActiveAccess ? "Open course" : "View course"}</Button>
                 </Link>
               </Stack>
             </Paper>

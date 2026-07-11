@@ -106,6 +106,14 @@ function getCloudflareErrorMessage(body: unknown, fallback: string) {
   return details.length ? `${fallback}: ${details.join("; ")}` : fallback;
 }
 
+function getStreamAllowedOrigins() {
+  try {
+    return [new URL(env.CORS_ORIGIN).host];
+  } catch {
+    return undefined;
+  }
+}
+
 async function getCourseOrThrow(db: ContextDb, courseId: string) {
   const rows = await db.select().from(course).where(eq(course.id, courseId)).limit(1);
   const foundCourse = rows[0];
@@ -299,6 +307,8 @@ export const adminRouter = router({
           },
           body: JSON.stringify({
             maxDurationSeconds: input.maxDurationSeconds,
+            requireSignedURLs: true,
+            allowedOrigins: getStreamAllowedOrigins(),
           }),
         },
       );

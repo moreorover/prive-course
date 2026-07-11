@@ -59,24 +59,42 @@ function formatProgress(seconds: number) {
   return minutes > 0 ? `${minutes}m ${remainingSeconds}s` : `${remainingSeconds}s`;
 }
 
+function getResumeSeconds(progressSeconds: number, durationSeconds?: number | null) {
+  if (progressSeconds <= 0) {
+    return 0;
+  }
+
+  if (durationSeconds && progressSeconds >= durationSeconds) {
+    return 0;
+  }
+
+  return progressSeconds;
+}
+
 export function LessonPlayer({
   lessonId,
   videoUid,
+  durationSeconds,
   initialProgressSeconds = 0,
   isCompleted = false,
   onProgressSaved,
 }: {
   lessonId: string;
   videoUid: string | null;
+  durationSeconds?: number | null;
   initialProgressSeconds?: number;
   isCompleted?: boolean;
   onProgressSaved?: () => Promise<unknown> | unknown;
 }) {
   const streamRef = useRef<StreamPlayerApi | undefined>(undefined);
   const [initialLocalProgress] = useState(() => readLocalProgress(lessonId));
-  const initialEffectiveProgressSeconds = Math.max(
+  const initialStoredProgressSeconds = Math.max(
     initialProgressSeconds,
     initialLocalProgress?.progressSeconds ?? 0,
+  );
+  const initialEffectiveProgressSeconds = getResumeSeconds(
+    initialStoredProgressSeconds,
+    durationSeconds,
   );
   const initialEffectiveCompleted = isCompleted || Boolean(initialLocalProgress?.completed);
   const progressRef = useRef<LocalLessonProgress>({
@@ -127,10 +145,11 @@ export function LessonPlayer({
 
   useEffect(() => {
     const localProgress = readLocalProgress(lessonId);
-    const nextProgressSeconds = Math.max(
+    const nextStoredProgressSeconds = Math.max(
       initialProgressSeconds,
       localProgress?.progressSeconds ?? 0,
     );
+    const nextProgressSeconds = getResumeSeconds(nextStoredProgressSeconds, durationSeconds);
     const nextCompleted = isCompleted || Boolean(localProgress?.completed);
 
     initialProgressSecondsRef.current = initialProgressSeconds;
@@ -142,7 +161,7 @@ export function LessonPlayer({
     };
     lastLocalProgressSecondsRef.current = nextProgressSeconds;
     refreshProgressDisplay();
-  }, [initialProgressSeconds, isCompleted, lessonId]);
+  }, [durationSeconds, initialProgressSeconds, isCompleted, lessonId]);
 
   useEffect(() => {
     if (!playbackSessionId) {
@@ -258,7 +277,7 @@ export function LessonPlayer({
               streamRef={streamRef}
               title="Lesson video"
               src={playbackToken.data.token}
-              startTime={completed ? 0 : savedSeconds}
+              startTime={completed ? 0 : getResumeSeconds(savedSeconds, durationSeconds)}
               onTimeUpdate={() => saveLocalProgress()}
               onPause={() => saveLocalProgress({ force: true })}
               onEnded={() => {

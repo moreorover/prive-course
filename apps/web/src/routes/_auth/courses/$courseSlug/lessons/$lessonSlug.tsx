@@ -46,6 +46,7 @@ function LessonRoute() {
               key={lesson.data.lesson.id}
               lessonId={lesson.data.lesson.id}
               videoUid={lesson.data.lesson.videoUid}
+              durationSeconds={lesson.data.lesson.durationSeconds}
               initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
               isCompleted={Boolean(lesson.data.progress?.completedAt)}
               onProgressSaved={() =>

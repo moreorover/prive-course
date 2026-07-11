@@ -2,6 +2,7 @@ import { Button, Menu, Skeleton, Text } from "@mantine/core";
 import { Link, useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
+import { queryClient, trpc } from "@/utils/trpc";
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -37,7 +38,13 @@ export default function UserMenu() {
           onClick={() => {
             authClient.signOut({
               fetchOptions: {
-                onSuccess: () => {
+                onSuccess: async () => {
+                  await queryClient.invalidateQueries({
+                    queryKey: trpc.courses.listPublished.queryKey(),
+                  });
+                  await queryClient.invalidateQueries({
+                    queryKey: trpc.courses.listGranted.queryKey(),
+                  });
                   navigate({
                     to: "/",
                   });

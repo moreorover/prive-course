@@ -41,6 +41,9 @@ Admin APIs must use server-side admin authorization. Frontend route visibility i
 
 ## Public Catalog And Student Flow
 
+This is the target v1 access model. Implementation is sequenced through the
+public catalog, free lesson access, and course detail phases in `TODO.md`.
+
 Public visitors and students can:
 
 1. Open `/courses`.

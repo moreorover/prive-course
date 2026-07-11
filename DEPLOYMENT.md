@@ -9,6 +9,23 @@ The app deploys to Cloudflare through Alchemy:
 - Database: Cloudflare D1 binding named `DB`
 - Video: Cloudflare Stream
 
+## Production URLs
+
+Current Cloudflare Workers URLs:
+
+```txt
+Web:    https://prive-course-web-mselvenis.mselvenis.workers.dev
+Server: https://prive-course-server-mselvenis.mselvenis.workers.dev
+```
+
+Verified after deploy:
+
+```txt
+GET / -> OK
+GET /trpc/healthCheck -> OK
+CORS origin -> https://prive-course-web-mselvenis.mselvenis.workers.dev
+```
+
 ## Required Environment
 
 Set these before running Cloudflare dev or deploy commands:
@@ -68,7 +85,7 @@ Alchemy is configured with:
 migrationsDir: "../../packages/db/src/migrations";
 ```
 
-Remote migration flow still needs to be confirmed against the real Cloudflare account before production launch.
+Remote migrations have been applied to the Cloudflare D1 database bound as `DB`.
 
 ## Deploy
 
@@ -77,6 +94,14 @@ Run:
 ```sh
 vp run deploy
 ```
+
+The first deploy after manually creating D1 may need adoption:
+
+```sh
+vp exec alchemy deploy --adopt
+```
+
+Use production deploy values in `packages/infra/.env` so deployed auth and CORS do not inherit local `apps/server/.env` URLs.
 
 Destroy non-production resources only when intentionally tearing down the stack:
 

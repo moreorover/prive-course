@@ -108,6 +108,7 @@ Completed:
 - Remote Cloudflare D1 database created and bound in `apps/server/wrangler.jsonc`.
 - Remote D1 migration workflow confirmed with Wrangler; expected auth, course, progress, passkey, and playback tables exist remotely.
 - Local service health checks confirmed: API `/` returns `OK` and the web app serves `http://localhost:3001`.
+- Web and server apps deployed to Cloudflare Workers with production CORS/auth URLs and verified health checks.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.

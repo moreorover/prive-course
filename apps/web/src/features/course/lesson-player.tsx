@@ -241,22 +241,6 @@ export function LessonPlayer({
     });
   }, [saveLocalProgress]);
 
-  const resetLocalReplayProgress = useCallback(() => {
-    if (!progressRef.current.completed) {
-      return;
-    }
-
-    progressRef.current = {
-      completed: false,
-      progressSeconds: 0,
-      serverCompleted: progressRef.current.serverCompleted || progressRef.current.completed,
-      updatedAt: Date.now(),
-    };
-    lastLocalProgressSecondsRef.current = 0;
-    writeLocalProgress(lessonId, progressRef.current);
-    refreshProgressDisplay();
-  }, [lessonId]);
-
   useEffect(() => {
     const flushOnPageHide = () => flushProgress();
     const flushOnVisibilityHidden = () => {
@@ -295,9 +279,8 @@ export function LessonPlayer({
               streamRef={streamRef}
               title="Lesson video"
               src={playbackToken.data.token}
-              startTime={completed ? 0 : getResumeSeconds(savedSeconds, durationSeconds)}
+              startTime={getResumeSeconds(savedSeconds, durationSeconds)}
               onTimeUpdate={() => saveLocalProgress()}
-              onPlay={resetLocalReplayProgress}
               onPause={() => saveLocalProgress({ force: true })}
               onEnded={() => {
                 saveLocalProgress({ completed: true, force: true });

@@ -35,6 +35,7 @@ export const server = await Worker("server", {
 export const web = await Vite("web", {
   cwd: "../../apps/web",
   assets: "dist",
+  spa: true,
   bindings: {
     VITE_SERVER_URL: server.url!,
   },

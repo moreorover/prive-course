@@ -2,6 +2,34 @@
 
 Run this after local D1 migrations are applied and the app is running.
 
+## Automated Smoke
+
+Local:
+
+```sh
+vp run db:migrate:local
+vp run dev
+vp run smoke
+```
+
+Production:
+
+```sh
+vp run smoke:production
+```
+
+The automated smoke script verifies:
+
+- server health endpoint
+- web app shell
+- built static asset loading
+- client-route fallback
+- CORS from web to server
+- protected course API rejects anonymous access
+
+The authenticated admin/student flows below still need manual browser coverage because they rely on
+real account state, passkeys, Cloudflare Stream, and multiple playback sessions.
+
 ## Setup
 
 Start the app:
@@ -64,5 +92,6 @@ vp run admin:bootstrap:local admin@example.com
 
 ## Current Limitations
 
-- Remote D1 migration flow still needs to be verified against the real Cloudflare account.
 - Stream uploads over 200 MB should use tus later.
+- Fully automated browser smoke is deferred until there is a test-auth path or seeded test users that
+  do not require passkey prompts.

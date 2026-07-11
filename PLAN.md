@@ -119,6 +119,8 @@ Completed:
 - Replay progress reset on player `onPlay` removed so playback continues from the saved local position.
 - Server-side lesson progress updates preserve completed lessons and only move stored progress forward.
 - Upload error states, direct upload progress, large-file warnings, empty states, and playback retry edge cases polished.
+- Automated smoke script added for server health, web shell/assets, SPA fallback, CORS, and anonymous protected-API rejection.
+- Cloudflare web deployment configured for single-page app fallback on direct client-route loads.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.
@@ -142,7 +144,7 @@ All commands pass. The web build emits only the generated app's large chunk warn
 
 Main remaining v1 work:
 
-- Smoke test admin and student flows end to end against the deployed app.
+- Smoke test authenticated admin and student flows end to end against the deployed app.
 
 ## Security Model
 
@@ -491,7 +493,8 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Loading, error, and empty states for initial admin/student routes.
 - [x] Basic responsive layout for initial admin/student routes.
 - [x] API tests for authorization boundaries.
-- [ ] Smoke test admin and student flows.
+- [x] Automated smoke script for public deploy/local health checks.
+- [ ] Manual smoke test authenticated admin and student flows.
 - [x] Tighten final UX polish around upload errors, empty states, and playback edge cases.
 - [x] Deployment notes.
 

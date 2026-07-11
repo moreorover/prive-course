@@ -154,9 +154,6 @@ export function LessonPlayer({
           <div className="relative aspect-video overflow-hidden bg-black">
             <Stream
               controls
-              responsive={false}
-              width="100%"
-              height="100%"
               streamRef={streamRef}
               title="Lesson video"
               src={playbackToken.data.token}

@@ -34,6 +34,7 @@ export const server = await Worker("server", {
 
 export const web = await Vite("web", {
   cwd: "../../apps/web",
+  entrypoint: "src/worker.ts",
   assets: "dist",
   spa: true,
   bindings: {

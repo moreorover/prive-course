@@ -7,7 +7,8 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **TypeScript** - For type safety and improved developer experience
 - **TanStack Router** - File-based routing with full type safety
 - **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
+- **Mantine v9** - Primary application UI components
+- **Shared UI package** - Starter primitives, global styles, and the Sonner wrapper live in `packages/ui`
 - **Hono** - Lightweight, performant server framework
 - **tRPC** - End-to-end type-safe APIs
 - **workers** - Runtime environment
@@ -47,31 +48,21 @@ pnpm run dev
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
 The API is running at [http://localhost:3000](http://localhost:3000).
 
-## UI Customization
+## UI Conventions
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+React web apps in this project use Mantine v9 as the primary UI system.
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+- Prefer Mantine components for new app UI.
+- Change global styles in `packages/ui/src/styles/globals.css`.
+- Keep reusable app components in `apps/web/src/components`.
+- Keep domain-specific UI in `apps/web/src/features`.
+- `packages/ui` still contains starter primitives used by auth/menu/toast surfaces.
 
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
+Import shared package utilities or starter primitives like this:
 
 ```tsx
 import { Button } from "@prive-course/ui/components/button";
 ```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
 
 ## Deployment
 
@@ -98,7 +89,7 @@ prive-course/
 │   ├── web/         # Frontend application (React + TanStack Router)
 │   └── server/      # Backend API (Hono, TRPC)
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
+│   ├── ui/          # Shared starter primitives and global styles
 │   ├── api/         # API layer / business logic
 │   ├── auth/        # Authentication configuration & logic
 │   └── db/          # Database schema & queries

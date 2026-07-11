@@ -25,7 +25,7 @@ Payment flows are intentionally out of scope for v1.
 - `packages/db`: Drizzle schema, database factory, and generated migrations.
 - `packages/env`: shared environment typing and validation entrypoints.
 - `packages/infra`: Alchemy deployment definitions for web, server, D1, and migrations.
-- `packages/ui`: shared shadcn/ui primitives and global styles from the starter stack.
+- `packages/ui`: starter primitives, the Sonner wrapper, and global styles used by the web app; prefer Mantine v9 for new app UI.
 
 ## Frontend Rules
 

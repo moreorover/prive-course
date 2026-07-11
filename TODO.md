@@ -17,7 +17,7 @@ reviewable steps; each checkbox should leave the app in a working state.
 
 ## Phase 1: Public Course Catalog
 
-- [ ] Document the updated catalog access model.
+- [x] Document the updated catalog access model.
   - Scope: Update `PRODUCT_FLOWS.md` so published courses are discoverable by guests, free lessons are viewable by guests, and paid lessons require an account with active course access.
   - Acceptance: The docs clearly distinguish guest-visible catalog/free content from account-required paid lesson access.
   - Validate: `vp run check`.

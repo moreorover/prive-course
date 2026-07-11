@@ -21,11 +21,11 @@ reviewable steps; each checkbox should leave the app in a working state.
   - Scope: Update `PRODUCT_FLOWS.md` so published courses are discoverable by guests, free lessons are viewable by guests, and paid lessons require an account with active course access.
   - Acceptance: The docs clearly distinguish guest-visible catalog/free content from account-required paid lesson access.
   - Validate: `vp run check`.
-- [ ] Add API coverage for published courses visible to guests.
+- [x] Add API coverage for published courses visible to guests.
   - Scope: Add or adjust course API tests before changing implementation.
   - Acceptance: Tests cover guest catalog access, published courses, unpublished courses, granted access state, and revoked access state.
   - Validate: `vp run test`.
-- [ ] Add a course catalog API that returns all published courses.
+- [x] Add a course catalog API that returns all published courses.
   - Scope: Return course summary fields for guests and include active access state when a session exists.
   - Acceptance: Draft and archived courses are excluded; guest responses do not require authentication; active access is computed server-side for signed-in users.
   - Validate: `vp run check` and `vp run test`.

@@ -105,6 +105,7 @@ Completed:
 - API authorization tests added for protected routes, admin-only routes, manual course access, and playback session conflict enforcement.
 - Manual smoke test checklist added in `SMOKE_TEST.md`.
 - Local D1 migration workflow confirmed with Wrangler; expected auth, course, progress, passkey, and playback tables exist locally.
+- Remote Cloudflare D1 database created and bound in `apps/server/wrangler.jsonc`.
 - Local service health checks confirmed: API `/` returns `OK` and the web app serves `http://localhost:3001`.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
@@ -398,7 +399,7 @@ Use route guards:
 - [x] Scaffold Cloudflare D1 setup.
 - [x] Add Drizzle migrations for auth/admin/passkey schema.
 - [x] Add Drizzle migrations for course-domain schema.
-- [ ] Create/bind real Cloudflare D1 resource.
+- [x] Create/bind real Cloudflare D1 resource.
 - [x] Confirm local D1 migration workflow.
 - [ ] Confirm remote D1 migration workflow.
 

@@ -109,6 +109,16 @@ Completed:
 - Remote D1 migration workflow confirmed with Wrangler; expected auth, course, progress, passkey, and playback tables exist remotely.
 - Local service health checks confirmed: API `/` returns `OK` and the web app serves `http://localhost:3001`.
 - Web and server apps deployed to Cloudflare Workers with production CORS/auth URLs and verified health checks.
+- Cloudflare Stream production credentials configured for deployed server runtime.
+- Cloudflare Stream upload creation hardened to require signed URLs and restrict playback origins.
+- Existing uploaded Stream video settings backfilled to require signed URLs and the deployed web origin.
+- Lesson playback switched to `@cloudflare/stream-react`.
+- Lesson progress tracking automated from player events.
+- Lesson progress writes buffered locally and flushed to the API on page leave/unmount to reduce database writes.
+- Lesson playback resumes from locally saved progress when progress is between the beginning and the end of the video.
+- Replay progress reset on player `onPlay` removed so playback continues from the saved local position.
+- Server-side lesson progress updates preserve completed lessons and only move stored progress forward.
+- Upload error states, direct upload progress, large-file warnings, empty states, and playback retry edge cases polished.
 - React Doctor added as a project script and pre-commit check.
 - Full React Doctor scan currently reports 0 issues.
 - Deployment notes added in `DEPLOYMENT.md`.
@@ -132,8 +142,7 @@ All commands pass. The web build emits only the generated app's large chunk warn
 
 Main remaining v1 work:
 
-- Signed playback tokens, playback heartbeat, and active playback enforcement.
-- Authorization tests, smoke testing, and deployment notes.
+- Smoke test admin and student flows end to end against the deployed app.
 
 ## Security Model
 
@@ -434,6 +443,9 @@ Use route guards:
 ### Phase 5: Stream Upload
 
 - [x] Cloudflare Stream direct upload URL endpoint.
+- [x] Direct upload URL requests configured for signed playback URLs.
+- [x] Direct upload URL requests restricted to the deployed web origin.
+- [x] Existing uploaded Stream video settings backfilled.
 - [x] Lesson video UID persistence.
 - [x] Basic upload UI.
 - [x] Processing state UI.
@@ -449,6 +461,10 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Course detail page.
 - [x] Lesson viewer.
 - [x] Progress tracking.
+- [x] Automatic player-event progress tracking.
+- [x] Local progress buffering with API flush on page leave/unmount.
+- [x] Resume playback from locally saved progress.
+- [x] Replay flow keeps saved local progress instead of resetting on play.
 
 ### Phase 7: Access Control
 
@@ -465,6 +481,7 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Active playback session enforcement.
 - [x] Heartbeat endpoint.
 - [x] Optional watermark.
+- [x] Cloudflare Stream React player integration.
 
 ### Phase 9: Verification And Polish
 
@@ -475,6 +492,7 @@ https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads
 - [x] Basic responsive layout for initial admin/student routes.
 - [x] API tests for authorization boundaries.
 - [ ] Smoke test admin and student flows.
+- [x] Tighten final UX polish around upload errors, empty states, and playback edge cases.
 - [x] Deployment notes.
 
 ## Credentials Needed Later

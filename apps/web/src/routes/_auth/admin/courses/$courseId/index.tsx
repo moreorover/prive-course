@@ -16,6 +16,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
+import { EmptyState } from "@/components/empty-state";
 import { queryClient, trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseId: string) {
@@ -137,76 +138,81 @@ function EditCourseRoute() {
                   </Link>
                 </Group>
 
-                <Table striped highlightOnHover>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>#</Table.Th>
-                      <Table.Th>Order</Table.Th>
-                      <Table.Th>Title</Table.Th>
-                      <Table.Th>Slug</Table.Th>
-                      <Table.Th>Status</Table.Th>
-                      <Table.Th />
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {lessons.data?.map((lesson, index) => (
-                      <Table.Tr key={lesson.id}>
-                        <Table.Td>{lesson.position + 1}</Table.Td>
-                        <Table.Td>
-                          <Group gap="xs" wrap="nowrap">
-                            <Tooltip label="Move up">
-                              <ActionIcon
-                                aria-label="Move lesson up"
-                                size="sm"
-                                variant="subtle"
-                                disabled={index === 0 || reorderLessons.isPending}
-                                onClick={() => moveLesson(index, -1)}
-                              >
-                                <ArrowUp size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label="Move down">
-                              <ActionIcon
-                                aria-label="Move lesson down"
-                                size="sm"
-                                variant="subtle"
-                                disabled={
-                                  index === (lessons.data?.length ?? 0) - 1 ||
-                                  reorderLessons.isPending
-                                }
-                                onClick={() => moveLesson(index, 1)}
-                              >
-                                <ArrowDown size={16} />
-                              </ActionIcon>
-                            </Tooltip>
-                          </Group>
-                        </Table.Td>
-                        <Table.Td>{lesson.title}</Table.Td>
-                        <Table.Td>{lesson.slug}</Table.Td>
-                        <Table.Td>
-                          <Badge variant="light">{lesson.status}</Badge>
-                        </Table.Td>
-                        <Table.Td>
-                          <Link
-                            to="/admin/courses/$courseId/lessons/$lessonId"
-                            params={{ courseId, lessonId: lesson.id }}
-                          >
-                            <Button size="xs" variant="light">
-                              Edit
-                            </Button>
-                          </Link>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                    {lessons.data?.length === 0 ? (
+                {lessons.data?.length === 0 ? (
+                  <EmptyState
+                    title="No lessons yet"
+                    description="Add the first lesson, upload a video, then publish it when it is ready."
+                    action={
+                      <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
+                        <Button>Create lesson</Button>
+                      </Link>
+                    }
+                  />
+                ) : (
+                  <Table striped highlightOnHover>
+                    <Table.Thead>
                       <Table.Tr>
-                        <Table.Td colSpan={6}>
-                          <Text c="dimmed">No lessons yet.</Text>
-                        </Table.Td>
+                        <Table.Th>#</Table.Th>
+                        <Table.Th>Order</Table.Th>
+                        <Table.Th>Title</Table.Th>
+                        <Table.Th>Slug</Table.Th>
+                        <Table.Th>Status</Table.Th>
+                        <Table.Th />
                       </Table.Tr>
-                    ) : null}
-                  </Table.Tbody>
-                </Table>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {lessons.data?.map((lesson, index) => (
+                        <Table.Tr key={lesson.id}>
+                          <Table.Td>{lesson.position + 1}</Table.Td>
+                          <Table.Td>
+                            <Group gap="xs" wrap="nowrap">
+                              <Tooltip label="Move up">
+                                <ActionIcon
+                                  aria-label="Move lesson up"
+                                  size="sm"
+                                  variant="subtle"
+                                  disabled={index === 0 || reorderLessons.isPending}
+                                  onClick={() => moveLesson(index, -1)}
+                                >
+                                  <ArrowUp size={16} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label="Move down">
+                                <ActionIcon
+                                  aria-label="Move lesson down"
+                                  size="sm"
+                                  variant="subtle"
+                                  disabled={
+                                    index === (lessons.data?.length ?? 0) - 1 ||
+                                    reorderLessons.isPending
+                                  }
+                                  onClick={() => moveLesson(index, 1)}
+                                >
+                                  <ArrowDown size={16} />
+                                </ActionIcon>
+                              </Tooltip>
+                            </Group>
+                          </Table.Td>
+                          <Table.Td>{lesson.title}</Table.Td>
+                          <Table.Td>{lesson.slug}</Table.Td>
+                          <Table.Td>
+                            <Badge variant="light">{lesson.status}</Badge>
+                          </Table.Td>
+                          <Table.Td>
+                            <Link
+                              to="/admin/courses/$courseId/lessons/$lessonId"
+                              params={{ courseId, lessonId: lesson.id }}
+                            >
+                              <Button size="xs" variant="light">
+                                Edit
+                              </Button>
+                            </Link>
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                )}
               </Stack>
             </Paper>
           </>

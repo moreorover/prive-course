@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, Stack, Table, Text, Title } from "@mantine
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 const coursesQueryOptions = trpc.admin.listCourses.queryOptions();
@@ -34,41 +35,46 @@ function AdminCourses() {
             <Title order={2} size="h4">
               Courses
             </Title>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Title</Table.Th>
-                  <Table.Th>Slug</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {courses.data?.map((course) => (
-                  <Table.Tr key={course.id}>
-                    <Table.Td>{course.title}</Table.Td>
-                    <Table.Td>{course.slug}</Table.Td>
-                    <Table.Td>
-                      <Badge variant="light">{course.status}</Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Link to="/admin/courses/$courseId" params={{ courseId: course.id }}>
-                        <Button variant="subtle" size="xs">
-                          Edit
-                        </Button>
-                      </Link>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-                {courses.data?.length === 0 ? (
+            {courses.data?.length === 0 ? (
+              <EmptyState
+                title="No courses yet"
+                description="Create the first course, then add lessons and grant users access."
+                action={
+                  <Link to="/admin/courses/new">
+                    <Button>Create course</Button>
+                  </Link>
+                }
+              />
+            ) : (
+              <Table striped highlightOnHover>
+                <Table.Thead>
                   <Table.Tr>
-                    <Table.Td colSpan={4}>
-                      <Text c="dimmed">No courses yet.</Text>
-                    </Table.Td>
+                    <Table.Th>Title</Table.Th>
+                    <Table.Th>Slug</Table.Th>
+                    <Table.Th>Status</Table.Th>
+                    <Table.Th />
                   </Table.Tr>
-                ) : null}
-              </Table.Tbody>
-            </Table>
+                </Table.Thead>
+                <Table.Tbody>
+                  {courses.data?.map((course) => (
+                    <Table.Tr key={course.id}>
+                      <Table.Td>{course.title}</Table.Td>
+                      <Table.Td>{course.slug}</Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{course.status}</Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Link to="/admin/courses/$courseId" params={{ courseId: course.id }}>
+                          <Button variant="subtle" size="xs">
+                            Edit
+                          </Button>
+                        </Link>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            )}
           </Stack>
         </Paper>
       </Stack>

@@ -1,5 +1,5 @@
 import { Stream, type StreamPlayerApi } from "@cloudflare/stream-react";
-import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { Alert, Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -109,8 +109,9 @@ export function LessonPlayer({
   const lastLocalProgressSecondsRef = useRef(initialEffectiveProgressSeconds);
   const lessonIdRef = useRef(lessonId);
   const [, refreshProgressDisplay] = useReducer((value: number) => value + 1, 0);
+  const [playerError, setPlayerError] = useState<string | null>(null);
   const savedSeconds = progressRef.current.progressSeconds;
-  const completed = progressRef.current.completed;
+  const completed = progressRef.current.completed || progressRef.current.serverCompleted;
   const playbackToken = useMutation(
     trpc.courses.createPlaybackToken.mutationOptions({
       onError: (error) => {
@@ -122,13 +123,23 @@ export function LessonPlayer({
   const updateProgress = useMutation(
     trpc.courses.updateProgress.mutationOptions({
       onSuccess: async (progress) => {
+        const currentProgress = progressRef.current;
+        const serverCompleted = Boolean(progress.completedAt) || currentProgress.serverCompleted;
+        const keepLocalReplayProgress =
+          serverCompleted &&
+          currentProgress.progressSeconds > 0 &&
+          currentProgress.progressSeconds < progress.progressSeconds;
+
         progressRef.current = {
-          completed: Boolean(progress.completedAt) || progressRef.current.completed,
-          progressSeconds: progress.progressSeconds,
-          serverCompleted: Boolean(progress.completedAt) || progressRef.current.serverCompleted,
+          completed: Boolean(progress.completedAt) || currentProgress.completed,
+          progressSeconds: keepLocalReplayProgress
+            ? currentProgress.progressSeconds
+            : progress.progressSeconds,
+          serverCompleted,
           updatedAt: Date.now(),
         };
-        lastLocalProgressSecondsRef.current = progress.progressSeconds;
+        lastLocalProgressSecondsRef.current = progressRef.current.progressSeconds;
+        writeLocalProgress(lessonIdRef.current, progressRef.current);
         refreshProgressDisplay();
 
         await onProgressSaved?.();
@@ -199,7 +210,7 @@ export function LessonPlayer({
         ? Math.max(currentSeconds, durationSeconds)
         : currentSeconds;
 
-      if (!nextCompleted && progressSeconds === 0) {
+      if (!force && !nextCompleted && progressSeconds === 0) {
         return;
       }
 
@@ -280,6 +291,12 @@ export function LessonPlayer({
               title="Lesson video"
               src={playbackToken.data.token}
               startTime={getResumeSeconds(savedSeconds, durationSeconds)}
+              onCanPlay={() => setPlayerError(null)}
+              onError={() => {
+                setPlayerError(
+                  "The video could not be loaded. The signed token may have expired or the video may still be processing.",
+                );
+              }}
               onTimeUpdate={() => saveLocalProgress()}
               onPause={() => saveLocalProgress({ force: true })}
               onEnded={() => {
@@ -300,6 +317,26 @@ export function LessonPlayer({
             <Text c="dimmed">Saved at {formatProgress(savedSeconds)}</Text>
             {completed ? <Badge color="green">Complete</Badge> : null}
           </Group>
+          {playerError ? (
+            <Alert color="red" title="Playback failed">
+              <Stack gap="sm">
+                <Text>{playerError}</Text>
+                <Group>
+                  <Button
+                    variant="light"
+                    loading={playbackToken.isPending}
+                    onClick={() => {
+                      setPlayerError(null);
+                      playbackToken.reset();
+                      playbackToken.mutate({ lessonId });
+                    }}
+                  >
+                    Request new token
+                  </Button>
+                </Group>
+              </Stack>
+            </Alert>
+          ) : null}
         </Stack>
       </Paper>
     );

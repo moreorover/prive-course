@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, SimpleGrid, Stack, Text, Title } from "@ma
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 const grantedCoursesQueryOptions = trpc.courses.listGranted.queryOptions();
@@ -25,8 +26,11 @@ function CoursesRoute() {
         </div>
 
         {courses.data?.length === 0 ? (
-          <Paper withBorder p="lg" radius="sm">
-            <Text c="dimmed">No courses have been granted to this account yet.</Text>
+          <Paper withBorder radius="sm">
+            <EmptyState
+              title="No courses yet"
+              description="This account does not have access to any courses. Ask an admin to grant access to a course."
+            />
           </Paper>
         ) : null}
 

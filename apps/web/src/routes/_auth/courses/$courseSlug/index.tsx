@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, Stack, Table, Text, Title } from "@mantine
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
+import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseSlug: string) {
@@ -41,42 +42,42 @@ function CourseDetailRoute() {
                 <Title order={2} size="h4">
                   Lessons
                 </Title>
-                <Table striped highlightOnHover>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>#</Table.Th>
-                      <Table.Th>Title</Table.Th>
-                      <Table.Th>Duration</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {course.data.lessons.map((lesson) => (
-                      <Table.Tr key={lesson.id}>
-                        <Table.Td>{lesson.position + 1}</Table.Td>
-                        <Table.Td>
-                          <Link
-                            to="/courses/$courseSlug/lessons/$lessonSlug"
-                            params={{ courseSlug, lessonSlug: lesson.slug }}
-                          >
-                            {lesson.title}
-                          </Link>
-                        </Table.Td>
-                        <Table.Td>
-                          {lesson.durationSeconds
-                            ? `${Math.round(lesson.durationSeconds / 60)} min`
-                            : "Pending"}
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                    {course.data.lessons.length === 0 ? (
+                {course.data.lessons.length === 0 ? (
+                  <EmptyState
+                    title="No published lessons"
+                    description="Lessons will appear here after an admin publishes them."
+                  />
+                ) : (
+                  <Table striped highlightOnHover>
+                    <Table.Thead>
                       <Table.Tr>
-                        <Table.Td colSpan={3}>
-                          <Text c="dimmed">No published lessons yet.</Text>
-                        </Table.Td>
+                        <Table.Th>#</Table.Th>
+                        <Table.Th>Title</Table.Th>
+                        <Table.Th>Duration</Table.Th>
                       </Table.Tr>
-                    ) : null}
-                  </Table.Tbody>
-                </Table>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {course.data.lessons.map((lesson) => (
+                        <Table.Tr key={lesson.id}>
+                          <Table.Td>{lesson.position + 1}</Table.Td>
+                          <Table.Td>
+                            <Link
+                              to="/courses/$courseSlug/lessons/$lessonSlug"
+                              params={{ courseSlug, lessonSlug: lesson.slug }}
+                            >
+                              {lesson.title}
+                            </Link>
+                          </Table.Td>
+                          <Table.Td>
+                            {lesson.durationSeconds
+                              ? `${Math.round(lesson.durationSeconds / 60)} min`
+                              : "Pending"}
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                )}
               </Stack>
             </Paper>
           </>

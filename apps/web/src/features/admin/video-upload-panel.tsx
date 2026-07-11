@@ -1,9 +1,22 @@
-import { Badge, Button, FileInput, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  Alert,
+  Badge,
+  Button,
+  FileInput,
+  Group,
+  Paper,
+  Progress,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { queryClient, trpc } from "@/utils/trpc";
+
+const directUploadRecommendedMaxBytes = 200 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
   if (readyToStream || state === "ready") {
@@ -36,6 +49,69 @@ function getStatusLabel(state: string | undefined, readyToStream: boolean) {
     .replace(/\b\w/g, (value) => value.toUpperCase());
 }
 
+function formatBytes(bytes: number) {
+  const megabytes = bytes / 1024 / 1024;
+
+  return `${megabytes.toFixed(megabytes >= 10 ? 0 : 1)} MB`;
+}
+
+async function readUploadError(response: Response) {
+  const responseText = await response.text().catch(() => "");
+
+  if (!responseText) {
+    return `Video upload failed with status ${response.status}`;
+  }
+
+  try {
+    const payload = JSON.parse(responseText) as {
+      errors?: Array<{ message?: string } | string>;
+      messages?: Array<{ message?: string } | string>;
+    };
+    const details = [...(payload.errors ?? []), ...(payload.messages ?? [])]
+      .flatMap((item) => {
+        const message = typeof item === "string" ? item : item.message;
+
+        return message ? [message] : [];
+      })
+      .join(" ");
+
+    return details || `Video upload failed with status ${response.status}`;
+  } catch {
+    return responseText.slice(0, 240) || `Video upload failed with status ${response.status}`;
+  }
+}
+
+function uploadFile(uploadUrl: string, file: File, onProgress: (progress: number) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    request.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    });
+    request.addEventListener("load", () => {
+      if (request.status >= 200 && request.status < 300) {
+        onProgress(100);
+        resolve();
+        return;
+      }
+
+      reject(
+        new Error(
+          request.responseText.slice(0, 240) || `Video upload failed with status ${request.status}`,
+        ),
+      );
+    });
+    request.addEventListener("error", () => reject(new Error("Video upload failed")));
+    request.addEventListener("abort", () => reject(new Error("Video upload was cancelled")));
+    request.open("POST", uploadUrl);
+    request.send(formData);
+  });
+}
+
 export function VideoUploadPanel({
   courseId,
   lessonId,
@@ -47,6 +123,8 @@ export function VideoUploadPanel({
 }) {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const videoStatus = useQuery({
     ...trpc.admin.getLessonVideoStatus.queryOptions({ lessonId }),
     enabled: Boolean(videoUid),
@@ -65,23 +143,21 @@ export function VideoUploadPanel({
       return;
     }
 
+    setUploadError(null);
+    setUploadProgress(0);
     setIsUploading(true);
     try {
       const upload = await createUploadUrl.mutateAsync({
         lessonId,
         maxDurationSeconds: 3600,
       });
-      const formData = new FormData();
-      formData.append("file", videoFile);
+      await uploadFile(upload.uploadURL, videoFile, setUploadProgress).catch(async (error) => {
+        if (error instanceof Error && error.message.startsWith("{")) {
+          throw new Error(await readUploadError(new Response(error.message)));
+        }
 
-      const response = await fetch(upload.uploadURL, {
-        method: "POST",
-        body: formData,
+        throw error;
       });
-
-      if (!response.ok) {
-        throw new Error("Video upload failed");
-      }
 
       await Promise.all([
         queryClient.invalidateQueries({
@@ -97,13 +173,17 @@ export function VideoUploadPanel({
       setVideoFile(null);
       toast.success("Video uploaded");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Video upload failed");
+      const message = error instanceof Error ? error.message : "Video upload failed";
+      setUploadError(message);
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
   }
 
   const status = videoStatus.data?.status;
+  const fileTooLargeForBasicUpload =
+    videoFile !== null && videoFile.size > directUploadRecommendedMaxBytes;
 
   return (
     <Paper withBorder p="md" radius="sm">
@@ -134,14 +214,43 @@ export function VideoUploadPanel({
         <FileInput
           accept="video/*"
           clearable
+          description="Use files under 200 MB for the current direct upload flow."
           label="Video file"
           value={videoFile}
-          onChange={setVideoFile}
+          onChange={(file) => {
+            setUploadError(null);
+            setUploadProgress(0);
+            setVideoFile(file);
+          }}
         />
+        {videoFile ? (
+          <Text c="dimmed" size="sm">
+            Selected {videoFile.name} ({formatBytes(videoFile.size)})
+          </Text>
+        ) : null}
+        {fileTooLargeForBasicUpload ? (
+          <Alert color="yellow" title="Large upload">
+            This file is larger than 200 MB. The current direct upload flow is intended for smaller
+            files; use a smaller test file until tus uploads are added.
+          </Alert>
+        ) : null}
+        {isUploading ? (
+          <Stack gap={4}>
+            <Progress value={uploadProgress} />
+            <Text c="dimmed" size="sm">
+              Uploading {uploadProgress}%
+            </Text>
+          </Stack>
+        ) : null}
+        {uploadError ? (
+          <Alert color="red" title="Upload failed">
+            {uploadError}
+          </Alert>
+        ) : null}
         <Group justify="flex-end">
           <Button
             loading={isUploading || createUploadUrl.isPending}
-            disabled={!videoFile}
+            disabled={!videoFile || fileTooLargeForBasicUpload}
             onClick={uploadVideo}
           >
             Upload video

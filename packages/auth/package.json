@@ -14,9 +14,7 @@
     "@better-auth/passkey": "^1.6.23",
     "@prive-course/db": "workspace:*",
     "@prive-course/env": "workspace:*",
-    "better-auth": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
+    "better-auth": "catalog:"
   },
   "devDependencies": {
     "@prive-course/config": "workspace:*",

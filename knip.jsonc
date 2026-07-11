@@ -1,0 +1,65 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "vite.config.ts",
+        "scripts/**/*.mjs",
+        "docs/superpowers/specs/**/*.md",
+        "docs/superpowers/plans/**/*.md",
+      ],
+      "project": ["*.{js,ts,json,jsonc}", "scripts/**/*.{js,mjs,ts}"],
+    },
+    "apps/web": {
+      "entry": ["src/main.tsx", "src/worker.ts", "src/routes/**/*.tsx", "vite.config.ts"],
+      "project": ["src/**/*.{ts,tsx}", "*.config.{ts,js}", "package.json"],
+      "ignore": ["src/routeTree.gen.ts", "dist/**", ".alchemy/**"],
+    },
+    "apps/server": {
+      "entry": ["src/index.ts", "scripts/**/*.mjs", "wrangler.jsonc", "tsdown.config.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.mjs", "*.config.ts", "package.json"],
+      "ignore": ["dist/**", ".wrangler/**"],
+    },
+    "packages/api": {
+      "entry": ["src/index.ts", "src/routers/**/*.test.ts"],
+      "project": ["src/**/*.ts", "package.json"],
+    },
+    "packages/auth": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts", "package.json"],
+    },
+    "packages/config": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts", "package.json"],
+    },
+    "packages/db": {
+      "entry": ["src/index.ts", "drizzle.config.ts"],
+      "project": ["src/**/*.ts", "drizzle.config.ts", "package.json"],
+      "ignore": ["src/migrations/**"],
+    },
+    "packages/env": {
+      "entry": ["src/**/*.ts", "env.d.ts"],
+      "project": ["src/**/*.ts", "env.d.ts", "package.json"],
+    },
+    "packages/infra": {
+      "entry": ["alchemy.run.ts"],
+      "project": ["*.ts", "package.json"],
+      "ignore": [".alchemy/**"],
+    },
+  },
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.wrangler/**",
+    "**/.alchemy/**",
+    "apps/web/src/routeTree.gen.ts",
+  ],
+  "ignoreDependencies": [
+    "@cloudflare/workers-types",
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
+    "cloudflare",
+    "tailwindcss",
+  ],
+}

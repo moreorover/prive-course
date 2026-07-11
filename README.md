@@ -8,7 +8,6 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **TanStack Router** - File-based routing with full type safety
 - **TailwindCSS** - Utility-first CSS for rapid UI development
 - **Mantine v9** - Primary application UI components
-- **Shared UI package** - Starter primitives, global styles, and the Sonner wrapper live in `packages/ui`
 - **Hono** - Lightweight, performant server framework
 - **tRPC** - End-to-end type-safe APIs
 - **workers** - Runtime environment
@@ -53,16 +52,9 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 React web apps in this project use Mantine v9 as the primary UI system.
 
 - Prefer Mantine components for new app UI.
-- Change global styles in `packages/ui/src/styles/globals.css`.
+- Change global styles in `apps/web/src/index.css`.
 - Keep reusable app components in `apps/web/src/components`.
 - Keep domain-specific UI in `apps/web/src/features`.
-- `packages/ui` still contains starter primitives used by auth/menu/toast surfaces.
-
-Import shared package utilities or starter primitives like this:
-
-```tsx
-import { Button } from "@prive-course/ui/components/button";
-```
 
 ## Deployment
 
@@ -89,7 +81,6 @@ prive-course/
 │   ├── web/         # Frontend application (React + TanStack Router)
 │   └── server/      # Backend API (Hono, TRPC)
 ├── packages/
-│   ├── ui/          # Shared starter primitives and global styles
 │   ├── api/         # API layer / business logic
 │   ├── auth/        # Authentication configuration & logic
 │   └── db/          # Database schema & queries
@@ -104,6 +95,7 @@ prive-course/
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run db:generate`: Generate database client/types
 - `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
+- `pnpm run knip`: Run unused files, exports, and dependency checks
 - `pnpm run test`: Run workspace tests
 - `pnpm run smoke:checklist`: Print the manual smoke-test checklist location
 - `pnpm run lint`: Run Vite+ lint checks

@@ -19,7 +19,6 @@
     "@mantine/hooks": "^9.4.1",
     "@prive-course/api": "workspace:*",
     "@prive-course/env": "workspace:*",
-    "@prive-course/ui": "workspace:*",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-form": "^1.33.0",
     "@tanstack/react-query": "^5.101.2",
@@ -29,14 +28,12 @@
     "@trpc/tanstack-react-query": "^11.18.0",
     "better-auth": "catalog:",
     "lucide-react": "catalog:",
-    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sonner": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@prive-course/config": "workspace:*",
     "@tanstack/react-query-devtools": "^5.101.2",
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/router-plugin": "^1.168.19",
@@ -44,8 +41,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^6.0.3",
-    "alchemy": "catalog:",
-    "postcss": "^8.5.16",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "^8.1.3"

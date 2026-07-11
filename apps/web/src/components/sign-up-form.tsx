@@ -1,6 +1,4 @@
-import { Button } from "@prive-course/ui/components/button";
-import { Input } from "@prive-course/ui/components/input";
-import { Label } from "@prive-course/ui/components/label";
+import { Button, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -66,105 +64,82 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
   }
 
   return (
-    <div className="mx-auto w-full mt-10 max-w-md p-6">
-      <h1 className="mb-6 text-center text-3xl font-bold">Create Account</h1>
+    <main className="mx-auto w-full mt-10 max-w-md p-6">
+      <Stack gap="md">
+        <Title order={1} ta="center">
+          Create Account
+        </Title>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-        className="space-y-4"
-      >
-        <div>
-          <form.Field name="name">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Name</Label>
-                <Input
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <Stack gap="md">
+            <form.Field name="name">
+              {(field) => (
+                <TextInput
+                  label="Name"
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
+                  error={field.state.meta.errors[0]?.message}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(event) => field.handleChange(event.currentTarget.value)}
                 />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+              )}
+            </form.Field>
 
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
+            <form.Field name="email">
+              {(field) => (
+                <TextInput
+                  label="Email"
                   id={field.name}
                   name={field.name}
                   type="email"
                   value={field.state.value}
+                  error={field.state.meta.errors[0]?.message}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(event) => field.handleChange(event.currentTarget.value)}
                 />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+              )}
+            </form.Field>
 
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
+            <form.Field name="password">
+              {(field) => (
+                <PasswordInput
+                  label="Password"
                   id={field.name}
                   name={field.name}
-                  type="password"
                   value={field.state.value}
+                  error={field.state.meta.errors[0]?.message}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(event) => field.handleChange(event.currentTarget.value)}
                 />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
+              )}
+            </form.Field>
 
-        <form.Subscribe
-          selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
-        >
-          {({ canSubmit, isSubmitting }) => (
-            <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Sign Up"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </form>
+            <form.Subscribe
+              selector={(state) => ({
+                canSubmit: state.canSubmit,
+                isSubmitting: state.isSubmitting,
+              })}
+            >
+              {({ canSubmit, isSubmitting }) => (
+                <Button type="submit" fullWidth loading={isSubmitting} disabled={!canSubmit}>
+                  Sign Up
+                </Button>
+              )}
+            </form.Subscribe>
+          </Stack>
+        </form>
 
-      <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignIn}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
+        <Button variant="subtle" onClick={onSwitchToSignIn}>
           Already have an account? Sign In
         </Button>
-      </div>
-    </div>
+      </Stack>
+    </main>
   );
 }

@@ -16,9 +16,7 @@
     "@prive-course/auth": "workspace:*",
     "@prive-course/db": "workspace:*",
     "@prive-course/env": "workspace:*",
-    "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
-    "dotenv": "catalog:",
     "drizzle-orm": "^0.45.2",
     "zod": "catalog:"
   },

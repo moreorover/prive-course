@@ -1,14 +1,4 @@
-import { Button } from "@prive-course/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@prive-course/ui/components/dropdown-menu";
-import { Skeleton } from "@prive-course/ui/components/skeleton";
+import { Button, Menu, Skeleton, Text } from "@mantine/core";
 import { Link, useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
@@ -18,7 +8,7 @@ export default function UserMenu() {
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
+    return <Skeleton height={36} width={96} />;
   }
 
   if (!session) {
@@ -30,40 +20,35 @@ export default function UserMenu() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              navigate({ to: "/profile" });
-            }}
-          >
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    navigate({
-                      to: "/",
-                    });
-                  },
+    <Menu position="bottom-end" withinPortal>
+      <Menu.Target>
+        <Button variant="outline">{session.user.name}</Button>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Label>My Account</Menu.Label>
+        <Menu.Item disabled>
+          <Text size="sm" c="dimmed">
+            {session.user.email}
+          </Text>
+        </Menu.Item>
+        <Menu.Item onClick={() => navigate({ to: "/profile" })}>Profile</Menu.Item>
+        <Menu.Item
+          color="red"
+          onClick={() => {
+            authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  navigate({
+                    to: "/",
+                  });
                 },
-              });
-            }}
-          >
-            Sign Out
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+              },
+            });
+          }}
+        >
+          Sign Out
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
   );
 }

@@ -19,9 +19,7 @@
     "@libsql/client": "0.17.4",
     "@prive-course/env": "workspace:*",
     "dotenv": "catalog:",
-    "drizzle-orm": "^0.45.2",
-    "libsql": "0.5.29",
-    "zod": "catalog:"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@prive-course/config": "workspace:*",

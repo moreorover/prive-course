@@ -10,8 +10,7 @@
     "types": ["vite/client"],
     "rootDirs": ["."],
     "paths": {
-      "@/*": ["./src/*"],
-      "@prive-course/ui/*": ["../../packages/ui/src/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

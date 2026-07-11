@@ -2,13 +2,14 @@
 
 Prive Course is a private video course platform with manual course access management.
 
-Version 1 has three primary actors:
+Version 1 has four primary actors:
 
+- **Guests** discover published courses, open published course detail pages, and view published free lessons without signing in.
+- **Students** register, sign in, and view paid lesson content only for courses where active access has been granted.
 - **Admin users** create course content, manage lessons, upload protected videos, and grant or revoke course access.
-- **Students** register, sign in, and view only the published courses they have been granted access to.
 - **The backend** owns authorization, Cloudflare Stream upload setup, signed playback tokens, progress writes, and playback-session enforcement.
 
-Payments, organizations, team accounts, certificates, comments, quizzes, and public course catalog flows are out of scope for v1.
+Payments, single-lesson purchases, organizations, team accounts, certificates, comments, and quizzes are out of scope for v1.
 
 ## Admin Flow
 
@@ -38,22 +39,21 @@ Admin route shape:
 
 Admin APIs must use server-side admin authorization. Frontend route visibility is not a security boundary.
 
-## Student Flow
+## Public Catalog And Student Flow
 
-Students can:
+Public visitors and students can:
 
-1. Register an account.
-2. Add and use a passkey.
-3. Sign in with email/password or passkey.
-4. Open `/courses`.
-5. See only published courses where active `course_access` exists.
-6. Open a published course they can access.
-7. Open published lessons in that course.
-8. Watch lessons through backend-issued signed playback tokens.
-9. Resume playback from saved progress.
-10. Complete lessons while the backend preserves completed progress.
+1. Open `/courses`.
+2. See published courses without signing in.
+3. Open a published course detail page without signing in.
+4. See published lesson lists with clear free, included, or locked access states.
+5. Open and watch published free lessons without signing in.
+6. Register or sign in when they need access to paid lessons.
+7. Open paid published lessons only when their account has active course access.
+8. Resume playback from saved progress after signing in.
+9. Complete lessons while the backend preserves completed progress.
 
-Student route shape:
+Public and student route shape:
 
 ```txt
 /courses
@@ -63,7 +63,7 @@ Student route shape:
 /profile
 ```
 
-Student APIs must validate the authenticated session and active course access server-side for course, lesson, progress, and playback operations.
+Published course summary and detail APIs may allow guest reads. Paid lesson, progress, and paid playback operations must validate the authenticated session and active course access server-side.
 
 ## Video Upload Flow
 
@@ -85,21 +85,23 @@ Playback uses backend-issued Cloudflare Stream signed tokens. Stream videos are 
 
 Flow:
 
-1. Student opens a lesson route.
+1. Visitor opens a lesson route.
 2. Frontend requests a playback token for the lesson.
 3. Backend validates:
-   - authenticated session
    - course is published
    - lesson is published
-   - user has active course access
    - lesson has a Stream video UID
-   - playback concurrency policy
+   - free lessons allow guest playback
+   - paid lessons require an authenticated session with active course access
+   - playback concurrency policy when an authenticated playback session exists
 4. Backend creates a Cloudflare Stream signed playback token.
 5. Frontend loads the protected player with the signed token.
 6. Frontend sends playback heartbeats.
 7. Backend records active playback state.
 8. Frontend buffers progress locally and flushes progress to the API on page leave or unmount.
 9. Backend only moves stored progress forward and preserves completed lessons.
+
+Progress writes remain a signed-in behavior.
 
 Playback protection:
 
@@ -121,13 +123,15 @@ Backend decides what is allowed.
 
 Client route guards improve UX:
 
-- Unauthenticated users are redirected to `/login`.
+- Guests can open public catalog and published course detail routes.
+- Guests are redirected to `/login` only when they try to access account-required surfaces.
 - Non-admin users cannot use admin screens.
-- Students without active course access should not see inaccessible course content.
+- Users without active course access should see locked paid lesson states instead of playable paid content.
 
 Backend checks are authoritative:
 
 - Protected tRPC procedures require an authenticated session.
 - Admin procedures require an admin user role.
-- Course and lesson procedures validate active course access.
-- Progress and playback procedures validate active course access and published content.
+- Guest-readable catalog procedures return only published course and allowed lesson metadata.
+- Paid lesson, progress, and paid playback procedures validate active course access.
+- Free lesson playback validates published course, published lesson, and free lesson state before issuing signed playback tokens.

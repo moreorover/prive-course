@@ -111,7 +111,8 @@ vp run destroy
 
 ## Stream
 
-Uploads currently use Cloudflare Stream direct creator uploads. This is suitable for basic POST uploads under 200 MB. Larger uploads should move to tus:
+Uploads use Cloudflare Stream direct creator uploads. Files up to 200 MB use the basic POST flow;
+larger files use tus chunks:
 
 https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
 

@@ -95,6 +95,7 @@ Completed:
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
 - Cloudflare Stream direct upload URL API and admin upload control added.
+- Cloudflare Stream tus upload URL API and large-file chunked upload control added.
 - Cloudflare Stream video status API and admin processing status UI added.
 - Lesson video UID persistence added.
 - Admin course access management screen added for user search, grant, and revoke.
@@ -119,6 +120,7 @@ Completed:
 - Replay progress reset on player `onPlay` removed so playback continues from the saved local position.
 - Server-side lesson progress updates preserve completed lessons and only move stored progress forward.
 - Upload error states, direct upload progress, large-file warnings, empty states, and playback retry edge cases polished.
+- Stream uploads use direct POST for files up to 200 MB and tus chunks for larger files.
 - Automated smoke script added for server health, web shell/assets, SPA fallback, CORS, and anonymous protected-API rejection.
 - Cloudflare web deployment configured for single-page app fallback on direct client-route loads.
 - React Doctor added as a project script and pre-commit check.
@@ -445,15 +447,17 @@ Use route guards:
 ### Phase 5: Stream Upload
 
 - [x] Cloudflare Stream direct upload URL endpoint.
+- [x] Cloudflare Stream tus upload URL endpoint for large files.
 - [x] Direct upload URL requests configured for signed playback URLs.
 - [x] Direct upload URL requests restricted to the deployed web origin.
 - [x] Existing uploaded Stream video settings backfilled.
 - [x] Lesson video UID persistence.
 - [x] Basic upload UI.
+- [x] Large-file upload UI with tus chunk progress.
 - [x] Processing state UI.
 
-TODO: The current Stream flow follows Cloudflare's direct creator upload docs for basic POST
-uploads, which are intended for files under 200 MB. Larger uploads should use tus later:
+The Stream flow follows Cloudflare's direct creator upload docs. Files up to 200 MB use basic POST
+uploads; larger files use tus chunks:
 https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
 
 ### Phase 6: Student Experience

@@ -65,6 +65,8 @@ vp run admin:bootstrap:local admin@example.com
 - Open the course edit page.
 - Create at least one published lesson.
 - Upload a small test video or paste a known Cloudflare Stream UID.
+- For large-file coverage, upload a file over 200 MB and confirm the panel reports tus upload
+  progress.
 - Confirm the Video panel shows a Stream UID and processing status.
 - Open the course access screen.
 - Search for `student@example.com`.
@@ -92,6 +94,6 @@ vp run admin:bootstrap:local admin@example.com
 
 ## Current Limitations
 
-- Stream uploads over 200 MB should use tus later.
+- Tus uploads do not yet persist the tus upload URL across browser refreshes.
 - Fully automated browser smoke is deferred until there is a test-auth path or seeded test users that
   do not require passkey prompts.

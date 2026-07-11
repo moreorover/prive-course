@@ -1,6 +1,7 @@
 import { course, courseAccess, lesson, user } from "@prive-course/db/schema";
 import { env } from "@prive-course/env/server";
 import { TRPCError } from "@trpc/server";
+import { Buffer } from "node:buffer";
 import { and, asc, desc, eq, inArray, isNull, like, or } from "drizzle-orm";
 import { z } from "zod";
 
@@ -52,6 +53,11 @@ const streamDirectUploadResponseSchema = z.object({
     uploadURL: z.string().url(),
     uid: z.string().min(1),
   }),
+});
+
+const streamTusUploadResponseSchema = z.object({
+  uploadURL: z.string().url(),
+  uid: z.string().min(1),
 });
 
 const streamVideoDetailsResponseSchema = z.object({
@@ -111,6 +117,48 @@ function getStreamAllowedOrigins() {
     return [new URL(env.CORS_ORIGIN).host];
   } catch {
     return undefined;
+  }
+}
+
+function encodeUploadMetadataValue(value: string | number) {
+  return Buffer.from(String(value), "utf8").toString("base64");
+}
+
+function getTusUploadMetadata(maxDurationSeconds: number) {
+  return [
+    `maxDurationSeconds ${encodeUploadMetadataValue(maxDurationSeconds)}`,
+    "requiresignedurls",
+  ].join(",");
+}
+
+function getStreamUidFromTusLocation(location: string) {
+  try {
+    const url = new URL(location);
+    const uid = url.pathname.split("/").filter(Boolean).at(-1);
+
+    return uid || null;
+  } catch {
+    return null;
+  }
+}
+
+async function readCloudflareErrorBody(response: Response) {
+  const text = await response.text().catch(() => "");
+
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return {
+      errors: [
+        {
+          message: text.slice(0, 240),
+        },
+      ],
+    };
   }
 }
 
@@ -336,6 +384,76 @@ export const adminRouter = router({
         .where(eq(lesson.id, input.lessonId));
 
       return payload.data.result;
+    }),
+
+  createLessonTusUploadUrl: adminProcedure
+    .input(
+      z.object({
+        lessonId: z.string().min(1),
+        fileSize: z.number().int().positive(),
+        maxDurationSeconds: z.number().int().positive().max(86_400).default(3600),
+      }),
+    )
+    .output(streamTusUploadResponseSchema)
+    .mutation(async ({ ctx, input }) => {
+      const foundLesson = await getLessonOrThrow(ctx.db, input.lessonId);
+      await getCourseOrThrow(ctx.db, foundLesson.courseId);
+
+      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_API_TOKEN) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Cloudflare Stream credentials are not configured",
+        });
+      }
+
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream?direct_user=true`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.CLOUDFLARE_STREAM_API_TOKEN}`,
+            "Tus-Resumable": "1.0.0",
+            "Upload-Length": String(input.fileSize),
+            "Upload-Metadata": getTusUploadMetadata(input.maxDurationSeconds),
+          },
+        },
+      );
+      const uploadURL = response.headers.get("Location");
+
+      if (!response.ok || !uploadURL) {
+        const body = await readCloudflareErrorBody(response);
+        const message = getCloudflareErrorMessage(
+          body,
+          "Failed to create Cloudflare Stream tus upload URL",
+        );
+
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message,
+        });
+      }
+
+      const uid = getStreamUidFromTusLocation(uploadURL);
+
+      if (!uid) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "Cloudflare Stream tus upload URL did not include a video UID",
+        });
+      }
+
+      await ctx.db
+        .update(lesson)
+        .set({
+          videoUid: uid,
+          updatedAt: new Date(),
+        })
+        .where(eq(lesson.id, input.lessonId));
+
+      return {
+        uploadURL,
+        uid,
+      };
     }),
 
   getLessonVideoStatus: adminProcedure

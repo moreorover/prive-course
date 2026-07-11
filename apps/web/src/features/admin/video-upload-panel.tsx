@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { queryClient, trpc } from "@/utils/trpc";
 
 const directUploadRecommendedMaxBytes = 200 * 1024 * 1024;
+const tusChunkSizeBytes = 50 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
   if (readyToStream || state === "ready") {
@@ -112,6 +113,66 @@ function uploadFile(uploadUrl: string, file: File, onProgress: (progress: number
   });
 }
 
+async function getTusUploadOffset(uploadUrl: string) {
+  const response = await fetch(uploadUrl, {
+    method: "HEAD",
+    headers: {
+      "Tus-Resumable": "1.0.0",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(await readUploadError(response));
+  }
+
+  return Number(response.headers.get("Upload-Offset") ?? 0);
+}
+
+async function uploadFileWithTus(
+  uploadUrl: string,
+  file: File,
+  onProgress: (progress: number) => void,
+) {
+  let offset = await getTusUploadOffset(uploadUrl);
+  let failedAttempts = 0;
+
+  onProgress(Math.round((offset / file.size) * 100));
+
+  while (offset < file.size) {
+    const chunk = file.slice(offset, Math.min(offset + tusChunkSizeBytes, file.size));
+    const response = await fetch(uploadUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/offset+octet-stream",
+        "Tus-Resumable": "1.0.0",
+        "Upload-Offset": String(offset),
+      },
+      body: chunk,
+    });
+
+    if (response.status === 409) {
+      offset = await getTusUploadOffset(uploadUrl);
+      failedAttempts = 0;
+      continue;
+    }
+
+    if (!response.ok) {
+      failedAttempts += 1;
+
+      if (failedAttempts <= 2) {
+        offset = await getTusUploadOffset(uploadUrl);
+        continue;
+      }
+
+      throw new Error(await readUploadError(response));
+    }
+
+    failedAttempts = 0;
+    offset = Number(response.headers.get("Upload-Offset") ?? offset + chunk.size);
+    onProgress(Math.round((offset / file.size) * 100));
+  }
+}
+
 export function VideoUploadPanel({
   courseId,
   lessonId,
@@ -137,6 +198,13 @@ export function VideoUploadPanel({
       },
     }),
   );
+  const createTusUploadUrl = useMutation(
+    trpc.admin.createLessonTusUploadUrl.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   async function uploadVideo() {
     if (!videoFile) {
@@ -147,17 +215,27 @@ export function VideoUploadPanel({
     setUploadProgress(0);
     setIsUploading(true);
     try {
-      const upload = await createUploadUrl.mutateAsync({
-        lessonId,
-        maxDurationSeconds: 3600,
-      });
-      await uploadFile(upload.uploadURL, videoFile, setUploadProgress).catch(async (error) => {
-        if (error instanceof Error && error.message.startsWith("{")) {
-          throw new Error(await readUploadError(new Response(error.message)));
-        }
+      if (videoFile.size <= directUploadRecommendedMaxBytes) {
+        const upload = await createUploadUrl.mutateAsync({
+          lessonId,
+          maxDurationSeconds: 3600,
+        });
+        await uploadFile(upload.uploadURL, videoFile, setUploadProgress).catch(async (error) => {
+          if (error instanceof Error && error.message.startsWith("{")) {
+            throw new Error(await readUploadError(new Response(error.message)));
+          }
 
-        throw error;
-      });
+          throw error;
+        });
+      } else {
+        const upload = await createTusUploadUrl.mutateAsync({
+          lessonId,
+          fileSize: videoFile.size,
+          maxDurationSeconds: 3600,
+        });
+
+        await uploadFileWithTus(upload.uploadURL, videoFile, setUploadProgress);
+      }
 
       await Promise.all([
         queryClient.invalidateQueries({
@@ -184,6 +262,7 @@ export function VideoUploadPanel({
   const status = videoStatus.data?.status;
   const fileTooLargeForBasicUpload =
     videoFile !== null && videoFile.size > directUploadRecommendedMaxBytes;
+  const uploadMode = fileTooLargeForBasicUpload ? "tus" : "direct";
 
   return (
     <Paper withBorder p="md" radius="sm">
@@ -214,7 +293,7 @@ export function VideoUploadPanel({
         <FileInput
           accept="video/*"
           clearable
-          description="Use files under 200 MB for the current direct upload flow."
+          description="Files over 200 MB are uploaded with resumable tus chunks."
           label="Video file"
           value={videoFile}
           onChange={(file) => {
@@ -229,16 +308,15 @@ export function VideoUploadPanel({
           </Text>
         ) : null}
         {fileTooLargeForBasicUpload ? (
-          <Alert color="yellow" title="Large upload">
-            This file is larger than 200 MB. The current direct upload flow is intended for smaller
-            files; use a smaller test file until tus uploads are added.
+          <Alert color="blue" title="Large upload">
+            This file is larger than 200 MB and will use Cloudflare Stream tus upload.
           </Alert>
         ) : null}
         {isUploading ? (
           <Stack gap={4}>
             <Progress value={uploadProgress} />
             <Text c="dimmed" size="sm">
-              Uploading {uploadProgress}%
+              Uploading with {uploadMode === "tus" ? "tus" : "direct POST"} {uploadProgress}%
             </Text>
           </Stack>
         ) : null}
@@ -249,8 +327,8 @@ export function VideoUploadPanel({
         ) : null}
         <Group justify="flex-end">
           <Button
-            loading={isUploading || createUploadUrl.isPending}
-            disabled={!videoFile || fileTooLargeForBasicUpload}
+            loading={isUploading || createUploadUrl.isPending || createTusUploadUrl.isPending}
+            disabled={!videoFile}
             onClick={uploadVideo}
           >
             Upload video

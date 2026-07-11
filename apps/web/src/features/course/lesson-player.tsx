@@ -1,14 +1,56 @@
 import { Stream, type StreamPlayerApi } from "@cloudflare/stream-react";
 import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
 
-const progressSaveIntervalMs = 15_000;
-const progressSaveDeltaSeconds = 5;
+const localProgressDeltaSeconds = 5;
+
+type LocalLessonProgress = {
+  completed: boolean;
+  progressSeconds: number;
+  updatedAt: number;
+};
+
+function getProgressStorageKey(lessonId: string) {
+  return `prive-course:lesson-progress:${lessonId}`;
+}
+
+function readLocalProgress(lessonId: string): LocalLessonProgress | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawProgress = window.localStorage.getItem(getProgressStorageKey(lessonId));
+
+    if (!rawProgress) {
+      return null;
+    }
+
+    const parsedProgress = JSON.parse(rawProgress) as Partial<LocalLessonProgress>;
+    const progressSeconds = Math.max(0, Math.floor(parsedProgress.progressSeconds ?? 0));
+
+    return {
+      completed: Boolean(parsedProgress.completed),
+      progressSeconds,
+      updatedAt: typeof parsedProgress.updatedAt === "number" ? parsedProgress.updatedAt : 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalProgress(lessonId: string, progress: LocalLessonProgress) {
+  try {
+    window.localStorage.setItem(getProgressStorageKey(lessonId), JSON.stringify(progress));
+  } catch {
+    // Local progress is a best-effort cache; server sync still runs on exit.
+  }
+}
 
 function formatProgress(seconds: number) {
   const minutes = Math.floor(seconds / 60);
@@ -31,11 +73,23 @@ export function LessonPlayer({
   onProgressSaved?: () => Promise<unknown> | unknown;
 }) {
   const streamRef = useRef<StreamPlayerApi | undefined>(undefined);
-  const lastSaveAtRef = useRef(0);
-  const lastSavedSecondsRef = useRef(initialProgressSeconds);
-  const completedRef = useRef(isCompleted);
-  const [savedSeconds, setSavedSeconds] = useState(initialProgressSeconds);
-  const completed = isCompleted || completedRef.current;
+  const [initialLocalProgress] = useState(() => readLocalProgress(lessonId));
+  const initialEffectiveProgressSeconds = Math.max(
+    initialProgressSeconds,
+    initialLocalProgress?.progressSeconds ?? 0,
+  );
+  const initialEffectiveCompleted = isCompleted || Boolean(initialLocalProgress?.completed);
+  const progressRef = useRef<LocalLessonProgress>({
+    completed: initialEffectiveCompleted,
+    progressSeconds: initialEffectiveProgressSeconds,
+    updatedAt: initialLocalProgress?.updatedAt ?? Date.now(),
+  });
+  const initialProgressSecondsRef = useRef(initialProgressSeconds);
+  const lastLocalProgressSecondsRef = useRef(initialEffectiveProgressSeconds);
+  const lessonIdRef = useRef(lessonId);
+  const [, refreshProgressDisplay] = useReducer((value: number) => value + 1, 0);
+  const savedSeconds = progressRef.current.progressSeconds;
+  const completed = progressRef.current.completed;
   const playbackToken = useMutation(
     trpc.courses.createPlaybackToken.mutationOptions({
       onError: (error) => {
@@ -47,12 +101,13 @@ export function LessonPlayer({
   const updateProgress = useMutation(
     trpc.courses.updateProgress.mutationOptions({
       onSuccess: async (progress) => {
-        lastSavedSecondsRef.current = progress.progressSeconds;
-        setSavedSeconds(progress.progressSeconds);
-
-        if (progress.completedAt) {
-          completedRef.current = true;
-        }
+        progressRef.current = {
+          completed: Boolean(progress.completedAt) || progressRef.current.completed,
+          progressSeconds: progress.progressSeconds,
+          updatedAt: Date.now(),
+        };
+        lastLocalProgressSecondsRef.current = progress.progressSeconds;
+        refreshProgressDisplay();
 
         await onProgressSaved?.();
       },
@@ -61,15 +116,32 @@ export function LessonPlayer({
       },
     }),
   );
+  const updateProgressMutateRef = useRef(updateProgress.mutate);
   const session = authClient.useSession();
   const playbackSessionId = playbackToken.data?.playbackSessionId;
   const watermarkText = session.data?.user.email ?? session.data?.user.name ?? "Prive Course";
 
   useEffect(() => {
-    lastSaveAtRef.current = 0;
-    lastSavedSecondsRef.current = initialProgressSeconds;
-    completedRef.current = isCompleted;
-    setSavedSeconds(initialProgressSeconds);
+    updateProgressMutateRef.current = updateProgress.mutate;
+  }, [updateProgress.mutate]);
+
+  useEffect(() => {
+    const localProgress = readLocalProgress(lessonId);
+    const nextProgressSeconds = Math.max(
+      initialProgressSeconds,
+      localProgress?.progressSeconds ?? 0,
+    );
+    const nextCompleted = isCompleted || Boolean(localProgress?.completed);
+
+    initialProgressSecondsRef.current = initialProgressSeconds;
+    lessonIdRef.current = lessonId;
+    progressRef.current = {
+      completed: nextCompleted,
+      progressSeconds: nextProgressSeconds,
+      updatedAt: localProgress?.updatedAt ?? Date.now(),
+    };
+    lastLocalProgressSecondsRef.current = nextProgressSeconds;
+    refreshProgressDisplay();
   }, [initialProgressSeconds, isCompleted, lessonId]);
 
   useEffect(() => {
@@ -86,14 +158,14 @@ export function LessonPlayer({
     };
   }, [heartbeat, playbackSessionId]);
 
-  const saveProgress = useCallback(
+  const saveLocalProgress = useCallback(
     ({ completed: nextCompleted = false, force = false } = {}) => {
-      if (completedRef.current && !nextCompleted) {
+      if (progressRef.current.completed && !nextCompleted) {
         return;
       }
 
       const player = streamRef.current;
-      if (!player || updateProgress.isPending) {
+      if (!player) {
         return;
       }
 
@@ -104,38 +176,67 @@ export function LessonPlayer({
         ? Math.max(0, Math.floor(player.duration))
         : 0;
       const progressSeconds = nextCompleted
-        ? Math.max(currentSeconds, durationSeconds, lastSavedSecondsRef.current)
-        : Math.max(currentSeconds, lastSavedSecondsRef.current);
+        ? Math.max(currentSeconds, durationSeconds, progressRef.current.progressSeconds)
+        : Math.max(currentSeconds, progressRef.current.progressSeconds);
 
       if (!nextCompleted && progressSeconds === 0) {
         return;
       }
 
-      const now = Date.now();
-      const saveDelta = progressSeconds - lastSavedSecondsRef.current;
-
-      if (!force && now - lastSaveAtRef.current < progressSaveIntervalMs) {
+      if (
+        !force &&
+        !nextCompleted &&
+        progressSeconds - lastLocalProgressSecondsRef.current < localProgressDeltaSeconds
+      ) {
         return;
       }
 
-      if (!nextCompleted && saveDelta < progressSaveDeltaSeconds) {
-        return;
-      }
-
-      lastSaveAtRef.current = now;
-
-      if (nextCompleted) {
-        completedRef.current = true;
-      }
-
-      updateProgress.mutate({
-        lessonId,
+      lastLocalProgressSecondsRef.current = progressSeconds;
+      progressRef.current = {
+        completed: nextCompleted || progressRef.current.completed,
         progressSeconds,
-        completed: nextCompleted,
-      });
+        updatedAt: Date.now(),
+      };
+      writeLocalProgress(lessonId, progressRef.current);
+
+      refreshProgressDisplay();
     },
-    [lessonId, updateProgress],
+    [lessonId],
   );
+
+  const flushProgress = useCallback(() => {
+    saveLocalProgress({ force: true });
+
+    const progress = progressRef.current;
+
+    if (progress.progressSeconds <= initialProgressSecondsRef.current && !progress.completed) {
+      return;
+    }
+
+    updateProgressMutateRef.current({
+      lessonId: lessonIdRef.current,
+      progressSeconds: progress.progressSeconds,
+      completed: progress.completed,
+    });
+  }, [saveLocalProgress]);
+
+  useEffect(() => {
+    const flushOnPageHide = () => flushProgress();
+    const flushOnVisibilityHidden = () => {
+      if (document.visibilityState === "hidden") {
+        flushProgress();
+      }
+    };
+
+    window.addEventListener("pagehide", flushOnPageHide);
+    document.addEventListener("visibilitychange", flushOnVisibilityHidden);
+
+    return () => {
+      flushProgress();
+      window.removeEventListener("pagehide", flushOnPageHide);
+      document.removeEventListener("visibilitychange", flushOnVisibilityHidden);
+    };
+  }, [flushProgress]);
 
   if (!videoUid) {
     return (
@@ -157,10 +258,12 @@ export function LessonPlayer({
               streamRef={streamRef}
               title="Lesson video"
               src={playbackToken.data.token}
-              startTime={completed ? 0 : initialProgressSeconds}
-              onTimeUpdate={() => saveProgress()}
-              onPause={() => saveProgress({ force: true })}
-              onEnded={() => saveProgress({ completed: true, force: true })}
+              startTime={completed ? 0 : savedSeconds}
+              onTimeUpdate={() => saveLocalProgress()}
+              onPause={() => saveLocalProgress({ force: true })}
+              onEnded={() => {
+                saveLocalProgress({ completed: true, force: true });
+              }}
             />
             <div className="pointer-events-none absolute inset-0 grid grid-cols-2 grid-rows-2 text-xs font-medium text-white/35">
               {Array.from({ length: 4 }).map((_, index) => (

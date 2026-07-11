@@ -39,7 +39,7 @@ CLOUDFLARE_STREAM_API_TOKEN
 CLOUDFLARE_API_TOKEN
 ```
 
-`CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create direct upload URLs, check video processing status, and create signed playback tokens.
+`CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create tus upload URLs, check video processing status, and create signed playback tokens.
 
 ## Local Development
 
@@ -111,8 +111,7 @@ vp run destroy
 
 ## Stream
 
-Uploads use Cloudflare Stream direct creator uploads. Files up to 200 MB use the basic POST flow;
-larger files use tus chunks:
+Uploads use Cloudflare Stream direct creator uploads with tus chunks:
 
 https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
 

@@ -46,15 +46,6 @@ const lessonInputSchema = z.object({
   status: publishStatusSchema.default("draft"),
 });
 
-const streamDirectUploadResponseSchema = z.object({
-  success: z.boolean(),
-  errors: z.array(z.unknown()).default([]),
-  result: z.object({
-    uploadURL: z.string().url(),
-    uid: z.string().min(1),
-  }),
-});
-
 const streamTusUploadResponseSchema = z.object({
   uploadURL: z.string().url(),
   uid: z.string().min(1),
@@ -110,14 +101,6 @@ function getCloudflareErrorMessage(body: unknown, fallback: string) {
     .filter((message): message is string => Boolean(message));
 
   return details.length ? `${fallback}: ${details.join("; ")}` : fallback;
-}
-
-function getStreamAllowedOrigins() {
-  try {
-    return [new URL(env.CORS_ORIGIN).host];
-  } catch {
-    return undefined;
-  }
 }
 
 function encodeUploadMetadataValue(value: string | number) {
@@ -325,65 +308,6 @@ export const adminRouter = router({
         .from(lesson)
         .where(eq(lesson.courseId, input.courseId))
         .orderBy(asc(lesson.position));
-    }),
-
-  createLessonUploadUrl: adminProcedure
-    .input(
-      z.object({
-        lessonId: z.string().min(1),
-        maxDurationSeconds: z.number().int().positive().max(86_400).default(3600),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const foundLesson = await getLessonOrThrow(ctx.db, input.lessonId);
-      await getCourseOrThrow(ctx.db, foundLesson.courseId);
-
-      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_STREAM_API_TOKEN) {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "Cloudflare Stream credentials are not configured",
-        });
-      }
-
-      const response = await fetch(
-        `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/direct_upload`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${env.CLOUDFLARE_STREAM_API_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            maxDurationSeconds: input.maxDurationSeconds,
-            requireSignedURLs: true,
-            allowedOrigins: getStreamAllowedOrigins(),
-          }),
-        },
-      );
-      const body = await response.json();
-      const payload = streamDirectUploadResponseSchema.safeParse(body);
-
-      if (!response.ok || !payload.success || !payload.data.success) {
-        const message = getCloudflareErrorMessage(
-          body,
-          "Failed to create Cloudflare Stream upload URL",
-        );
-
-        throw new TRPCError({
-          code: "BAD_GATEWAY",
-          message,
-        });
-      }
-
-      await ctx.db
-        .update(lesson)
-        .set({
-          videoUid: payload.data.result.uid,
-          updatedAt: new Date(),
-        })
-        .where(eq(lesson.id, input.lessonId));
-
-      return payload.data.result;
     }),
 
   createLessonTusUploadUrl: adminProcedure

@@ -94,8 +94,7 @@ Completed:
 - Admin lesson list, new-lesson, and edit-lesson screens added under each course.
 - Admin lesson create/update forms implemented with Mantine forms.
 - Admin lesson ordering added with up/down controls.
-- Cloudflare Stream direct upload URL API and admin upload control added.
-- Cloudflare Stream tus upload URL API and large-file chunked upload control added.
+- Cloudflare Stream tus upload URL API and admin chunked upload control added.
 - Cloudflare Stream video status API and admin processing status UI added.
 - Lesson video UID persistence added.
 - Admin course access management screen added for user search, grant, and revoke.
@@ -119,8 +118,8 @@ Completed:
 - Lesson playback resumes from locally saved progress when progress is between the beginning and the end of the video.
 - Replay progress reset on player `onPlay` removed so playback continues from the saved local position.
 - Server-side lesson progress updates preserve completed lessons and only move stored progress forward.
-- Upload error states, direct upload progress, large-file warnings, empty states, and playback retry edge cases polished.
-- Stream uploads use direct POST for files up to 200 MB and tus chunks for larger files.
+- Upload error states, tus upload progress, empty states, and playback retry edge cases polished.
+- Stream uploads use tus chunks for all files.
 - Automated smoke script added for server health, web shell/assets, SPA fallback, CORS, and anonymous protected-API rejection.
 - Cloudflare web deployment configured for single-page app fallback on direct client-route loads.
 - React Doctor added as a project script and pre-commit check.
@@ -311,14 +310,14 @@ Regular users can:
 
 ## Video Upload Flow
 
-Use Cloudflare Stream direct upload.
+Use Cloudflare Stream direct creator upload with tus.
 
 Recommended flow:
 
 1. Admin creates or opens a lesson draft.
 2. Admin clicks upload.
-3. Backend creates a Cloudflare Stream direct upload URL.
-4. Browser uploads the video directly to Cloudflare Stream.
+3. Backend creates a Cloudflare Stream tus upload URL.
+4. Browser uploads the video directly to Cloudflare Stream in tus chunks.
 5. Backend stores the resulting `video_uid` on the lesson.
 6. Backend displays processing/ready state in the lesson editor.
 
@@ -446,18 +445,15 @@ Use route guards:
 
 ### Phase 5: Stream Upload
 
-- [x] Cloudflare Stream direct upload URL endpoint.
-- [x] Cloudflare Stream tus upload URL endpoint for large files.
-- [x] Direct upload URL requests configured for signed playback URLs.
-- [x] Direct upload URL requests restricted to the deployed web origin.
+- [x] Cloudflare Stream tus upload URL endpoint.
+- [x] Tus upload metadata configured for signed playback URLs.
 - [x] Existing uploaded Stream video settings backfilled.
 - [x] Lesson video UID persistence.
 - [x] Basic upload UI.
-- [x] Large-file upload UI with tus chunk progress.
+- [x] Upload UI with tus chunk progress.
 - [x] Processing state UI.
 
-The Stream flow follows Cloudflare's direct creator upload docs. Files up to 200 MB use basic POST
-uploads; larger files use tus chunks:
+The Stream flow follows Cloudflare's direct creator upload docs and uses tus chunks for all files:
 https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/
 
 ### Phase 6: Student Experience

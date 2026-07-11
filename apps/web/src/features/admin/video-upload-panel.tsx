@@ -16,7 +16,6 @@ import { toast } from "sonner";
 
 import { queryClient, trpc } from "@/utils/trpc";
 
-const directUploadRecommendedMaxBytes = 200 * 1024 * 1024;
 const tusChunkSizeBytes = 50 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
@@ -80,37 +79,6 @@ async function readUploadError(response: Response) {
   } catch {
     return responseText.slice(0, 240) || `Video upload failed with status ${response.status}`;
   }
-}
-
-function uploadFile(uploadUrl: string, file: File, onProgress: (progress: number) => void) {
-  return new Promise<void>((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    const formData = new FormData();
-    formData.append("file", file);
-
-    request.upload.addEventListener("progress", (event) => {
-      if (event.lengthComputable) {
-        onProgress(Math.round((event.loaded / event.total) * 100));
-      }
-    });
-    request.addEventListener("load", () => {
-      if (request.status >= 200 && request.status < 300) {
-        onProgress(100);
-        resolve();
-        return;
-      }
-
-      reject(
-        new Error(
-          request.responseText.slice(0, 240) || `Video upload failed with status ${request.status}`,
-        ),
-      );
-    });
-    request.addEventListener("error", () => reject(new Error("Video upload failed")));
-    request.addEventListener("abort", () => reject(new Error("Video upload was cancelled")));
-    request.open("POST", uploadUrl);
-    request.send(formData);
-  });
 }
 
 async function getTusUploadOffset(uploadUrl: string) {
@@ -191,13 +159,6 @@ export function VideoUploadPanel({
     enabled: Boolean(videoUid),
     refetchInterval: videoUid ? 15_000 : false,
   });
-  const createUploadUrl = useMutation(
-    trpc.admin.createLessonUploadUrl.mutationOptions({
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    }),
-  );
   const createTusUploadUrl = useMutation(
     trpc.admin.createLessonTusUploadUrl.mutationOptions({
       onError: (error) => {
@@ -215,27 +176,13 @@ export function VideoUploadPanel({
     setUploadProgress(0);
     setIsUploading(true);
     try {
-      if (videoFile.size <= directUploadRecommendedMaxBytes) {
-        const upload = await createUploadUrl.mutateAsync({
-          lessonId,
-          maxDurationSeconds: 3600,
-        });
-        await uploadFile(upload.uploadURL, videoFile, setUploadProgress).catch(async (error) => {
-          if (error instanceof Error && error.message.startsWith("{")) {
-            throw new Error(await readUploadError(new Response(error.message)));
-          }
+      const upload = await createTusUploadUrl.mutateAsync({
+        lessonId,
+        fileSize: videoFile.size,
+        maxDurationSeconds: 3600,
+      });
 
-          throw error;
-        });
-      } else {
-        const upload = await createTusUploadUrl.mutateAsync({
-          lessonId,
-          fileSize: videoFile.size,
-          maxDurationSeconds: 3600,
-        });
-
-        await uploadFileWithTus(upload.uploadURL, videoFile, setUploadProgress);
-      }
+      await uploadFileWithTus(upload.uploadURL, videoFile, setUploadProgress);
 
       await Promise.all([
         queryClient.invalidateQueries({
@@ -260,9 +207,6 @@ export function VideoUploadPanel({
   }
 
   const status = videoStatus.data?.status;
-  const fileTooLargeForBasicUpload =
-    videoFile !== null && videoFile.size > directUploadRecommendedMaxBytes;
-  const uploadMode = fileTooLargeForBasicUpload ? "tus" : "direct";
 
   return (
     <Paper withBorder p="md" radius="sm">
@@ -293,7 +237,7 @@ export function VideoUploadPanel({
         <FileInput
           accept="video/*"
           clearable
-          description="Files over 200 MB are uploaded with resumable tus chunks."
+          description="Videos are uploaded with resumable Cloudflare Stream tus chunks."
           label="Video file"
           value={videoFile}
           onChange={(file) => {
@@ -307,16 +251,15 @@ export function VideoUploadPanel({
             Selected {videoFile.name} ({formatBytes(videoFile.size)})
           </Text>
         ) : null}
-        {fileTooLargeForBasicUpload ? (
-          <Alert color="blue" title="Large upload">
-            This file is larger than 200 MB and will use Cloudflare Stream tus upload.
-          </Alert>
-        ) : null}
+        <Alert color="blue" title="Resumable upload">
+          Uploads use Cloudflare Stream tus chunks, so interrupted transfers can recover during the
+          current browser session.
+        </Alert>
         {isUploading ? (
           <Stack gap={4}>
             <Progress value={uploadProgress} />
             <Text c="dimmed" size="sm">
-              Uploading with {uploadMode === "tus" ? "tus" : "direct POST"} {uploadProgress}%
+              Uploading with tus {uploadProgress}%
             </Text>
           </Stack>
         ) : null}
@@ -327,7 +270,7 @@ export function VideoUploadPanel({
         ) : null}
         <Group justify="flex-end">
           <Button
-            loading={isUploading || createUploadUrl.isPending || createTusUploadUrl.isPending}
+            loading={isUploading || createTusUploadUrl.isPending}
             disabled={!videoFile}
             onClick={uploadVideo}
           >

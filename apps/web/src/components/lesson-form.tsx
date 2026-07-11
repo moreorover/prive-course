@@ -46,7 +46,6 @@ export function LessonForm({
   onSubmit,
 }: LessonFormProps) {
   const form = useForm<LessonFormValue>({
-    mode: "uncontrolled",
     initialValues: initialValue ?? {
       title: "",
       slug: "",
@@ -76,7 +75,6 @@ export function LessonForm({
           </Title>
           <TextInput
             label="Title"
-            key={form.key("title")}
             {...form.getInputProps("title")}
             onChange={(event) => {
               const nextTitle = event.currentTarget.value;
@@ -89,35 +87,23 @@ export function LessonForm({
           />
           <TextInput
             label="Slug"
-            key={form.key("slug")}
             {...form.getInputProps("slug")}
             onChange={(event) => form.setFieldValue("slug", slugify(event.currentTarget.value))}
             required
           />
-          <Textarea
-            label="Description"
-            minRows={4}
-            key={form.key("description")}
-            {...form.getInputProps("description")}
-          />
+          <Textarea label="Description" minRows={4} {...form.getInputProps("description")} />
           <NumberInput
             label="Position"
             min={0}
             allowDecimal={false}
-            key={form.key("position")}
             {...form.getInputProps("position")}
             required
           />
-          <TextInput
-            label="Video UID"
-            key={form.key("videoUid")}
-            {...form.getInputProps("videoUid")}
-          />
+          <TextInput label="Video UID" {...form.getInputProps("videoUid")} />
           <NumberInput
             label="Duration seconds"
             min={0}
             allowDecimal={false}
-            key={form.key("durationSeconds")}
             {...form.getInputProps("durationSeconds")}
           />
           <Select
@@ -127,7 +113,6 @@ export function LessonForm({
               { value: "published", label: "Published" },
               { value: "archived", label: "Archived" },
             ]}
-            key={form.key("status")}
             {...form.getInputProps("status")}
             onChange={(value) =>
               form.setFieldValue("status", (value as PublishStatus | null) ?? "draft")

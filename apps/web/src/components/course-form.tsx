@@ -34,7 +34,6 @@ export function CourseForm({
   onSubmit,
 }: CourseFormProps) {
   const form = useForm<CourseFormValue>({
-    mode: "uncontrolled",
     initialValues: initialValue ?? {
       title: "",
       slug: "",
@@ -56,7 +55,6 @@ export function CourseForm({
           </Title>
           <TextInput
             label="Title"
-            key={form.key("title")}
             {...form.getInputProps("title")}
             onChange={(event) => {
               const nextTitle = event.currentTarget.value;
@@ -69,17 +67,11 @@ export function CourseForm({
           />
           <TextInput
             label="Slug"
-            key={form.key("slug")}
             {...form.getInputProps("slug")}
             onChange={(event) => form.setFieldValue("slug", slugify(event.currentTarget.value))}
             required
           />
-          <Textarea
-            label="Description"
-            minRows={4}
-            key={form.key("description")}
-            {...form.getInputProps("description")}
-          />
+          <Textarea label="Description" minRows={4} {...form.getInputProps("description")} />
           <Select
             label="Status"
             data={[
@@ -87,7 +79,6 @@ export function CourseForm({
               { value: "published", label: "Published" },
               { value: "archived", label: "Archived" },
             ]}
-            key={form.key("status")}
             {...form.getInputProps("status")}
             onChange={(value) =>
               form.setFieldValue("status", (value as PublishStatus | null) ?? "draft")

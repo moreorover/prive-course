@@ -50,8 +50,8 @@ Public visitors and students can:
 5. Open and watch published free lessons without signing in.
 6. Register or sign in when they need access to paid lessons.
 7. Open paid published lessons only when their account has active course access.
-8. Resume playback from saved progress after signing in.
-9. Complete lessons while the backend preserves completed progress.
+8. Resume playback from saved progress after signing in, when the lesson supports progress for that user.
+9. Complete accessible signed-in lessons while the backend preserves completed progress.
 
 Public and student route shape:
 
@@ -63,7 +63,7 @@ Public and student route shape:
 /profile
 ```
 
-Published course summary and detail APIs may allow guest reads. Paid lesson, progress, and paid playback operations must validate the authenticated session and active course access server-side.
+Published course summary and detail APIs may allow guest reads. Paid lesson and paid playback operations must validate the authenticated session and active course access server-side. Progress writes are signed-in only: paid lesson progress requires active course access, while free lesson progress requires the backend to validate published course, published lesson, and free lesson state.
 
 ## Video Upload Flow
 
@@ -96,20 +96,21 @@ Flow:
    - playback concurrency policy when an authenticated playback session exists
 4. Backend creates a Cloudflare Stream signed playback token.
 5. Frontend loads the protected player with the signed token.
-6. Frontend sends playback heartbeats.
-7. Backend records active playback state.
-8. Frontend buffers progress locally and flushes progress to the API on page leave or unmount.
+6. For authenticated playback sessions, frontend sends playback heartbeats.
+7. For authenticated playback sessions, backend records active playback state.
+8. For signed-in users, frontend buffers progress locally and flushes progress to the API on page leave or unmount.
 9. Backend only moves stored progress forward and preserves completed lessons.
 
-Progress writes remain a signed-in behavior.
+Guest free playback receives a backend-issued signed token, but it does not create user-bound progress, account watermarking, or per-user playback-session enforcement. Account-specific playback controls apply after sign-in.
 
 Playback protection:
 
 ```txt
 - backend-issued signed playback tokens
-- 1 active playback session per user/lesson policy
-- heartbeat-based active session tracking
-- visible account watermark in the protected player
+- authenticated playback: 1 active playback session per user/lesson policy
+- authenticated playback: heartbeat-based active session tracking
+- authenticated playback: visible account watermark in the protected player
+- guest free playback: no account watermark or saved progress until sign-in
 ```
 
 ## Route Guards And Authorization
@@ -133,5 +134,6 @@ Backend checks are authoritative:
 - Protected tRPC procedures require an authenticated session.
 - Admin procedures require an admin user role.
 - Guest-readable catalog procedures return only published course and allowed lesson metadata.
-- Paid lesson, progress, and paid playback procedures validate active course access.
+- Paid lesson, paid progress, and paid playback procedures validate active course access.
+- Signed-in free lesson progress validates published course, published lesson, and free lesson state.
 - Free lesson playback validates published course, published lesson, and free lesson state before issuing signed playback tokens.

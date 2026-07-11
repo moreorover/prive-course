@@ -82,10 +82,8 @@ Public and student route shape:
 /dashboard
 /profile
 ```
-````
 
 Published course summary and detail APIs may allow guest reads. Paid lesson, progress, and paid playback operations must validate the authenticated session and active course access server-side.
-
 ````
 
 - [ ] **Step 4: Update playback flow authorization language**
@@ -103,7 +101,7 @@ In `## Video Playback Flow`, keep the protected Stream-token model and change th
    - paid lessons require an authenticated session with active course access
    - playback concurrency policy when an authenticated playback session exists
 4. Backend creates a Cloudflare Stream signed playback token.
-````
+```
 
 Keep the existing heartbeat and progress details, but make sure progress writes remain signed-in behavior.
 

@@ -56,6 +56,10 @@ React web apps in this project use Mantine v9 as the primary UI system.
 - Keep reusable app components in `apps/web/src/components`.
 - Keep domain-specific UI in `apps/web/src/features`.
 
+## Product Flows
+
+See [PRODUCT_FLOWS.md](./PRODUCT_FLOWS.md) for admin, student, upload, playback, route guard, and authorization flows.
+
 ## Deployment
 
 ### Cloudflare via Alchemy

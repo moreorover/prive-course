@@ -85,6 +85,7 @@ Payment flows are intentionally out of scope for v1.
 
 - `README.md`: human onboarding, basic stack summary, project structure, and common scripts.
 - `AGENTS.md`: contributor and agent rules for working in this repo.
+- `PRODUCT_FLOWS.md`: admin, student, upload, playback, route guard, and authorization flows.
 - `DEPLOYMENT.md`: Cloudflare runtime, environment variables, D1 migrations, deploy commands, and Stream operations.
 - `SMOKE_TEST.md`: automated smoke checks and manual admin/student smoke flows.
 - `TODO.md`: deferred product or technical work that is still intentionally open.

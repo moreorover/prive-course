@@ -73,6 +73,39 @@ const streamVideoDetailsResponseSchema = z.object({
   }),
 });
 
+const cloudflareApiErrorSchema = z.object({
+  errors: z
+    .array(
+      z.object({
+        code: z.union([z.number(), z.string()]).optional(),
+        message: z.string().optional(),
+      }),
+    )
+    .optional(),
+  messages: z
+    .array(
+      z.object({
+        code: z.union([z.number(), z.string()]).optional(),
+        message: z.string().optional(),
+      }),
+    )
+    .optional(),
+});
+
+function getCloudflareErrorMessage(body: unknown, fallback: string) {
+  const payload = cloudflareApiErrorSchema.safeParse(body);
+
+  if (!payload.success) {
+    return fallback;
+  }
+
+  const details = [...(payload.data.errors ?? []), ...(payload.data.messages ?? [])]
+    .map((detail) => detail.message)
+    .filter((message): message is string => Boolean(message));
+
+  return details.length ? `${fallback}: ${details.join("; ")}` : fallback;
+}
+
 async function getCourseOrThrow(db: ContextDb, courseId: string) {
   const rows = await db.select().from(course).where(eq(course.id, courseId)).limit(1);
   const foundCourse = rows[0];
@@ -273,9 +306,14 @@ export const adminRouter = router({
       const payload = streamDirectUploadResponseSchema.safeParse(body);
 
       if (!response.ok || !payload.success || !payload.data.success) {
+        const message = getCloudflareErrorMessage(
+          body,
+          "Failed to create Cloudflare Stream upload URL",
+        );
+
         throw new TRPCError({
           code: "BAD_GATEWAY",
-          message: "Failed to create Cloudflare Stream upload URL",
+          message,
         });
       }
 
@@ -324,9 +362,14 @@ export const adminRouter = router({
       const payload = streamVideoDetailsResponseSchema.safeParse(body);
 
       if (!response.ok || !payload.success || !payload.data.success) {
+        const message = getCloudflareErrorMessage(
+          body,
+          "Failed to load Cloudflare Stream video status",
+        );
+
         throw new TRPCError({
           code: "BAD_GATEWAY",
-          message: "Failed to load Cloudflare Stream video status",
+          message,
         });
       }
 

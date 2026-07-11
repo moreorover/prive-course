@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@better-auth/passkey": "^1.6.23",
+    "@cloudflare/stream-react": "^1.9.3",
     "@mantine/core": "^9.4.1",
     "@mantine/form": "^9.4.1",
     "@mantine/hooks": "^9.4.1",

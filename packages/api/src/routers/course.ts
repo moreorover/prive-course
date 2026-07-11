@@ -198,9 +198,12 @@ export const courseRouter = router({
     .mutation(async ({ ctx, input }) => {
       await getPublishedLessonForUser(ctx.db, ctx.session.user.id, input.lessonId);
 
-      const completedAt = input.completed ? new Date() : null;
       const existingProgress = await ctx.db
-        .select({ id: lessonProgress.id })
+        .select({
+          id: lessonProgress.id,
+          progressSeconds: lessonProgress.progressSeconds,
+          completedAt: lessonProgress.completedAt,
+        })
         .from(lessonProgress)
         .where(
           and(
@@ -209,12 +212,17 @@ export const courseRouter = router({
           ),
         )
         .limit(1);
+      const progressSeconds = Math.max(
+        existingProgress[0]?.progressSeconds ?? 0,
+        input.progressSeconds,
+      );
+      const completedAt = input.completed ? new Date() : (existingProgress[0]?.completedAt ?? null);
 
       if (existingProgress[0]) {
         await ctx.db
           .update(lessonProgress)
           .set({
-            progressSeconds: input.progressSeconds,
+            progressSeconds,
             completedAt,
             updatedAt: new Date(),
           })
@@ -224,7 +232,7 @@ export const courseRouter = router({
           id: crypto.randomUUID(),
           userId: ctx.session.user.id,
           lessonId: input.lessonId,
-          progressSeconds: input.progressSeconds,
+          progressSeconds,
           completedAt,
         });
       }

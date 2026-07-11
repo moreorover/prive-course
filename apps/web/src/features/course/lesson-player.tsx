@@ -12,6 +12,7 @@ const localProgressDeltaSeconds = 5;
 type LocalLessonProgress = {
   completed: boolean;
   progressSeconds: number;
+  serverCompleted: boolean;
   updatedAt: number;
 };
 
@@ -37,6 +38,7 @@ function readLocalProgress(lessonId: string): LocalLessonProgress | null {
     return {
       completed: Boolean(parsedProgress.completed),
       progressSeconds,
+      serverCompleted: Boolean(parsedProgress.serverCompleted ?? parsedProgress.completed),
       updatedAt: typeof parsedProgress.updatedAt === "number" ? parsedProgress.updatedAt : 0,
     };
   } catch {
@@ -100,6 +102,7 @@ export function LessonPlayer({
   const progressRef = useRef<LocalLessonProgress>({
     completed: initialEffectiveCompleted,
     progressSeconds: initialEffectiveProgressSeconds,
+    serverCompleted: initialEffectiveCompleted,
     updatedAt: initialLocalProgress?.updatedAt ?? Date.now(),
   });
   const initialProgressSecondsRef = useRef(initialProgressSeconds);
@@ -122,6 +125,7 @@ export function LessonPlayer({
         progressRef.current = {
           completed: Boolean(progress.completedAt) || progressRef.current.completed,
           progressSeconds: progress.progressSeconds,
+          serverCompleted: Boolean(progress.completedAt) || progressRef.current.serverCompleted,
           updatedAt: Date.now(),
         };
         lastLocalProgressSecondsRef.current = progress.progressSeconds;
@@ -157,6 +161,7 @@ export function LessonPlayer({
     progressRef.current = {
       completed: nextCompleted,
       progressSeconds: nextProgressSeconds,
+      serverCompleted: nextCompleted,
       updatedAt: localProgress?.updatedAt ?? Date.now(),
     };
     lastLocalProgressSecondsRef.current = nextProgressSeconds;
@@ -179,10 +184,6 @@ export function LessonPlayer({
 
   const saveLocalProgress = useCallback(
     ({ completed: nextCompleted = false, force = false } = {}) => {
-      if (progressRef.current.completed && !nextCompleted) {
-        return;
-      }
-
       const player = streamRef.current;
       if (!player) {
         return;
@@ -195,8 +196,8 @@ export function LessonPlayer({
         ? Math.max(0, Math.floor(player.duration))
         : 0;
       const progressSeconds = nextCompleted
-        ? Math.max(currentSeconds, durationSeconds, progressRef.current.progressSeconds)
-        : Math.max(currentSeconds, progressRef.current.progressSeconds);
+        ? Math.max(currentSeconds, durationSeconds)
+        : currentSeconds;
 
       if (!nextCompleted && progressSeconds === 0) {
         return;
@@ -214,6 +215,7 @@ export function LessonPlayer({
       progressRef.current = {
         completed: nextCompleted || progressRef.current.completed,
         progressSeconds,
+        serverCompleted: progressRef.current.serverCompleted,
         updatedAt: Date.now(),
       };
       writeLocalProgress(lessonId, progressRef.current);
@@ -238,6 +240,22 @@ export function LessonPlayer({
       completed: progress.completed,
     });
   }, [saveLocalProgress]);
+
+  const resetLocalReplayProgress = useCallback(() => {
+    if (!progressRef.current.completed) {
+      return;
+    }
+
+    progressRef.current = {
+      completed: false,
+      progressSeconds: 0,
+      serverCompleted: progressRef.current.serverCompleted || progressRef.current.completed,
+      updatedAt: Date.now(),
+    };
+    lastLocalProgressSecondsRef.current = 0;
+    writeLocalProgress(lessonId, progressRef.current);
+    refreshProgressDisplay();
+  }, [lessonId]);
 
   useEffect(() => {
     const flushOnPageHide = () => flushProgress();
@@ -279,6 +297,7 @@ export function LessonPlayer({
               src={playbackToken.data.token}
               startTime={completed ? 0 : getResumeSeconds(savedSeconds, durationSeconds)}
               onTimeUpdate={() => saveLocalProgress()}
+              onPlay={resetLocalReplayProgress}
               onPause={() => saveLocalProgress({ force: true })}
               onEnded={() => {
                 saveLocalProgress({ completed: true, force: true });

@@ -241,6 +241,10 @@ export function LessonPlayer({
 
     const progress = progressRef.current;
 
+    if (!session.data) {
+      return;
+    }
+
     if (progress.progressSeconds <= initialProgressSecondsRef.current && !progress.completed) {
       return;
     }
@@ -250,7 +254,7 @@ export function LessonPlayer({
       progressSeconds: progress.progressSeconds,
       completed: progress.completed,
     });
-  }, [saveLocalProgress]);
+  }, [saveLocalProgress, session.data]);
 
   useEffect(() => {
     const flushOnPageHide = () => flushProgress();
@@ -303,15 +307,17 @@ export function LessonPlayer({
                 saveLocalProgress({ completed: true, force: true });
               }}
             />
-            <div className="pointer-events-none absolute inset-0 grid grid-cols-2 grid-rows-2 text-xs font-medium text-white/35">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="flex items-center justify-center">
-                  <span className="rotate-[-18deg] rounded bg-black/20 px-2 py-1">
-                    {watermarkText}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {session.data ? (
+              <div className="pointer-events-none absolute inset-0 grid grid-cols-2 grid-rows-2 text-xs font-medium text-white/35">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex items-center justify-center">
+                    <span className="rotate-[-18deg] rounded bg-black/20 px-2 py-1">
+                      {watermarkText}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
           <Group justify="space-between">
             <Text c="dimmed">Saved at {formatProgress(savedSeconds)}</Text>

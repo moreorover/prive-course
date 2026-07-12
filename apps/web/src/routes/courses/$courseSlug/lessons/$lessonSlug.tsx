@@ -1,6 +1,6 @@
 import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, type ErrorComponentProps } from "@tanstack/react-router";
 
 import { LessonPlayer } from "@/features/course/lesson-player";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -14,12 +14,80 @@ function lessonQueryOptions(courseSlug: string, lessonSlug: string) {
 
 export const Route = createFileRoute("/courses/$courseSlug/lessons/$lessonSlug")({
   component: LessonRoute,
+  errorComponent: LessonError,
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(
       lessonQueryOptions(params.courseSlug, params.lessonSlug),
     );
   },
 });
+
+function isCourseAccessError(error: unknown) {
+  return error instanceof Error && error.message === "Course access required";
+}
+
+function LessonError({ error }: ErrorComponentProps) {
+  const { courseSlug } = Route.useParams();
+
+  if (!isCourseAccessError(error)) {
+    return (
+      <main className="mx-auto w-full max-w-5xl px-4 py-8">
+        <Stack gap="lg">
+          <Link to="/courses/$courseSlug" params={{ courseSlug }}>
+            <Button variant="subtle">Back to course</Button>
+          </Link>
+          <Paper withBorder p="lg" radius="sm">
+            <Stack gap="xs">
+              <Title order={1} size="h3">
+                Lesson unavailable
+              </Title>
+              <Text c="dimmed">
+                {error instanceof Error ? error.message : "This lesson could not be loaded."}
+              </Text>
+            </Stack>
+          </Paper>
+        </Stack>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-5xl px-4 py-8">
+      <Stack gap="lg">
+        <Link to="/courses/$courseSlug" params={{ courseSlug }}>
+          <Button variant="subtle">Back to course</Button>
+        </Link>
+        <Paper withBorder p="lg" radius="sm">
+          <Stack gap="md">
+            <Group gap="sm">
+              <Badge color="gray" variant="light">
+                Locked
+              </Badge>
+              <Text c="dimmed">Course access required</Text>
+            </Group>
+            <div>
+              <Title order={1} size="h3">
+                This lesson is included with course access
+              </Title>
+              <Text c="dimmed" mt="xs">
+                Free preview lessons can be watched without signing in. This lesson requires an
+                account with active access to the course.
+              </Text>
+            </div>
+            <Group>
+              <Link to="/login">
+                <Button>Sign in</Button>
+              </Link>
+              <Link to="/courses/$courseSlug" params={{ courseSlug }}>
+                <Button variant="light">View course lessons</Button>
+              </Link>
+            </Group>
+          </Stack>
+        </Paper>
+      </Stack>
+    </main>
+  );
+}
 
 function LessonRoute() {
   const { courseSlug, lessonSlug } = Route.useParams();

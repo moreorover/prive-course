@@ -1,4 +1,4 @@
-import { Badge, Button, Paper, Stack, Table, Text, Title } from "@mantine/core";
+import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -21,8 +21,8 @@ function CourseDetailRoute() {
   const course = useQuery(courseQueryOptions(courseSlug));
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page">
+      <Stack gap="xl">
         <Link to="/courses">
           <Button variant="subtle">Back to courses</Button>
         </Link>
@@ -31,10 +31,12 @@ function CourseDetailRoute() {
           <>
             <div>
               <Title order={1}>{course.data.title}</Title>
-              <Text c="dimmed">{course.data.description || "No description yet."}</Text>
+              <Text c="dimmed" maw={760}>
+                {course.data.description || "No description yet."}
+              </Text>
             </div>
 
-            <Paper withBorder p="md" radius="sm">
+            <section>
               <Stack gap="md">
                 <Title order={2} size="h4">
                   Lessons
@@ -45,69 +47,65 @@ function CourseDetailRoute() {
                     description="Lessons will appear here when they are available."
                   />
                 ) : (
-                  <Table striped highlightOnHover>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>#</Table.Th>
-                        <Table.Th>Title</Table.Th>
-                        <Table.Th>Access</Table.Th>
-                        <Table.Th>Duration</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                      {course.data.lessons.map((lesson) => {
-                        const canOpenLesson = lesson.isFree || course.data.hasActiveAccess;
-                        const accessLabel = lesson.isFree
-                          ? "Free"
-                          : course.data.hasActiveAccess
-                            ? "Included"
-                            : "Locked";
+                  <Stack gap="sm">
+                    {course.data.lessons.map((lesson) => {
+                      const canOpenLesson = lesson.isFree || course.data.hasActiveAccess;
+                      const accessLabel = lesson.isFree
+                        ? "Free"
+                        : course.data.hasActiveAccess
+                          ? "Included"
+                          : "Locked";
+                      const lessonMeta = lesson.durationSeconds
+                        ? `${Math.round(lesson.durationSeconds / 60)} min`
+                        : "Duration pending";
 
-                        return (
-                          <Table.Tr key={lesson.id}>
-                            <Table.Td>{lesson.position + 1}</Table.Td>
-                            <Table.Td>
-                              {canOpenLesson ? (
-                                <Link
-                                  to="/courses/$courseSlug/lessons/$lessonSlug"
-                                  params={{ courseSlug, lessonSlug: lesson.slug }}
-                                >
-                                  {lesson.title}
-                                </Link>
-                              ) : (
-                                <Text>{lesson.title}</Text>
-                              )}
-                            </Table.Td>
-                            <Table.Td>
-                              <Badge
-                                color={
-                                  lesson.isFree
-                                    ? "teal"
-                                    : course.data.hasActiveAccess
-                                      ? "blue"
-                                      : "gray"
-                                }
-                                variant="light"
-                              >
-                                {accessLabel}
-                              </Badge>
-                            </Table.Td>
-                            <Table.Td>
-                              {lesson.durationSeconds
-                                ? `${Math.round(lesson.durationSeconds / 60)} min`
-                                : "Pending"}
-                            </Table.Td>
-                          </Table.Tr>
-                        );
-                      })}
-                    </Table.Tbody>
-                  </Table>
+                      const content = (
+                        <Paper withBorder p="md" className="pc-panel">
+                          <Group justify="space-between" align="start" gap="md">
+                            <div>
+                              <Text fw={700}>
+                                {lesson.position + 1}. {lesson.title}
+                              </Text>
+                              <Text c="dimmed" size="sm">
+                                {lessonMeta}
+                              </Text>
+                            </div>
+                            <Badge
+                              color={
+                                lesson.isFree
+                                  ? "teal"
+                                  : course.data.hasActiveAccess
+                                    ? "blue"
+                                    : "gray"
+                              }
+                              variant="light"
+                            >
+                              {accessLabel}
+                            </Badge>
+                          </Group>
+                        </Paper>
+                      );
+
+                      return canOpenLesson ? (
+                        <Link
+                          key={lesson.id}
+                          to="/courses/$courseSlug/lessons/$lessonSlug"
+                          params={{ courseSlug, lessonSlug: lesson.slug }}
+                          style={{ color: "inherit", textDecoration: "none" }}
+                        >
+                          {content}
+                        </Link>
+                      ) : (
+                        <div key={lesson.id}>{content}</div>
+                      );
+                    })}
+                  </Stack>
                 )}
               </Stack>
-            </Paper>
+            </section>
           </>
         ) : (
-          <Paper withBorder p="lg" radius="sm">
+          <Paper withBorder p="lg" className="pc-panel">
             <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
           </Paper>
         )}

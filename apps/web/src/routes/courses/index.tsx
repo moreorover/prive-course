@@ -1,4 +1,4 @@
-import { Badge, Button, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Badge, Button, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -18,36 +18,36 @@ function CoursesRoute() {
   const courses = useQuery(publishedCoursesQueryOptions);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page">
+      <Stack gap="xl">
         <div>
           <Title order={1}>Courses</Title>
-          <Text c="dimmed">Explore available courses.</Text>
+          <Text c="dimmed" maw={680}>
+            Browse available courses and open free previews before signing in.
+          </Text>
         </div>
 
         {courses.data?.length === 0 ? (
-          <Paper withBorder radius="sm">
-            <EmptyState
-              title="No courses yet"
-              description="Courses will appear here when they are available."
-            />
-          </Paper>
+          <EmptyState
+            title="No courses yet"
+            description="Courses will appear here when they are available."
+          />
         ) : null}
 
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
           {courses.data?.map((course) => (
-            <Paper key={course.id} withBorder p="md" radius="sm">
-              <Stack gap="sm">
-                <div>
+            <Paper key={course.id} withBorder p="lg" className="pc-panel">
+              <Stack gap="md">
+                <Group justify="space-between" align="start" gap="md" wrap="nowrap">
                   <Title order={2} size="h4">
                     {course.title}
                   </Title>
                   {course.hasActiveAccess ? (
-                    <Badge color="teal" variant="light" mt="xs">
+                    <Badge color="teal" variant="light">
                       Access granted
                     </Badge>
                   ) : null}
-                </div>
+                </Group>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>

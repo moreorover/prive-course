@@ -45,7 +45,7 @@ export function LessonList({
   lessons: NavigationLesson[];
 }) {
   return (
-    <Paper withBorder p="md" radius="sm">
+    <section>
       <Stack gap="md">
         <Title order={2} size="h4">
           Lessons
@@ -70,7 +70,7 @@ export function LessonList({
 
             if (navigationLesson.accessState === "locked") {
               return (
-                <Paper key={navigationLesson.id} withBorder p="sm" radius="sm">
+                <Paper key={navigationLesson.id} withBorder p="sm" className="pc-panel">
                   {lessonTitle}
                 </Paper>
               );
@@ -86,7 +86,7 @@ export function LessonList({
                 <Paper
                   withBorder
                   p="sm"
-                  radius="sm"
+                  className="pc-panel"
                   bg={navigationLesson.isCurrent ? "var(--mantine-color-blue-light)" : undefined}
                 >
                   {lessonTitle}
@@ -96,7 +96,7 @@ export function LessonList({
           })}
         </Stack>
       </Stack>
-    </Paper>
+    </section>
   );
 }
 

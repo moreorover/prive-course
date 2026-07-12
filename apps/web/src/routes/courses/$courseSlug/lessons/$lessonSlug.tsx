@@ -32,12 +32,12 @@ function LessonError({ error }: ErrorComponentProps) {
 
   if (!isCourseAccessError(error)) {
     return (
-      <main className="mx-auto w-full max-w-5xl px-4 py-8">
+      <main className="pc-page">
         <Stack gap="lg">
           <Link to="/courses/$courseSlug" params={{ courseSlug }}>
             <Button variant="subtle">Back to course</Button>
           </Link>
-          <Paper withBorder p="lg" radius="sm">
+          <Paper withBorder p="lg" className="pc-panel">
             <Stack gap="xs">
               <Title order={1} size="h3">
                 Lesson unavailable
@@ -53,12 +53,12 @@ function LessonError({ error }: ErrorComponentProps) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
+    <main className="pc-page">
       <Stack gap="lg">
         <Link to="/courses/$courseSlug" params={{ courseSlug }}>
           <Button variant="subtle">Back to course</Button>
         </Link>
-        <Paper withBorder p="lg" radius="sm">
+        <Paper withBorder p="lg" className="pc-panel">
           <Stack gap="md">
             <Group gap="sm">
               <Badge color="gray" variant="light">
@@ -95,17 +95,15 @@ function LessonRoute() {
   const lesson = useQuery(lessonQueryOptions(courseSlug, lessonSlug));
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page">
+      <Stack gap="xl">
         <Link to="/courses/$courseSlug" params={{ courseSlug }}>
           <Button variant="subtle">Back to course</Button>
         </Link>
 
         {lesson.data ? (
-          <div className="grid gap-4 lg:grid-cols-[minmax(220px,280px)_1fr] lg:items-start">
-            <LessonList courseSlug={courseSlug} lessons={lesson.data.navigation.lessons} />
-
-            <Stack gap="lg">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] lg:items-start">
+            <Stack gap="xl">
               <div>
                 <Group gap="sm">
                   <Title order={1}>{lesson.data.lesson.title}</Title>
@@ -145,14 +143,16 @@ function LessonRoute() {
               />
 
               {lesson.data.lesson.description ? (
-                <Paper withBorder radius="sm" p="md">
+                <Paper withBorder p="md" className="pc-panel">
                   <Text>{lesson.data.lesson.description}</Text>
                 </Paper>
               ) : null}
             </Stack>
+
+            <LessonList courseSlug={courseSlug} lessons={lesson.data.navigation.lessons} />
           </div>
         ) : (
-          <Paper withBorder p="lg" radius="sm">
+          <Paper withBorder p="lg" className="pc-panel">
             <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>
           </Paper>
         )}

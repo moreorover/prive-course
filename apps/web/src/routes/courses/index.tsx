@@ -1,4 +1,4 @@
-import { Badge, Button, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Button, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -42,17 +42,12 @@ function CoursesRoute() {
                   <Title order={2} size="h4">
                     {course.title}
                   </Title>
-                  {course.hasActiveAccess ? (
-                    <Badge color="teal" variant="light" mt="xs">
-                      Access granted
-                    </Badge>
-                  ) : null}
                 </div>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>
                 <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button variant={course.hasActiveAccess ? "filled" : "light"}>View course</Button>
+                  <Button>View course</Button>
                 </Link>
               </Stack>
             </Paper>

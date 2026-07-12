@@ -143,7 +143,7 @@ async function main() {
   });
 
   await check("server CORS allows web origin with credentials", async () => {
-    const response = await fetch(`${config.serverUrl}/trpc/courses.listGranted`, {
+    const response = await fetch(`${config.serverUrl}/trpc/courses.listPublished`, {
       headers: {
         "Access-Control-Request-Headers": "content-type",
         "Access-Control-Request-Method": "POST",
@@ -166,16 +166,13 @@ async function main() {
   });
 
   await check("protected course API rejects anonymous access", async () => {
-    const input = encodeURIComponent(JSON.stringify({ 0: { json: null } }));
-    const response = await fetch(
-      `${config.serverUrl}/trpc/courses.listGranted?batch=1&input=${input}`,
-      {
-        headers: {
-          Origin: config.webUrl,
-        },
-        method: "GET",
+    const input = encodeURIComponent(JSON.stringify({ 0: { json: { slug: "smoke-test" } } }));
+    const response = await fetch(`${config.serverUrl}/trpc/courses.bySlug?batch=1&input=${input}`, {
+      headers: {
+        Origin: config.webUrl,
       },
-    );
+      method: "GET",
+    });
     const body = await readText(response);
 
     assert(

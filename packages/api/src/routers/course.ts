@@ -102,28 +102,6 @@ export const courseRouter = router({
       .orderBy(asc(course.title));
   }),
 
-  listGranted: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
-      .select({
-        id: course.id,
-        title: course.title,
-        slug: course.slug,
-        description: course.description,
-        status: course.status,
-        grantedAt: courseAccess.grantedAt,
-      })
-      .from(courseAccess)
-      .innerJoin(course, eq(course.id, courseAccess.courseId))
-      .where(
-        and(
-          eq(courseAccess.userId, ctx.session.user.id),
-          isNull(courseAccess.revokedAt),
-          eq(course.status, "published"),
-        ),
-      )
-      .orderBy(asc(course.title));
-  }),
-
   bySlug: protectedProcedure
     .input(z.object({ slug: z.string().min(1) }))
     .query(async ({ ctx, input }) => {

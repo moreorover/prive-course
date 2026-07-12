@@ -1,14 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  NumberInput,
-  Paper,
-  Select,
-  Stack,
-  TextInput,
-  Textarea,
-  Title,
-} from "@mantine/core";
+import { Button, Checkbox, Paper, Select, Stack, TextInput, Textarea, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 type PublishStatus = "draft" | "published" | "archived";
@@ -17,8 +7,6 @@ export type LessonFormValue = {
   title: string;
   slug: string;
   description: string;
-  position: number;
-  durationSeconds: number | null;
   isFree: boolean;
   status: PublishStatus;
 };
@@ -51,19 +39,12 @@ export function LessonForm({
       title: "",
       slug: "",
       description: "",
-      position: 0,
-      durationSeconds: null,
       isFree: false,
       status: "draft",
     },
     validate: {
       title: (value) => (value.trim() ? null : "Title is required"),
       slug: (value) => (value.trim() ? null : "Slug is required"),
-      position: (value) => (Number.isInteger(value) && value >= 0 ? null : "Position is required"),
-      durationSeconds: (value) =>
-        value === null || (Number.isInteger(value) && value >= 0)
-          ? null
-          : "Duration must be 0 or greater",
     },
   });
 
@@ -93,19 +74,6 @@ export function LessonForm({
             required
           />
           <Textarea label="Description" minRows={4} {...form.getInputProps("description")} />
-          <NumberInput
-            label="Position"
-            min={0}
-            allowDecimal={false}
-            {...form.getInputProps("position")}
-            required
-          />
-          <NumberInput
-            label="Duration seconds"
-            min={0}
-            allowDecimal={false}
-            {...form.getInputProps("durationSeconds")}
-          />
           <Checkbox
             label="Free preview lesson"
             description="Guests can watch this lesson without course access."

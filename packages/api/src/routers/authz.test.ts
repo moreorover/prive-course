@@ -221,6 +221,42 @@ describe("API authorization boundaries", () => {
     ).rejects.toThrow();
   });
 
+  it("rejects manual lesson position and duration through lesson creation", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "course-id",
+          },
+        ],
+        [],
+        [
+          {
+            id: "lesson-id",
+            courseId: "course-id",
+            title: "Lesson",
+            slug: "lesson",
+            position: 0,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.createLesson({
+        courseId: "course-id",
+        title: "Lesson",
+        slug: "lesson",
+        description: "",
+        position: 99,
+        durationSeconds: 123,
+        isFree: false,
+        status: "draft",
+      }),
+    ).rejects.toThrow();
+  });
+
   it("rejects manual video UID changes through lesson updates", async () => {
     const caller = createCaller({
       session: createSession("admin"),
@@ -238,6 +274,29 @@ describe("API authorization boundaries", () => {
       caller.admin.updateLesson({
         id: "lesson-id",
         videoUid: "manual-video-uid",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects manual lesson position and duration through lesson updates", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "lesson-id",
+            position: 99,
+            durationSeconds: 123,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.updateLesson({
+        id: "lesson-id",
+        position: 99,
+        durationSeconds: 123,
       }),
     ).rejects.toThrow();
   });

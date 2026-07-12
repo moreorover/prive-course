@@ -56,8 +56,6 @@ function EditLessonRoute() {
                 title: lesson.data.title,
                 slug: lesson.data.slug,
                 description: lesson.data.description ?? "",
-                position: lesson.data.position,
-                durationSeconds: lesson.data.durationSeconds,
                 isFree: lesson.data.isFree,
                 status: lesson.data.status,
               }}

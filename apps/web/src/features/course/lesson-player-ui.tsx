@@ -40,7 +40,7 @@ export function ProtectedVideoPanel({
           <Text c="dimmed" ta="center" maw={480}>
             Start playback when you're ready.
           </Text>
-          <Button loading={isPending} onClick={onStart}>
+          <Button color="gold" loading={isPending} onClick={onStart}>
             Start playback
           </Button>
           {errorMessage ? <Text c="red">{errorMessage}</Text> : null}
@@ -113,7 +113,7 @@ export function ActiveVideoPanel({
         </div>
         <Group justify="space-between" gap="md">
           <Text c="dimmed">Saved at {savedProgressLabel}</Text>
-          {completed ? <Badge color="green">Complete</Badge> : null}
+          {completed ? <Badge color="gold">Complete</Badge> : null}
         </Group>
         {playerError ? (
           <Alert color="red" title="Playback failed">

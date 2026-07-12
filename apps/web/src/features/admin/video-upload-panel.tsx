@@ -20,7 +20,7 @@ const tusChunkSizeBytes = 50 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
   if (readyToStream || state === "ready") {
-    return "green";
+    return "gold";
   }
 
   if (state === "error") {

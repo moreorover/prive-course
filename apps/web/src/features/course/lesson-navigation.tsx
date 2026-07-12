@@ -16,7 +16,7 @@ export type NavigationLesson = {
 function getAccessBadge(lesson: NavigationLesson) {
   if (lesson.accessState === "free") {
     return (
-      <Badge color="teal" variant="light">
+      <Badge color="gold" variant="light">
         Free
       </Badge>
     );
@@ -24,7 +24,7 @@ function getAccessBadge(lesson: NavigationLesson) {
 
   if (lesson.accessState === "included") {
     return (
-      <Badge color="blue" variant="light">
+      <Badge color="gold" variant="filled">
         Included
       </Badge>
     );
@@ -87,7 +87,7 @@ export function LessonList({
                   withBorder
                   p="sm"
                   className="pc-panel"
-                  bg={navigationLesson.isCurrent ? "var(--mantine-color-blue-light)" : undefined}
+                  bg={navigationLesson.isCurrent ? "var(--mantine-color-gold-light)" : undefined}
                 >
                   {lessonTitle}
                 </Paper>

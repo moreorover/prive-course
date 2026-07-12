@@ -1,6 +1,6 @@
 import type { Context } from "../context";
 import { appRouter } from "./index";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@prive-course/env/server", () => ({
   env: {
@@ -8,6 +8,10 @@ vi.mock("@prive-course/env/server", () => ({
     CLOUDFLARE_STREAM_API_TOKEN: "stream-token",
   },
 }));
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 type Session = NonNullable<Context["session"]>;
 
@@ -57,6 +61,20 @@ class QueryResult<T> {
 
   find(predicate: (value: T extends Array<infer Item> ? Item : never) => boolean) {
     return Array.isArray(this.result) ? this.result.find(predicate) : undefined;
+  }
+}
+
+class MutationResult {
+  set() {
+    return this;
+  }
+
+  where() {
+    return Promise.resolve([]);
+  }
+
+  values() {
+    return Promise.resolve([]);
   }
 }
 
@@ -119,6 +137,8 @@ function createMockDb(results: MockQueryResult[]) {
         requireWhere: nextResult.requireWhere,
       });
     }),
+    insert: vi.fn(() => new MutationResult()),
+    update: vi.fn(() => new MutationResult()),
   };
 }
 
@@ -165,7 +185,123 @@ describe("API authorization boundaries", () => {
     });
   });
 
-  it("rejects course detail access without a manual course grant", async () => {
+  it("rejects manual video UID changes through lesson creation", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "course-id",
+          },
+        ],
+        [
+          {
+            id: "lesson-id",
+            courseId: "course-id",
+            title: "Lesson",
+            slug: "lesson",
+            videoUid: "manual-video-uid",
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.createLesson({
+        courseId: "course-id",
+        title: "Lesson",
+        slug: "lesson",
+        description: "",
+        position: 0,
+        durationSeconds: null,
+        isFree: false,
+        status: "draft",
+        videoUid: "manual-video-uid",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects manual lesson position and duration through lesson creation", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "course-id",
+          },
+        ],
+        [],
+        [
+          {
+            id: "lesson-id",
+            courseId: "course-id",
+            title: "Lesson",
+            slug: "lesson",
+            position: 0,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.createLesson({
+        courseId: "course-id",
+        title: "Lesson",
+        slug: "lesson",
+        description: "",
+        position: 99,
+        durationSeconds: 123,
+        isFree: false,
+        status: "draft",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects manual video UID changes through lesson updates", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "lesson-id",
+            videoUid: "manual-video-uid",
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.updateLesson({
+        id: "lesson-id",
+        videoUid: "manual-video-uid",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects manual lesson position and duration through lesson updates", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "lesson-id",
+            position: 99,
+            durationSeconds: 123,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.updateLesson({
+        id: "lesson-id",
+        position: 99,
+        durationSeconds: 123,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("allows signed-in users without a manual course grant to open published course detail", async () => {
     const caller = createCaller({
       session: createSession("user"),
       results: [
@@ -177,12 +313,18 @@ describe("API authorization boundaries", () => {
           },
         ],
         [],
+        [],
       ],
     });
 
-    await expect(caller.courses.bySlug({ slug: "course" })).rejects.toMatchObject({
-      code: "FORBIDDEN",
-    });
+    await expect(caller.courses.bySlug({ slug: "course" })).resolves.toEqual(
+      expect.objectContaining({
+        id: "course-id",
+        hasActiveAccess: false,
+        grantedAt: null,
+        lessons: [],
+      }),
+    );
   });
 
   it("allows guests to list published course summaries", async () => {
@@ -242,6 +384,221 @@ describe("API authorization boundaries", () => {
         status: "published",
       }),
     ]);
+  });
+
+  it("allows guests to open published course detail with free and locked lesson metadata", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        [
+          {
+            id: "course-id",
+            title: "Published Course",
+            slug: "course",
+            description: "Visible detail",
+            status: "published",
+          },
+        ],
+        [
+          {
+            id: "free-lesson-id",
+            courseId: "course-id",
+            title: "Free Lesson",
+            slug: "free-lesson",
+            description: null,
+            position: 0,
+            durationSeconds: 120,
+            status: "published",
+            isFree: true,
+          },
+          {
+            id: "paid-lesson-id",
+            courseId: "course-id",
+            title: "Paid Lesson",
+            slug: "paid-lesson",
+            description: null,
+            position: 1,
+            durationSeconds: 180,
+            status: "published",
+            isFree: false,
+          },
+        ],
+      ],
+    });
+
+    await expect(caller.courses.bySlug({ slug: "course" })).resolves.toEqual(
+      expect.objectContaining({
+        id: "course-id",
+        hasActiveAccess: false,
+        grantedAt: null,
+        lessons: [
+          expect.objectContaining({ id: "free-lesson-id", isFree: true }),
+          expect.objectContaining({ id: "paid-lesson-id", isFree: false }),
+        ],
+      }),
+    );
+  });
+
+  it("allows guests to open published free lesson detail", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              title: "Published Course",
+              slug: "course",
+              status: "published",
+            },
+            lesson: {
+              id: "free-lesson-id",
+              courseId: "course-id",
+              title: "Free Lesson",
+              slug: "free-lesson",
+              status: "published",
+              isFree: true,
+              videoUid: "video-uid",
+            },
+            progress: null,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.lessonBySlug({ courseSlug: "course", lessonSlug: "free-lesson" }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        lesson: expect.objectContaining({ id: "free-lesson-id", isFree: true }),
+        progress: null,
+      }),
+    );
+  });
+
+  it("rejects guest access to published paid lesson detail", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              title: "Published Course",
+              slug: "course",
+              status: "published",
+            },
+            lesson: {
+              id: "paid-lesson-id",
+              courseId: "course-id",
+              title: "Paid Lesson",
+              slug: "paid-lesson",
+              status: "published",
+              isFree: false,
+              videoUid: "video-uid",
+            },
+            progress: null,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.lessonBySlug({ courseSlug: "course", lessonSlug: "paid-lesson" }),
+    ).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+  });
+
+  it("allows guests to create playback tokens for published free lessons without playback sessions", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          success: true,
+          result: {
+            token: "signed-stream-token",
+          },
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const caller = createCaller({
+      session: null,
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              status: "published",
+            },
+            lesson: {
+              id: "free-lesson-id",
+              courseId: "course-id",
+              status: "published",
+              isFree: true,
+              videoUid: "video-uid",
+            },
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.createPlaybackToken({ lessonId: "free-lesson-id" }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        playbackSessionId: null,
+        token: "signed-stream-token",
+        iframeUrl: "https://iframe.videodelivery.net/signed-stream-token",
+      }),
+    );
+  });
+
+  it("allows signed-in users to save progress for published free lessons without a course grant", async () => {
+    const caller = createCaller({
+      session: createSession("user"),
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              status: "published",
+            },
+            lesson: {
+              id: "free-lesson-id",
+              courseId: "course-id",
+              status: "published",
+              isFree: true,
+              videoUid: "video-uid",
+            },
+          },
+        ],
+        [],
+        [
+          {
+            id: "progress-id",
+            userId: "user-id",
+            lessonId: "free-lesson-id",
+            progressSeconds: 30,
+            completedAt: null,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.updateProgress({
+        lessonId: "free-lesson-id",
+        progressSeconds: 30,
+        completed: false,
+      }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        lessonId: "free-lesson-id",
+        progressSeconds: 30,
+      }),
+    );
   });
 
   it("rejects playback token creation without a manual course grant", async () => {

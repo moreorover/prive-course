@@ -20,12 +20,13 @@ const lessonSummaryColumns = {
   description: lesson.description,
   position: lesson.position,
   durationSeconds: lesson.durationSeconds,
+  isFree: lesson.isFree,
   status: lesson.status,
 };
 
-async function assertCourseAccess(db: ContextDb, userId: string, courseId: string) {
+async function getActiveCourseAccess(db: ContextDb, userId: string, courseId: string) {
   const access = await db
-    .select({ id: courseAccess.id })
+    .select({ id: courseAccess.id, grantedAt: courseAccess.grantedAt })
     .from(courseAccess)
     .where(
       and(
@@ -36,15 +37,18 @@ async function assertCourseAccess(db: ContextDb, userId: string, courseId: strin
     )
     .limit(1);
 
-  if (!access[0]) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "Course access required",
-    });
-  }
+  return access[0] ?? null;
 }
 
 type ContextDb = ReturnType<typeof import("@prive-course/db").createDb>;
+type ContextSession = {
+  session?: {
+    id?: string;
+  };
+  user: {
+    id: string;
+  };
+} | null;
 
 const streamTokenResponseSchema = z.object({
   success: z.boolean(),
@@ -57,7 +61,7 @@ const streamTokenResponseSchema = z.object({
 const playbackHeartbeatWindowMs = 90_000;
 const playbackTokenTtlSeconds = 60 * 60;
 
-async function getPublishedLessonForUser(db: ContextDb, userId: string, lessonId: string) {
+async function getPublishedLesson(db: ContextDb, lessonId: string) {
   const rows = await db
     .select({
       lesson,
@@ -78,9 +82,41 @@ async function getPublishedLessonForUser(db: ContextDb, userId: string, lessonId
     });
   }
 
-  await assertCourseAccess(db, userId, row.course.id);
-
   return row;
+}
+
+async function assertPublishedLessonAccess(
+  db: ContextDb,
+  session: ContextSession,
+  row: Awaited<ReturnType<typeof getPublishedLesson>>,
+) {
+  if (row.lesson.isFree) {
+    return {
+      hasActiveAccess: false,
+      grantedAt: null,
+    };
+  }
+
+  if (!session) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Course access required",
+    });
+  }
+
+  const access = await getActiveCourseAccess(db, session.user.id, row.course.id);
+
+  if (!access) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Course access required",
+    });
+  }
+
+  return {
+    hasActiveAccess: true,
+    grantedAt: access.grantedAt,
+  };
 }
 
 function getAuthSessionId(session: { session?: { id?: string } }) {
@@ -102,7 +138,7 @@ export const courseRouter = router({
       .orderBy(asc(course.title));
   }),
 
-  bySlug: protectedProcedure
+  bySlug: publicProcedure
     .input(z.object({ slug: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
       const rows = await ctx.db
@@ -119,7 +155,9 @@ export const courseRouter = router({
         });
       }
 
-      await assertCourseAccess(ctx.db, ctx.session.user.id, foundCourse.id);
+      const activeAccess = ctx.session
+        ? await getActiveCourseAccess(ctx.db, ctx.session.user.id, foundCourse.id)
+        : null;
 
       const lessons = await ctx.db
         .select(lessonSummaryColumns)
@@ -129,11 +167,13 @@ export const courseRouter = router({
 
       return {
         ...foundCourse,
+        hasActiveAccess: activeAccess !== null,
+        grantedAt: activeAccess?.grantedAt ?? null,
         lessons,
       };
     }),
 
-  lessonBySlug: protectedProcedure
+  lessonBySlug: publicProcedure
     .input(
       z.object({
         courseSlug: z.string().min(1),
@@ -145,17 +185,9 @@ export const courseRouter = router({
         .select({
           course,
           lesson,
-          progress: lessonProgress,
         })
         .from(lesson)
         .innerJoin(course, eq(course.id, lesson.courseId))
-        .leftJoin(
-          lessonProgress,
-          and(
-            eq(lessonProgress.lessonId, lesson.id),
-            eq(lessonProgress.userId, ctx.session.user.id),
-          ),
-        )
         .where(
           and(
             eq(course.slug, input.courseSlug),
@@ -174,9 +206,24 @@ export const courseRouter = router({
         });
       }
 
-      await assertCourseAccess(ctx.db, ctx.session.user.id, row.course.id);
+      await assertPublishedLessonAccess(ctx.db, ctx.session, row);
+      const progressRows = ctx.session
+        ? await ctx.db
+            .select()
+            .from(lessonProgress)
+            .where(
+              and(
+                eq(lessonProgress.lessonId, row.lesson.id),
+                eq(lessonProgress.userId, ctx.session.user.id),
+              ),
+            )
+            .limit(1)
+        : [];
 
-      return row;
+      return {
+        ...row,
+        progress: progressRows[0] ?? null,
+      };
     }),
 
   updateProgress: protectedProcedure
@@ -188,7 +235,8 @@ export const courseRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await getPublishedLessonForUser(ctx.db, ctx.session.user.id, input.lessonId);
+      const row = await getPublishedLesson(ctx.db, input.lessonId);
+      await assertPublishedLessonAccess(ctx.db, ctx.session, row);
 
       const existingProgress = await ctx.db
         .select({
@@ -243,10 +291,11 @@ export const courseRouter = router({
       return progressRows[0];
     }),
 
-  createPlaybackToken: protectedProcedure
+  createPlaybackToken: publicProcedure
     .input(z.object({ lessonId: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      const row = await getPublishedLessonForUser(ctx.db, ctx.session.user.id, input.lessonId);
+      const row = await getPublishedLesson(ctx.db, input.lessonId);
+      await assertPublishedLessonAccess(ctx.db, ctx.session, row);
 
       if (!row.lesson.videoUid) {
         throw new TRPCError({
@@ -262,35 +311,38 @@ export const courseRouter = router({
         });
       }
 
-      const authSessionId = getAuthSessionId(ctx.session);
+      const tokenExpiresAt = new Date(Date.now() + playbackTokenTtlSeconds * 1000);
       const now = new Date();
-      const heartbeatCutoff = new Date(Date.now() - playbackHeartbeatWindowMs);
-      const activeSessions = await ctx.db
-        .select({
-          id: playbackSession.id,
-          authSessionId: playbackSession.authSessionId,
-        })
-        .from(playbackSession)
-        .where(
-          and(
-            eq(playbackSession.userId, ctx.session.user.id),
-            gt(playbackSession.expiresAt, now),
-            gt(playbackSession.lastHeartbeatAt, heartbeatCutoff),
-          ),
+      const authSessionId = ctx.session ? getAuthSessionId(ctx.session) : null;
+
+      if (ctx.session) {
+        const heartbeatCutoff = new Date(Date.now() - playbackHeartbeatWindowMs);
+        const activeSessions = await ctx.db
+          .select({
+            id: playbackSession.id,
+            authSessionId: playbackSession.authSessionId,
+          })
+          .from(playbackSession)
+          .where(
+            and(
+              eq(playbackSession.userId, ctx.session.user.id),
+              gt(playbackSession.expiresAt, now),
+              gt(playbackSession.lastHeartbeatAt, heartbeatCutoff),
+            ),
+          );
+
+        const conflictingSession = activeSessions.find(
+          (session) => session.authSessionId !== authSessionId,
         );
 
-      const conflictingSession = activeSessions.find(
-        (session) => session.authSessionId !== authSessionId,
-      );
-
-      if (conflictingSession) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "This account is already playing a lesson in another session",
-        });
+        if (conflictingSession) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "This account is already playing a lesson in another session",
+          });
+        }
       }
 
-      const tokenExpiresAt = new Date(Date.now() + playbackTokenTtlSeconds * 1000);
       const response = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/stream/${row.lesson.videoUid}/token`,
         {
@@ -312,6 +364,16 @@ export const courseRouter = router({
           code: "BAD_GATEWAY",
           message: "Failed to create Cloudflare Stream playback token",
         });
+      }
+
+      if (!ctx.session) {
+        return {
+          playbackSessionId: null,
+          token: payload.data.result.token,
+          iframeUrl: `https://iframe.videodelivery.net/${payload.data.result.token}`,
+          tokenExpiresAt,
+          heartbeatExpiresAt: null,
+        };
       }
 
       const playbackSessionId = crypto.randomUUID();

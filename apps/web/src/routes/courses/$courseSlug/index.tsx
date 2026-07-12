@@ -53,28 +53,56 @@ function CourseDetailRoute() {
                       <Table.Tr>
                         <Table.Th>#</Table.Th>
                         <Table.Th>Title</Table.Th>
+                        <Table.Th>Access</Table.Th>
                         <Table.Th>Duration</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                      {course.data.lessons.map((lesson) => (
-                        <Table.Tr key={lesson.id}>
-                          <Table.Td>{lesson.position + 1}</Table.Td>
-                          <Table.Td>
-                            <Link
-                              to="/courses/$courseSlug/lessons/$lessonSlug"
-                              params={{ courseSlug, lessonSlug: lesson.slug }}
-                            >
-                              {lesson.title}
-                            </Link>
-                          </Table.Td>
-                          <Table.Td>
-                            {lesson.durationSeconds
-                              ? `${Math.round(lesson.durationSeconds / 60)} min`
-                              : "Pending"}
-                          </Table.Td>
-                        </Table.Tr>
-                      ))}
+                      {course.data.lessons.map((lesson) => {
+                        const canOpenLesson = lesson.isFree || course.data.hasActiveAccess;
+                        const accessLabel = lesson.isFree
+                          ? "Free"
+                          : course.data.hasActiveAccess
+                            ? "Included"
+                            : "Locked";
+
+                        return (
+                          <Table.Tr key={lesson.id}>
+                            <Table.Td>{lesson.position + 1}</Table.Td>
+                            <Table.Td>
+                              {canOpenLesson ? (
+                                <Link
+                                  to="/courses/$courseSlug/lessons/$lessonSlug"
+                                  params={{ courseSlug, lessonSlug: lesson.slug }}
+                                >
+                                  {lesson.title}
+                                </Link>
+                              ) : (
+                                <Text>{lesson.title}</Text>
+                              )}
+                            </Table.Td>
+                            <Table.Td>
+                              <Badge
+                                color={
+                                  lesson.isFree
+                                    ? "teal"
+                                    : course.data.hasActiveAccess
+                                      ? "blue"
+                                      : "gray"
+                                }
+                                variant="light"
+                              >
+                                {accessLabel}
+                              </Badge>
+                            </Table.Td>
+                            <Table.Td>
+                              {lesson.durationSeconds
+                                ? `${Math.round(lesson.durationSeconds / 60)} min`
+                                : "Pending"}
+                            </Table.Td>
+                          </Table.Tr>
+                        );
+                      })}
                     </Table.Tbody>
                   </Table>
                 )}

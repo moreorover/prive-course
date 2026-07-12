@@ -41,6 +41,7 @@ export const lesson = sqliteTable(
     position: integer("position").notNull(),
     videoUid: text("video_uid"),
     durationSeconds: integer("duration_seconds"),
+    isFree: integer("is_free", { mode: "boolean" }).default(false).notNull(),
     status: text("status").$type<PublishStatus>().default("draft").notNull(),
     createdAt,
     updatedAt,

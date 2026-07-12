@@ -30,21 +30,16 @@ const courseInputSchema = z.object({
   status: publishStatusSchema.default("draft"),
 });
 
-const lessonInputSchema = z.object({
-  courseId: z.string().min(1),
-  title: z.string().trim().min(1).max(180),
-  slug: slugSchema,
-  description: optionalTextSchema,
-  position: z.number().int().min(0),
-  videoUid: z
-    .string()
-    .trim()
-    .max(200)
-    .optional()
-    .transform((value) => (value ? value : null)),
-  durationSeconds: z.number().int().nonnegative().nullable().optional(),
-  status: publishStatusSchema.default("draft"),
-});
+const lessonInputSchema = z
+  .object({
+    courseId: z.string().min(1),
+    title: z.string().trim().min(1).max(180),
+    slug: slugSchema,
+    description: optionalTextSchema,
+    isFree: z.boolean().default(false),
+    status: publishStatusSchema.default("draft"),
+  })
+  .strict();
 
 const streamTusUploadResponseSchema = z.object({
   uploadURL: z.string().url(),
@@ -229,10 +224,15 @@ export const adminRouter = router({
   createLesson: adminProcedure.input(lessonInputSchema).mutation(async ({ ctx, input }) => {
     await getCourseOrThrow(ctx.db, input.courseId);
 
+    const existingLessons = await ctx.db
+      .select({ id: lesson.id })
+      .from(lesson)
+      .where(eq(lesson.courseId, input.courseId))
+      .orderBy(asc(lesson.position));
     const id = crypto.randomUUID();
     await ctx.db.insert(lesson).values({
       id,
-      durationSeconds: input.durationSeconds ?? null,
+      position: existingLessons.length,
       ...input,
     });
 
@@ -425,11 +425,26 @@ export const adminRouter = router({
         });
       }
 
+      const durationSeconds =
+        typeof payload.data.result.duration === "number"
+          ? Math.max(0, Math.round(payload.data.result.duration))
+          : null;
+
+      if (durationSeconds !== null && durationSeconds !== foundLesson.durationSeconds) {
+        await ctx.db
+          .update(lesson)
+          .set({
+            durationSeconds,
+            updatedAt: new Date(),
+          })
+          .where(eq(lesson.id, input.lessonId));
+      }
+
       return {
         configured: true,
         videoUid: payload.data.result.uid,
         readyToStream: payload.data.result.readyToStream ?? false,
-        duration: payload.data.result.duration ?? null,
+        duration: durationSeconds,
         status: payload.data.result.status ?? null,
       };
     }),

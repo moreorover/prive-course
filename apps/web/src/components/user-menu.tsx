@@ -40,9 +40,6 @@ export default function UserMenu() {
               fetchOptions: {
                 onSuccess: async () => {
                   await queryClient.invalidateQueries({
-                    queryKey: trpc.courses.listPublished.queryKey(),
-                  });
-                  await queryClient.invalidateQueries({
                     queryKey: trpc.courses.listGranted.queryKey(),
                   });
                   navigate({

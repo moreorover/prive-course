@@ -30,7 +30,6 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
       navigate({
         to: "/dashboard",
       });
-      await queryClient.invalidateQueries({ queryKey: trpc.courses.listPublished.queryKey() });
       await queryClient.invalidateQueries({ queryKey: trpc.courses.listGranted.queryKey() });
       toast.success("Sign in successful");
     } finally {
@@ -53,9 +52,6 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
           onSuccess: async () => {
             navigate({
               to: "/dashboard",
-            });
-            await queryClient.invalidateQueries({
-              queryKey: trpc.courses.listPublished.queryKey(),
             });
             await queryClient.invalidateQueries({ queryKey: trpc.courses.listGranted.queryKey() });
             toast.success("Sign in successful");

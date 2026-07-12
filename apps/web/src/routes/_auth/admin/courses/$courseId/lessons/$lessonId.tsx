@@ -59,6 +59,7 @@ function EditLessonRoute() {
                 position: lesson.data.position,
                 videoUid: lesson.data.videoUid ?? "",
                 durationSeconds: lesson.data.durationSeconds,
+                isFree: lesson.data.isFree,
                 status: lesson.data.status,
               }}
               onSubmit={(value: LessonFormValue) => updateLesson.mutate({ id: lessonId, ...value })}

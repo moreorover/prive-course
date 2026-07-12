@@ -43,6 +43,7 @@ const lessonInputSchema = z.object({
     .optional()
     .transform((value) => (value ? value : null)),
   durationSeconds: z.number().int().nonnegative().nullable().optional(),
+  isFree: z.boolean().default(false),
   status: publishStatusSchema.default("draft"),
 });
 

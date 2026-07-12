@@ -60,6 +60,7 @@ function NewLessonRoute() {
             position: lessons.data?.length ?? 0,
             videoUid: "",
             durationSeconds: null,
+            isFree: false,
             status: "draft",
           }}
           onSubmit={(value: LessonFormValue) =>

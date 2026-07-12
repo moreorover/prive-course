@@ -1,0 +1,1 @@
+ALTER TABLE `lesson` ADD `is_free` integer DEFAULT false NOT NULL;

@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   NumberInput,
   Paper,
   Select,
@@ -19,6 +20,7 @@ export type LessonFormValue = {
   position: number;
   videoUid: string;
   durationSeconds: number | null;
+  isFree: boolean;
   status: PublishStatus;
 };
 
@@ -53,6 +55,7 @@ export function LessonForm({
       position: 0,
       videoUid: "",
       durationSeconds: null,
+      isFree: false,
       status: "draft",
     },
     validate: {
@@ -105,6 +108,11 @@ export function LessonForm({
             min={0}
             allowDecimal={false}
             {...form.getInputProps("durationSeconds")}
+          />
+          <Checkbox
+            label="Free preview lesson"
+            description="Guests can watch this lesson without course access."
+            {...form.getInputProps("isFree", { type: "checkbox" })}
           />
           <Select
             label="Status"

@@ -66,15 +66,15 @@ reviewable steps; each checkbox should leave the app in a working state.
 
 ## Phase 4: Lesson Viewing Navigation
 
-- [ ] Return ordered lesson navigation context from the lesson API.
+- [x] Return ordered lesson navigation context from the lesson API.
   - Scope: Include enough published lesson summary data to render a sidebar and previous/next links.
   - Acceptance: The current lesson, previous lesson, next lesson, and locked/free states are computed consistently by the backend.
   - Validate: `vp run check` and `vp run test`.
-- [ ] Add previous and next lesson navigation.
+- [x] Add previous and next lesson navigation.
   - Scope: Add navigation controls to the lesson route using TanStack Router `Link`.
   - Acceptance: Controls are disabled or absent at course boundaries and never link guests or users without access to locked paid lessons.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Add a responsive lesson viewing layout.
+- [x] Add a responsive lesson viewing layout.
   - Scope: On laptop and wider viewports, show the lesson list on the left and video plus description on the right; on mobile, keep a single-column flow.
   - Acceptance: The video, lesson description, and navigation remain usable on mobile and laptop widths without fixed-width layout assumptions.
   - Validate: `vp run check`, `vp run test`, React Doctor, and `vp run smoke` when practical.

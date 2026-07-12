@@ -91,9 +91,11 @@ async function assertPublishedLessonAccess(
   row: Awaited<ReturnType<typeof getPublishedLesson>>,
 ) {
   if (row.lesson.isFree) {
+    const access = session ? await getActiveCourseAccess(db, session.user.id, row.course.id) : null;
+
     return {
-      hasActiveAccess: false,
-      grantedAt: null,
+      hasActiveAccess: access !== null,
+      grantedAt: access?.grantedAt ?? null,
     };
   }
 
@@ -117,6 +119,19 @@ async function assertPublishedLessonAccess(
     hasActiveAccess: true,
     grantedAt: access.grantedAt,
   };
+}
+
+type LessonAccessState = "free" | "included" | "locked";
+
+function getLessonAccessState(
+  lessonSummary: { isFree: boolean },
+  hasActiveAccess: boolean,
+): LessonAccessState {
+  if (lessonSummary.isFree) {
+    return "free";
+  }
+
+  return hasActiveAccess ? "included" : "locked";
 }
 
 function getAuthSessionId(session: { session?: { id?: string } }) {
@@ -267,7 +282,7 @@ export const courseRouter = router({
         });
       }
 
-      await assertPublishedLessonAccess(ctx.db, ctx.session, row);
+      const accessInfo = await assertPublishedLessonAccess(ctx.db, ctx.session, row);
       const progressRows = ctx.session
         ? await ctx.db
             .select()
@@ -280,10 +295,35 @@ export const courseRouter = router({
             )
             .limit(1)
         : [];
+      const lessons = await ctx.db
+        .select(lessonSummaryColumns)
+        .from(lesson)
+        .where(and(eq(lesson.courseId, row.course.id), eq(lesson.status, "published")))
+        .orderBy(asc(lesson.position));
+      const navigationLessons = lessons.map((publishedLesson) => ({
+        ...publishedLesson,
+        accessState: getLessonAccessState(publishedLesson, accessInfo.hasActiveAccess),
+        isCurrent: publishedLesson.id === row.lesson.id,
+      }));
+      const accessibleLessons = navigationLessons.filter(
+        (publishedLesson) => publishedLesson.accessState !== "locked",
+      );
+      const accessibleLessonIndex = accessibleLessons.findIndex(
+        (publishedLesson) => publishedLesson.id === row.lesson.id,
+      );
 
       return {
         ...row,
         progress: progressRows[0] ?? null,
+        navigation: {
+          lessons: navigationLessons,
+          previousLesson:
+            accessibleLessonIndex > 0 ? accessibleLessons[accessibleLessonIndex - 1] : null,
+          nextLesson:
+            accessibleLessonIndex >= 0 && accessibleLessonIndex < accessibleLessons.length - 1
+              ? accessibleLessons[accessibleLessonIndex + 1]
+              : null,
+        },
       };
     }),
 

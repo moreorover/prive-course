@@ -12,7 +12,12 @@ vi.mock("@prive-course/env/server", () => ({
 type Session = NonNullable<Context["session"]>;
 
 class QueryResult<T> {
-  constructor(private readonly result: T) {}
+  private didCallWhere = false;
+
+  constructor(
+    private readonly result: T,
+    private readonly options: { expectedWhereTokens?: string[]; requireWhere?: boolean } = {},
+  ) {}
 
   from() {
     return this;
@@ -26,12 +31,24 @@ class QueryResult<T> {
     return this;
   }
 
-  where() {
+  where(condition?: unknown) {
+    this.didCallWhere = true;
+    const conditionTokens = collectSqlConditionTokens(condition);
+
+    for (const expectedToken of this.options.expectedWhereTokens ?? []) {
+      if (!conditionTokens.includes(expectedToken)) {
+        throw new Error(`Expected where clause to include ${expectedToken}`);
+      }
+    }
+
     return this;
   }
 
   orderBy() {
-    return this;
+    if (this.options.requireWhere && !this.didCallWhere) {
+      throw new Error("Expected query to include a where clause");
+    }
+    return Promise.resolve(this.result);
   }
 
   limit() {
@@ -43,9 +60,65 @@ class QueryResult<T> {
   }
 }
 
-function createMockDb(results: unknown[]) {
+type MockQueryResult =
+  | unknown[]
+  | { expectedWhereTokens?: string[]; result: unknown[]; requireWhere?: boolean };
+
+function collectSqlConditionTokens(condition: unknown): string[] {
+  if (!condition || typeof condition !== "object") {
+    return [];
+  }
+
+  const chunks = (condition as { queryChunks?: unknown[] }).queryChunks;
+  if (!chunks) {
+    return [];
+  }
+
+  return chunks.flatMap((chunk) => {
+    if (typeof chunk === "string") {
+      return [chunk];
+    }
+
+    if (!chunk || typeof chunk !== "object") {
+      return [];
+    }
+
+    const namedChunk = chunk as { name?: unknown; queryChunks?: unknown[]; value?: unknown };
+
+    if (typeof namedChunk.name === "string") {
+      return [namedChunk.name];
+    }
+
+    if (Array.isArray(namedChunk.value)) {
+      return namedChunk.value.filter((value): value is string => typeof value === "string");
+    }
+
+    if (typeof namedChunk.value === "string") {
+      return [namedChunk.value];
+    }
+
+    if (Array.isArray(namedChunk.queryChunks)) {
+      return collectSqlConditionTokens(namedChunk);
+    }
+
+    return [];
+  });
+}
+
+function createMockDb(results: MockQueryResult[]) {
   return {
-    select: vi.fn(() => new QueryResult(results.shift() ?? [])),
+    select: vi.fn(() => {
+      const nextResult = results.shift() ?? [];
+
+      if (Array.isArray(nextResult)) {
+        return new QueryResult(nextResult);
+      }
+
+      return new QueryResult(nextResult.result, {
+        expectedWhereTokens: nextResult.expectedWhereTokens,
+        requireWhere: nextResult.requireWhere,
+      });
+    }),
   };
 }
 
@@ -65,7 +138,7 @@ function createCaller({
   results = [],
   session,
 }: {
-  results?: unknown[];
+  results?: MockQueryResult[];
   session: Context["session"];
 }) {
   return appRouter.createCaller({
@@ -110,6 +183,65 @@ describe("API authorization boundaries", () => {
     await expect(caller.courses.bySlug({ slug: "course" })).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
+  });
+
+  it("allows guests to list published course summaries", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        {
+          expectedWhereTokens: ["status", "published"],
+          requireWhere: true,
+          result: [
+            {
+              id: "published-course-id",
+              title: "Published Course",
+              slug: "published-course",
+              description: "Visible to guests",
+              status: "published",
+            },
+          ],
+        },
+      ],
+    });
+
+    await expect(caller.courses.listPublished()).resolves.toEqual([
+      {
+        id: "published-course-id",
+        title: "Published Course",
+        slug: "published-course",
+        description: "Visible to guests",
+        status: "published",
+      },
+    ]);
+  });
+
+  it("does not expose draft or archived courses in the guest catalog", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        {
+          expectedWhereTokens: ["status", "published"],
+          requireWhere: true,
+          result: [
+            {
+              id: "published-course-id",
+              title: "Published Course",
+              slug: "published-course",
+              description: null,
+              status: "published",
+            },
+          ],
+        },
+      ],
+    });
+
+    await expect(caller.courses.listPublished()).resolves.toEqual([
+      expect.objectContaining({
+        id: "published-course-id",
+        status: "published",
+      }),
+    ]);
   });
 
   it("rejects playback token creation without a manual course grant", async () => {

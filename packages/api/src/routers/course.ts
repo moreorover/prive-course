@@ -10,7 +10,7 @@ import { TRPCError } from "@trpc/server";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
-import { protectedProcedure, router } from "../index";
+import { protectedProcedure, publicProcedure, router } from "../index";
 
 const lessonSummaryColumns = {
   id: lesson.id,
@@ -88,7 +88,7 @@ function getAuthSessionId(session: { session?: { id?: string } }) {
 }
 
 export const courseRouter = router({
-  listGranted: protectedProcedure.query(async ({ ctx }) => {
+  listPublished: publicProcedure.query(async ({ ctx }) => {
     return ctx.db
       .select({
         id: course.id,
@@ -96,17 +96,9 @@ export const courseRouter = router({
         slug: course.slug,
         description: course.description,
         status: course.status,
-        grantedAt: courseAccess.grantedAt,
       })
-      .from(courseAccess)
-      .innerJoin(course, eq(course.id, courseAccess.courseId))
-      .where(
-        and(
-          eq(courseAccess.userId, ctx.session.user.id),
-          isNull(courseAccess.revokedAt),
-          eq(course.status, "published"),
-        ),
-      )
+      .from(course)
+      .where(eq(course.status, "published"))
       .orderBy(asc(course.title));
   }),
 

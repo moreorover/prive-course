@@ -12,7 +12,7 @@ function lessonQueryOptions(courseSlug: string, lessonSlug: string) {
   });
 }
 
-export const Route = createFileRoute("/_auth/courses/$courseSlug/lessons/$lessonSlug")({
+export const Route = createFileRoute("/courses/$courseSlug/lessons/$lessonSlug")({
   component: LessonRoute,
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(

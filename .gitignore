@@ -55,5 +55,6 @@ coverage
 *.sqlite-shm
 *.sqlite-wal
 .cache
+.superpowers/
 tmp
 temp

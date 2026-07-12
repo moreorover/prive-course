@@ -4,7 +4,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { queryClient, trpc } from "@/utils/trpc";
+import { trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseId: string) {
   return trpc.admin.getCourse.queryOptions({ id: courseId });
@@ -49,12 +49,7 @@ function CourseAccessRoute() {
   const revokeAccess = useMutation(
     trpc.admin.revokeCourseAccess.mutationOptions({
       onSuccess: async () => {
-        await Promise.all([
-          access.refetch(),
-          queryClient.invalidateQueries({
-            queryKey: trpc.courses.listGranted.queryKey(),
-          }),
-        ]);
+        await access.refetch();
         toast.success("Access revoked");
       },
       onError: (error) => {

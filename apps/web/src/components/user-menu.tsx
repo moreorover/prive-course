@@ -3,7 +3,6 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
-import { queryClient, trpc } from "@/utils/trpc";
 
 export default function UserMenu() {
   const navigate = useNavigate();
@@ -59,13 +58,7 @@ export default function UserMenu() {
           onClick={() => {
             authClient.signOut({
               fetchOptions: {
-                onSuccess: async () => {
-                  await queryClient.invalidateQueries({
-                    queryKey: trpc.courses.listPublished.queryKey(),
-                  });
-                  await queryClient.invalidateQueries({
-                    queryKey: trpc.courses.listGranted.queryKey(),
-                  });
+                onSuccess: () => {
                   navigate({
                     to: "/",
                   });

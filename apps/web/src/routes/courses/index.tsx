@@ -86,11 +86,6 @@ function CoursesRoute() {
                       {course.title}
                     </Title>
                   </Stack>
-                  {course.hasActiveAccess ? (
-                    <Badge color="gold" variant="filled">
-                      Access granted
-                    </Badge>
-                  ) : null}
                 </Group>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
@@ -104,11 +99,7 @@ function CoursesRoute() {
                   </Badge>
                 </Group>
                 <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button
-                    variant={course.hasActiveAccess ? "filled" : "light"}
-                    color="gold"
-                    fullWidth
-                  >
+                  <Button variant="light" color="gold" fullWidth>
                     View course
                   </Button>
                 </Link>

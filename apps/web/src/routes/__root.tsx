@@ -38,10 +38,38 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 const theme = createTheme({
+  defaultRadius: "sm",
   primaryColor: "teal",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headings: {
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+    fontWeight: "720",
+  },
+  colors: {
+    brass: [
+      "#fbf6e7",
+      "#f1e5bf",
+      "#e5d091",
+      "#d4b765",
+      "#b08a3c",
+      "#987331",
+      "#775725",
+      "#59401c",
+      "#3b2a13",
+      "#22180b",
+    ],
+  },
+  components: {
+    Button: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    Paper: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
   },
 });
 
@@ -49,7 +77,7 @@ function RootComponent() {
   return (
     <>
       <HeadContent />
-      <MantineProvider defaultColorScheme="dark" theme={theme}>
+      <MantineProvider defaultColorScheme="auto" theme={theme}>
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <Header />
           <Outlet />

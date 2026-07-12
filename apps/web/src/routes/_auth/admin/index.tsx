@@ -18,8 +18,8 @@ function AdminCourses() {
   const courses = useQuery(coursesQueryOptions);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page">
+      <Stack gap="xl">
         <Group justify="space-between" align="end">
           <div>
             <Title order={1}>Admin</Title>
@@ -30,22 +30,22 @@ function AdminCourses() {
           </Link>
         </Group>
 
-        <Paper withBorder p="md" radius="sm">
-          <Stack gap="md">
-            <Title order={2} size="h4">
-              Courses
-            </Title>
-            {courses.data?.length === 0 ? (
-              <EmptyState
-                title="No courses yet"
-                description="Create the first course, then add lessons and grant users access."
-                action={
-                  <Link to="/admin/courses/new">
-                    <Button>Create course</Button>
-                  </Link>
-                }
-              />
-            ) : (
+        <Stack gap="md">
+          <Title order={2} size="h4">
+            Courses
+          </Title>
+          {courses.data?.length === 0 ? (
+            <EmptyState
+              title="No courses yet"
+              description="Create the first course, then add lessons and grant users access."
+              action={
+                <Link to="/admin/courses/new">
+                  <Button>Create course</Button>
+                </Link>
+              }
+            />
+          ) : (
+            <Paper withBorder p="lg" className="pc-panel">
               <Table striped highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -74,9 +74,9 @@ function AdminCourses() {
                   ))}
                 </Table.Tbody>
               </Table>
-            )}
-          </Stack>
-        </Paper>
+            </Paper>
+          )}
+        </Stack>
       </Stack>
     </main>
   );

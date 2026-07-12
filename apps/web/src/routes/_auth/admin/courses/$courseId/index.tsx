@@ -97,8 +97,8 @@ function EditCourseRoute() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page">
+      <Stack gap="xl">
         <Link to="/admin">
           <Button variant="subtle">Back to courses</Button>
         </Link>
@@ -124,31 +124,31 @@ function EditCourseRoute() {
               onSubmit={(value: CourseFormValue) => updateCourse.mutate({ id: courseId, ...value })}
             />
 
-            <Paper withBorder p="md" radius="sm">
-              <Stack gap="md">
-                <Group justify="space-between" align="center">
-                  <div>
-                    <Title order={2} size="h4">
-                      Lessons
-                    </Title>
-                    <Text c="dimmed">Create and edit lessons for this course.</Text>
-                  </div>
-                  <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
-                    <Button>New lesson</Button>
-                  </Link>
-                </Group>
+            <Stack gap="md">
+              <Group justify="space-between" align="center">
+                <div>
+                  <Title order={2} size="h4">
+                    Lessons
+                  </Title>
+                  <Text c="dimmed">Create and edit lessons for this course.</Text>
+                </div>
+                <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
+                  <Button>New lesson</Button>
+                </Link>
+              </Group>
 
-                {lessons.data?.length === 0 ? (
-                  <EmptyState
-                    title="No lessons yet"
-                    description="Add the first lesson, upload a video, then publish it when it is ready."
-                    action={
-                      <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
-                        <Button>Create lesson</Button>
-                      </Link>
-                    }
-                  />
-                ) : (
+              {lessons.data?.length === 0 ? (
+                <EmptyState
+                  title="No lessons yet"
+                  description="Add the first lesson, upload a video, then publish it when it is ready."
+                  action={
+                    <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
+                      <Button>Create lesson</Button>
+                    </Link>
+                  }
+                />
+              ) : (
+                <Paper withBorder p="lg" className="pc-panel">
                   <Table striped highlightOnHover>
                     <Table.Thead>
                       <Table.Tr>
@@ -212,12 +212,12 @@ function EditCourseRoute() {
                       ))}
                     </Table.Tbody>
                   </Table>
-                )}
-              </Stack>
-            </Paper>
+                </Paper>
+              )}
+            </Stack>
           </>
         ) : (
-          <Paper withBorder p="lg" radius="sm">
+          <Paper withBorder p="lg" className="pc-panel">
             <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
           </Paper>
         )}

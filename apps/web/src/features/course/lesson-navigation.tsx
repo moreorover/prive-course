@@ -16,7 +16,7 @@ export type NavigationLesson = {
 function getAccessBadge(lesson: NavigationLesson) {
   if (lesson.accessState === "free") {
     return (
-      <Badge color="teal" variant="light">
+      <Badge color="gold" variant="light">
         Free
       </Badge>
     );
@@ -24,7 +24,7 @@ function getAccessBadge(lesson: NavigationLesson) {
 
   if (lesson.accessState === "included") {
     return (
-      <Badge color="blue" variant="light">
+      <Badge color="gold" variant="filled">
         Included
       </Badge>
     );
@@ -45,7 +45,7 @@ export function LessonList({
   lessons: NavigationLesson[];
 }) {
   return (
-    <Paper withBorder p="md" radius="sm">
+    <section>
       <Stack gap="md">
         <Title order={2} size="h4">
           Lessons
@@ -70,7 +70,7 @@ export function LessonList({
 
             if (navigationLesson.accessState === "locked") {
               return (
-                <Paper key={navigationLesson.id} withBorder p="sm" radius="sm">
+                <Paper key={navigationLesson.id} withBorder p="sm" className="pc-panel">
                   {lessonTitle}
                 </Paper>
               );
@@ -86,8 +86,8 @@ export function LessonList({
                 <Paper
                   withBorder
                   p="sm"
-                  radius="sm"
-                  bg={navigationLesson.isCurrent ? "var(--mantine-color-blue-light)" : undefined}
+                  className="pc-panel"
+                  bg={navigationLesson.isCurrent ? "var(--mantine-color-gold-light)" : undefined}
                 >
                   {lessonTitle}
                 </Paper>
@@ -96,7 +96,7 @@ export function LessonList({
           })}
         </Stack>
       </Stack>
-    </Paper>
+    </section>
   );
 }
 

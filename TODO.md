@@ -89,15 +89,29 @@ reviewable steps; each checkbox should leave the app in a working state.
 
 ## Phase 5: UI Facelift
 
-- [ ] Use `$frontend-design` to define the visual direction.
+- Constraints:
+  - Existing UI can change freely when it improves the product.
+  - Light and dark modes must both look intentional.
+  - Prefer Mantine v9 components and props before creating custom complex components.
+  - The main reading flow should be mobile-first and single-column; desktop can use two columns, but no more.
+
+- [x] Use `$frontend-design` to define the visual direction.
   - Scope: Establish a premium, trustworthy, clean interface direction before changing app styling.
   - Acceptance: The design direction is specific enough to guide Mantine theme, spacing, typography, and page composition.
   - Validate: Design review before implementation.
-- [ ] Refine global Mantine styling.
+- [x] Reposition public pages as a course marketing platform.
+  - Scope: Make guest-facing course catalog and course detail pages feel product-ready for browsing, evaluating, and entering courses.
+  - Acceptance: Guests can view all published courses, inspect individual course details, understand the lesson outline, and clearly distinguish free previews from locked lessons.
+  - Validate: `vp run check`, `vp run test`, React Doctor, and visual review at mobile and desktop widths.
+- [x] Replace current palette with a gold-led light/dark visual system.
+  - Scope: Use gold as the main accent with supporting colors that avoid a flat beige/yellow-heavy look.
+  - Acceptance: CTAs, badges, section markers, focus states, and key course surfaces use the palette consistently in both light and dark modes.
+  - Validate: `vp run check`, `vp run test`, and React Doctor.
+- [x] Refine global Mantine styling.
   - Scope: Update global styling in `apps/web/src/index.css` and theme-level choices rather than making components describe their own style intent.
   - Acceptance: Styling remains mobile-first, responsive, and consistent with Mantine conventions.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Improve course and lesson surfaces.
+- [x] Improve course and lesson surfaces.
   - Scope: Polish course cards, course detail lesson lists, locked/free indicators, empty states, and lesson playback pages.
   - Acceptance: The app feels premium, trustworthy, and clean without marketing-page treatment or decorative clutter.
   - Validate: `vp run check`, `vp run test`, React Doctor, and visual review at mobile and laptop widths.

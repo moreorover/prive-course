@@ -36,7 +36,7 @@ function NewLessonRoute() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
+    <main className="pc-page-narrow">
       <Stack gap="lg">
         <Link to="/admin/courses/$courseId" params={{ courseId }}>
           <Button variant="subtle">Back to course</Button>

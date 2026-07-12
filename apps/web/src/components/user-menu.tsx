@@ -1,5 +1,6 @@
-import { Button, Menu, Skeleton, Text } from "@mantine/core";
+import { Avatar, Button, Menu, Skeleton, Text } from "@mantine/core";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { LogOut, User } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -14,26 +15,46 @@ export default function UserMenu() {
   if (!session) {
     return (
       <Link to="/login">
-        <Button variant="outline">Sign In</Button>
+        <Button variant="filled">Sign in</Button>
       </Link>
     );
   }
 
+  const initials =
+    session.user.name
+      ?.split(" ")
+      .flatMap((part) => (part ? [part[0]] : []))
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "PC";
+
   return (
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
-        <Button variant="outline">{session.user.name}</Button>
+        <Button
+          variant="outline"
+          leftSection={
+            <Avatar color="teal" radius="xl" size={22}>
+              {initials}
+            </Avatar>
+          }
+        >
+          {session.user.name}
+        </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Label>My Account</Menu.Label>
+        <Menu.Label>Account</Menu.Label>
         <Menu.Item disabled>
           <Text size="sm" c="dimmed">
             {session.user.email}
           </Text>
         </Menu.Item>
-        <Menu.Item onClick={() => navigate({ to: "/profile" })}>Profile</Menu.Item>
+        <Menu.Item leftSection={<User size={16} />} onClick={() => navigate({ to: "/profile" })}>
+          Profile
+        </Menu.Item>
         <Menu.Item
           color="red"
+          leftSection={<LogOut size={16} />}
           onClick={() => {
             authClient.signOut({
               fetchOptions: {

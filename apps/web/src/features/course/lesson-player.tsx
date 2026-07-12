@@ -1,11 +1,12 @@
-import { Stream, type StreamPlayerApi } from "@cloudflare/stream-react";
-import { Alert, Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import type { StreamPlayerApi } from "@cloudflare/stream-react";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
+
+import { ActiveVideoPanel, NoVideoPanel, ProtectedVideoPanel } from "./lesson-player-ui";
 
 const localProgressDeltaSeconds = 5;
 
@@ -275,98 +276,48 @@ export function LessonPlayer({
   }, [flushProgress]);
 
   if (!videoUid) {
-    return (
-      <Paper withBorder radius="sm" p="md">
-        <div className="grid aspect-video place-items-center border border-dashed">
-          <Text fw={600}>No video uploaded</Text>
-        </div>
-      </Paper>
-    );
+    return <NoVideoPanel />;
   }
 
   if (playbackToken.data) {
     return (
-      <Paper withBorder radius="sm" p="md">
-        <Stack gap="md">
-          <div className="relative aspect-video overflow-hidden bg-black">
-            <Stream
-              controls
-              streamRef={streamRef}
-              title="Lesson video"
-              src={playbackToken.data.token}
-              startTime={getResumeSeconds(savedSeconds, durationSeconds)}
-              onCanPlay={() => setPlayerError(null)}
-              onError={() => {
-                setPlayerError(
-                  "The video could not be loaded. Try starting playback again, or wait a few minutes if the video was just uploaded.",
-                );
-              }}
-              onTimeUpdate={() => saveLocalProgress()}
-              onPause={() => saveLocalProgress({ force: true })}
-              onEnded={() => {
-                saveLocalProgress({ completed: true, force: true });
-              }}
-            />
-            {session.data ? (
-              <div className="pointer-events-none absolute inset-0 grid grid-cols-2 grid-rows-2 text-xs font-medium text-white/35">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <div key={index} className="flex items-center justify-center">
-                    <span className="rotate-[-18deg] rounded bg-black/20 px-2 py-1">
-                      {watermarkText}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
-          <Group justify="space-between">
-            <Text c="dimmed">Saved at {formatProgress(savedSeconds)}</Text>
-            {completed ? <Badge color="green">Complete</Badge> : null}
-          </Group>
-          {playerError ? (
-            <Alert color="red" title="Playback failed">
-              <Stack gap="sm">
-                <Text>{playerError}</Text>
-                <Group>
-                  <Button
-                    variant="light"
-                    loading={playbackToken.isPending}
-                    onClick={() => {
-                      setPlayerError(null);
-                      playbackToken.reset();
-                      playbackToken.mutate({ lessonId });
-                    }}
-                  >
-                    Try again
-                  </Button>
-                </Group>
-              </Stack>
-            </Alert>
-          ) : null}
-        </Stack>
-      </Paper>
+      <ActiveVideoPanel
+        completed={completed}
+        isTokenPending={playbackToken.isPending}
+        onCanPlay={() => setPlayerError(null)}
+        onEnded={() => {
+          saveLocalProgress({ completed: true, force: true });
+        }}
+        onError={() => {
+          setPlayerError(
+            "The video could not be loaded. Try starting playback again, or wait a few minutes if the video was just uploaded.",
+          );
+        }}
+        onPause={() => saveLocalProgress({ force: true })}
+        onRetry={() => {
+          setPlayerError(null);
+          playbackToken.reset();
+          playbackToken.mutate({ lessonId });
+        }}
+        onTimeUpdate={() => saveLocalProgress()}
+        playerError={playerError}
+        savedProgressLabel={formatProgress(savedSeconds)}
+        showWatermark={Boolean(session.data)}
+        startTime={getResumeSeconds(savedSeconds, durationSeconds)}
+        streamRef={streamRef}
+        token={playbackToken.data.token}
+        watermarkText={watermarkText}
+      />
     );
   }
 
   return (
-    <Paper withBorder radius="sm" p="md">
-      <div className="grid aspect-video place-items-center border border-dashed">
-        <Stack align="center" gap="xs">
-          <Text fw={600}>Video is protected</Text>
-          <Text c="dimmed" ta="center" maw={480}>
-            Start playback when you're ready.
-          </Text>
-          <Button
-            loading={playbackToken.isPending}
-            onClick={() => {
-              playbackToken.mutate({ lessonId });
-            }}
-          >
-            Start playback
-          </Button>
-          {playbackToken.isError ? <Text c="red">{playbackToken.error.message}</Text> : null}
-        </Stack>
-      </div>
-    </Paper>
+    <ProtectedVideoPanel
+      errorMessage={playbackToken.isError ? playbackToken.error.message : undefined}
+      isPending={playbackToken.isPending}
+      onStart={() => {
+        playbackToken.mutate({ lessonId });
+      }}
+    />
   );
 }

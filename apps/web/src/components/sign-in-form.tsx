@@ -1,4 +1,4 @@
-import { Button, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -27,7 +27,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
       }
 
       navigate({
-        to: "/dashboard",
+        to: "/courses",
       });
       toast.success("Sign in successful");
     } finally {
@@ -49,7 +49,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         {
           onSuccess: async () => {
             navigate({
-              to: "/dashboard",
+              to: "/courses",
             });
             toast.success("Sign in successful");
           },
@@ -72,11 +72,12 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
   }
 
   return (
-    <main className="mx-auto w-full mt-10 max-w-md p-6">
+    <Paper withBorder p="xl" className="pc-panel">
       <Stack gap="md">
-        <Title order={1} ta="center">
-          Welcome Back
-        </Title>
+        <Stack gap={4} ta="center">
+          <Title order={1}>Welcome back</Title>
+          <Text c="dimmed">Continue your private course access.</Text>
+        </Stack>
 
         <Button type="button" fullWidth loading={isPasskeyPending} onClick={signInWithPasskey}>
           {isPasskeyPending ? "Waiting for passkey..." : "Sign in with passkey"}
@@ -127,7 +128,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
             >
               {({ canSubmit, isSubmitting }) => (
                 <Button type="submit" fullWidth loading={isSubmitting} disabled={!canSubmit}>
-                  Sign In
+                  Sign in
                 </Button>
               )}
             </form.Subscribe>
@@ -135,9 +136,9 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignUp}>
-          Need an account? Sign Up
+          Need an account? Sign up
         </Button>
       </Stack>
-    </main>
+    </Paper>
   );
 }

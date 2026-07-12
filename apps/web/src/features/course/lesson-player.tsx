@@ -298,7 +298,7 @@ export function LessonPlayer({
               onCanPlay={() => setPlayerError(null)}
               onError={() => {
                 setPlayerError(
-                  "The video could not be loaded. The signed token may have expired or the video may still be processing.",
+                  "The video could not be loaded. Try starting playback again, or wait a few minutes if the video was just uploaded.",
                 );
               }}
               onTimeUpdate={() => saveLocalProgress()}
@@ -337,7 +337,7 @@ export function LessonPlayer({
                       playbackToken.mutate({ lessonId });
                     }}
                   >
-                    Request new token
+                    Try again
                   </Button>
                 </Group>
               </Stack>
@@ -354,7 +354,7 @@ export function LessonPlayer({
         <Stack align="center" gap="xs">
           <Text fw={600}>Video is protected</Text>
           <Text c="dimmed" ta="center" maw={480}>
-            Start playback to create a signed Cloudflare Stream token for this lesson.
+            Start playback when you're ready.
           </Text>
           <Button
             loading={playbackToken.isPending}

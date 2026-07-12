@@ -476,6 +476,209 @@ describe("API authorization boundaries", () => {
     );
   });
 
+  it("returns guest lesson navigation that skips locked paid lessons", async () => {
+    const caller = createCaller({
+      session: null,
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              title: "Published Course",
+              slug: "course",
+              status: "published",
+            },
+            lesson: {
+              id: "current-free-lesson-id",
+              courseId: "course-id",
+              title: "Current Free Lesson",
+              slug: "current-free-lesson",
+              position: 1,
+              durationSeconds: 120,
+              status: "published",
+              isFree: true,
+              videoUid: "video-uid",
+            },
+          },
+        ],
+        [
+          {
+            id: "first-free-lesson-id",
+            courseId: "course-id",
+            title: "First Free Lesson",
+            slug: "first-free-lesson",
+            description: null,
+            position: 0,
+            durationSeconds: 60,
+            status: "published",
+            isFree: true,
+          },
+          {
+            id: "current-free-lesson-id",
+            courseId: "course-id",
+            title: "Current Free Lesson",
+            slug: "current-free-lesson",
+            description: null,
+            position: 1,
+            durationSeconds: 120,
+            status: "published",
+            isFree: true,
+          },
+          {
+            id: "locked-paid-lesson-id",
+            courseId: "course-id",
+            title: "Locked Paid Lesson",
+            slug: "locked-paid-lesson",
+            description: null,
+            position: 2,
+            durationSeconds: 180,
+            status: "published",
+            isFree: false,
+          },
+          {
+            id: "next-free-lesson-id",
+            courseId: "course-id",
+            title: "Next Free Lesson",
+            slug: "next-free-lesson",
+            description: null,
+            position: 3,
+            durationSeconds: 240,
+            status: "published",
+            isFree: true,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.lessonBySlug({ courseSlug: "course", lessonSlug: "current-free-lesson" }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        navigation: {
+          lessons: [
+            expect.objectContaining({
+              id: "first-free-lesson-id",
+              accessState: "free",
+              isCurrent: false,
+            }),
+            expect.objectContaining({
+              id: "current-free-lesson-id",
+              accessState: "free",
+              isCurrent: true,
+            }),
+            expect.objectContaining({
+              id: "locked-paid-lesson-id",
+              accessState: "locked",
+              isCurrent: false,
+            }),
+            expect.objectContaining({
+              id: "next-free-lesson-id",
+              accessState: "free",
+              isCurrent: false,
+            }),
+          ],
+          previousLesson: expect.objectContaining({ id: "first-free-lesson-id" }),
+          nextLesson: expect.objectContaining({ id: "next-free-lesson-id" }),
+        },
+      }),
+    );
+  });
+
+  it("returns included paid lessons in navigation for granted users", async () => {
+    const grantedAt = new Date("2026-07-12T10:00:00.000Z");
+    const caller = createCaller({
+      session: createSession("user"),
+      results: [
+        [
+          {
+            course: {
+              id: "course-id",
+              title: "Published Course",
+              slug: "course",
+              status: "published",
+            },
+            lesson: {
+              id: "current-paid-lesson-id",
+              courseId: "course-id",
+              title: "Current Paid Lesson",
+              slug: "current-paid-lesson",
+              position: 1,
+              durationSeconds: 120,
+              status: "published",
+              isFree: false,
+              videoUid: "video-uid",
+            },
+          },
+        ],
+        [{ id: "access-id", grantedAt }],
+        [],
+        [
+          {
+            id: "previous-paid-lesson-id",
+            courseId: "course-id",
+            title: "Previous Paid Lesson",
+            slug: "previous-paid-lesson",
+            description: null,
+            position: 0,
+            durationSeconds: 60,
+            status: "published",
+            isFree: false,
+          },
+          {
+            id: "current-paid-lesson-id",
+            courseId: "course-id",
+            title: "Current Paid Lesson",
+            slug: "current-paid-lesson",
+            description: null,
+            position: 1,
+            durationSeconds: 120,
+            status: "published",
+            isFree: false,
+          },
+          {
+            id: "next-paid-lesson-id",
+            courseId: "course-id",
+            title: "Next Paid Lesson",
+            slug: "next-paid-lesson",
+            description: null,
+            position: 2,
+            durationSeconds: 180,
+            status: "published",
+            isFree: false,
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.courses.lessonBySlug({ courseSlug: "course", lessonSlug: "current-paid-lesson" }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        navigation: {
+          lessons: [
+            expect.objectContaining({
+              id: "previous-paid-lesson-id",
+              accessState: "included",
+              isCurrent: false,
+            }),
+            expect.objectContaining({
+              id: "current-paid-lesson-id",
+              accessState: "included",
+              isCurrent: true,
+            }),
+            expect.objectContaining({
+              id: "next-paid-lesson-id",
+              accessState: "included",
+              isCurrent: false,
+            }),
+          ],
+          previousLesson: expect.objectContaining({ id: "previous-paid-lesson-id" }),
+          nextLesson: expect.objectContaining({ id: "next-paid-lesson-id" }),
+        },
+      }),
+    );
+  });
+
   it("rejects guest access to published paid lesson detail", async () => {
     const caller = createCaller({
       session: null,
@@ -574,6 +777,7 @@ describe("API authorization boundaries", () => {
             },
           },
         ],
+        [],
         [],
         [
           {

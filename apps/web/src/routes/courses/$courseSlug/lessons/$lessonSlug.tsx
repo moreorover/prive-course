@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, type ErrorComponentProps } from "@tanstack/react-router";
 
+import { LessonList, LessonNavControls } from "@/features/course/lesson-navigation";
 import { LessonPlayer } from "@/features/course/lesson-player";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -101,40 +102,55 @@ function LessonRoute() {
         </Link>
 
         {lesson.data ? (
-          <>
-            <div>
-              <Group gap="sm">
-                <Title order={1}>{lesson.data.lesson.title}</Title>
-                <Badge variant="light">{lesson.data.lesson.status}</Badge>
-                {lesson.data.lesson.isFree ? (
-                  <Badge color="teal" variant="light">
-                    Free preview
-                  </Badge>
-                ) : null}
-              </Group>
-              <Text c="dimmed">{lesson.data.course.title}</Text>
-            </div>
+          <div className="grid gap-4 lg:grid-cols-[minmax(220px,280px)_1fr] lg:items-start">
+            <LessonList courseSlug={courseSlug} lessons={lesson.data.navigation.lessons} />
 
-            <LessonPlayer
-              key={lesson.data.lesson.id}
-              lessonId={lesson.data.lesson.id}
-              videoUid={lesson.data.lesson.videoUid}
-              durationSeconds={lesson.data.lesson.durationSeconds}
-              initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
-              isCompleted={Boolean(lesson.data.progress?.completedAt)}
-              onProgressSaved={() =>
-                queryClient.invalidateQueries({
-                  queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
-                })
-              }
-            />
+            <Stack gap="lg">
+              <div>
+                <Group gap="sm">
+                  <Title order={1}>{lesson.data.lesson.title}</Title>
+                  {lesson.data.lesson.isFree ? (
+                    <Badge color="teal" variant="light">
+                      Free preview
+                    </Badge>
+                  ) : null}
+                </Group>
+                <Text c="dimmed">{lesson.data.course.title}</Text>
+              </div>
 
-            {lesson.data.lesson.description ? (
-              <Paper withBorder radius="sm" p="md">
-                <Text>{lesson.data.lesson.description}</Text>
-              </Paper>
-            ) : null}
-          </>
+              <LessonNavControls
+                courseSlug={courseSlug}
+                previousLesson={lesson.data.navigation.previousLesson}
+                nextLesson={lesson.data.navigation.nextLesson}
+              />
+
+              <LessonPlayer
+                key={lesson.data.lesson.id}
+                lessonId={lesson.data.lesson.id}
+                videoUid={lesson.data.lesson.videoUid}
+                durationSeconds={lesson.data.lesson.durationSeconds}
+                initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
+                isCompleted={Boolean(lesson.data.progress?.completedAt)}
+                onProgressSaved={() =>
+                  queryClient.invalidateQueries({
+                    queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
+                  })
+                }
+              />
+
+              <LessonNavControls
+                courseSlug={courseSlug}
+                previousLesson={lesson.data.navigation.previousLesson}
+                nextLesson={lesson.data.navigation.nextLesson}
+              />
+
+              {lesson.data.lesson.description ? (
+                <Paper withBorder radius="sm" p="md">
+                  <Text>{lesson.data.lesson.description}</Text>
+                </Paper>
+              ) : null}
+            </Stack>
+          </div>
         ) : (
           <Paper withBorder p="lg" radius="sm">
             <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>

@@ -91,15 +91,15 @@ reviewable steps; each checkbox should leave the app in a working state.
   - Prefer Mantine v9 components and props before creating custom complex components.
   - The main reading flow should be mobile-first and single-column; desktop can use two columns, but no more.
 
-- [ ] Use `$frontend-design` to define the visual direction.
+- [x] Use `$frontend-design` to define the visual direction.
   - Scope: Establish a premium, trustworthy, clean interface direction before changing app styling.
   - Acceptance: The design direction is specific enough to guide Mantine theme, spacing, typography, and page composition.
   - Validate: Design review before implementation.
-- [ ] Refine global Mantine styling.
+- [x] Refine global Mantine styling.
   - Scope: Update global styling in `apps/web/src/index.css` and theme-level choices rather than making components describe their own style intent.
   - Acceptance: Styling remains mobile-first, responsive, and consistent with Mantine conventions.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Improve course and lesson surfaces.
+- [x] Improve course and lesson surfaces.
   - Scope: Polish course cards, course detail lesson lists, locked/free indicators, empty states, and lesson playback pages.
   - Acceptance: The app feels premium, trustworthy, and clean without marketing-page treatment or decorative clutter.
   - Validate: `vp run check`, `vp run test`, React Doctor, and visual review at mobile and laptop widths.

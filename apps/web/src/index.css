@@ -18,27 +18,29 @@ body {
 }
 
 [data-mantine-color-scheme="light"] {
-  --pc-canvas: #f7f4ed;
-  --pc-canvas-glow: rgb(176 138 60 / 16%);
-  --pc-panel: #fffaf0;
-  --pc-panel-soft: #f1eadc;
-  --pc-border: #d9d1c2;
-  --pc-text: #1d221c;
-  --pc-muted: #6d675c;
-  --pc-accent: #b08a3c;
-  --pc-accent-strong: #176b67;
+  --pc-canvas: #fbf7ef;
+  --pc-canvas-glow: rgb(213 167 61 / 18%);
+  --pc-panel: #fffdf8;
+  --pc-panel-soft: #f1e8d7;
+  --pc-border: #ddd3c0;
+  --pc-text: #17140e;
+  --pc-muted: #6b6255;
+  --pc-accent: #d5a73d;
+  --pc-accent-strong: #23433f;
+  --pc-danger-soft: #8e3f35;
 }
 
 [data-mantine-color-scheme="dark"] {
-  --pc-canvas: #11130f;
-  --pc-canvas-glow: rgb(23 107 103 / 22%);
-  --pc-panel: #191b16;
-  --pc-panel-soft: #20241d;
-  --pc-border: #34372f;
-  --pc-text: #f7f4ed;
-  --pc-muted: #b8b09f;
-  --pc-accent: #d0a84d;
-  --pc-accent-strong: #4eb5ad;
+  --pc-canvas: #111318;
+  --pc-canvas-glow: rgb(213 167 61 / 16%);
+  --pc-panel: #1a1d23;
+  --pc-panel-soft: #22252d;
+  --pc-border: #37322a;
+  --pc-text: #fbf7ef;
+  --pc-muted: #bdb3a2;
+  --pc-accent: #e0b64d;
+  --pc-accent-strong: #84b8ad;
+  --pc-danger-soft: #d07b70;
 }
 
 ::selection {

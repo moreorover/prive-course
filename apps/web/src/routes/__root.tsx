@@ -39,24 +39,24 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 const theme = createTheme({
   defaultRadius: "sm",
-  primaryColor: "teal",
+  primaryColor: "gold",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headings: {
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
     fontWeight: "720",
   },
   colors: {
-    brass: [
-      "#fbf6e7",
-      "#f1e5bf",
-      "#e5d091",
-      "#d4b765",
-      "#b08a3c",
-      "#987331",
-      "#775725",
-      "#59401c",
-      "#3b2a13",
-      "#22180b",
+    gold: [
+      "#fff8e1",
+      "#f7e8b5",
+      "#ecd47e",
+      "#dfbf48",
+      "#d5a73d",
+      "#bd8f31",
+      "#946b25",
+      "#6d4d1d",
+      "#493315",
+      "#281b0b",
     ],
   },
   components: {

@@ -185,6 +185,63 @@ describe("API authorization boundaries", () => {
     });
   });
 
+  it("rejects manual video UID changes through lesson creation", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "course-id",
+          },
+        ],
+        [
+          {
+            id: "lesson-id",
+            courseId: "course-id",
+            title: "Lesson",
+            slug: "lesson",
+            videoUid: "manual-video-uid",
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.createLesson({
+        courseId: "course-id",
+        title: "Lesson",
+        slug: "lesson",
+        description: "",
+        position: 0,
+        durationSeconds: null,
+        isFree: false,
+        status: "draft",
+        videoUid: "manual-video-uid",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects manual video UID changes through lesson updates", async () => {
+    const caller = createCaller({
+      session: createSession("admin"),
+      results: [
+        [
+          {
+            id: "lesson-id",
+            videoUid: "manual-video-uid",
+          },
+        ],
+      ],
+    });
+
+    await expect(
+      caller.admin.updateLesson({
+        id: "lesson-id",
+        videoUid: "manual-video-uid",
+      }),
+    ).rejects.toThrow();
+  });
+
   it("allows signed-in users without a manual course grant to open published course detail", async () => {
     const caller = createCaller({
       session: createSession("user"),

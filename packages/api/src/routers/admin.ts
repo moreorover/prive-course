@@ -30,22 +30,18 @@ const courseInputSchema = z.object({
   status: publishStatusSchema.default("draft"),
 });
 
-const lessonInputSchema = z.object({
-  courseId: z.string().min(1),
-  title: z.string().trim().min(1).max(180),
-  slug: slugSchema,
-  description: optionalTextSchema,
-  position: z.number().int().min(0),
-  videoUid: z
-    .string()
-    .trim()
-    .max(200)
-    .optional()
-    .transform((value) => (value ? value : null)),
-  durationSeconds: z.number().int().nonnegative().nullable().optional(),
-  isFree: z.boolean().default(false),
-  status: publishStatusSchema.default("draft"),
-});
+const lessonInputSchema = z
+  .object({
+    courseId: z.string().min(1),
+    title: z.string().trim().min(1).max(180),
+    slug: slugSchema,
+    description: optionalTextSchema,
+    position: z.number().int().min(0),
+    durationSeconds: z.number().int().nonnegative().nullable().optional(),
+    isFree: z.boolean().default(false),
+    status: publishStatusSchema.default("draft"),
+  })
+  .strict();
 
 const streamTusUploadResponseSchema = z.object({
   uploadURL: z.string().url(),

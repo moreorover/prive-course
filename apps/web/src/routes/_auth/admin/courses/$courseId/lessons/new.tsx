@@ -58,7 +58,6 @@ function NewLessonRoute() {
             slug: "",
             description: "",
             position: lessons.data?.length ?? 0,
-            videoUid: "",
             durationSeconds: null,
             isFree: false,
             status: "draft",

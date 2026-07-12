@@ -57,7 +57,6 @@ function EditLessonRoute() {
                 slug: lesson.data.slug,
                 description: lesson.data.description ?? "",
                 position: lesson.data.position,
-                videoUid: lesson.data.videoUid ?? "",
                 durationSeconds: lesson.data.durationSeconds,
                 isFree: lesson.data.isFree,
                 status: lesson.data.status,

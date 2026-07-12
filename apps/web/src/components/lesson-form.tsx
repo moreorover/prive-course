@@ -18,7 +18,6 @@ export type LessonFormValue = {
   slug: string;
   description: string;
   position: number;
-  videoUid: string;
   durationSeconds: number | null;
   isFree: boolean;
   status: PublishStatus;
@@ -53,7 +52,6 @@ export function LessonForm({
       slug: "",
       description: "",
       position: 0,
-      videoUid: "",
       durationSeconds: null,
       isFree: false,
       status: "draft",
@@ -102,7 +100,6 @@ export function LessonForm({
             {...form.getInputProps("position")}
             required
           />
-          <TextInput label="Video UID" {...form.getInputProps("videoUid")} />
           <NumberInput
             label="Duration seconds"
             min={0}

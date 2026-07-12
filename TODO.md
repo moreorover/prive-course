@@ -63,10 +63,6 @@ reviewable steps; each checkbox should leave the app in a working state.
   - Scope: Show free, included, and locked states in the lesson list.
   - Acceptance: Free lessons are visibly open to guests, granted-course paid lessons are visibly included, and locked paid lessons do not link to playable content.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Keep purchase language out of the gated lesson state.
-  - Scope: Use copy that says an account with course access is required, without introducing payment or single-lesson purchase flows.
-  - Acceptance: No course detail UI mentions buying a single lesson or paying inside the app.
-  - Validate: `rg -n "buy|purchase|payment|pay" apps/web/src PRODUCT_FLOWS.md TODO.md`.
 
 ## Phase 4: Lesson Viewing Navigation
 

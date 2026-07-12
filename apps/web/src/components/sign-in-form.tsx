@@ -28,7 +28,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
       }
 
       navigate({
-        to: "/dashboard",
+        to: "/courses",
       });
       await queryClient.invalidateQueries({ queryKey: trpc.courses.listPublished.queryKey() });
       await queryClient.invalidateQueries({ queryKey: trpc.courses.listGranted.queryKey() });
@@ -52,7 +52,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         {
           onSuccess: async () => {
             navigate({
-              to: "/dashboard",
+              to: "/courses",
             });
             await queryClient.invalidateQueries({
               queryKey: trpc.courses.listPublished.queryKey(),

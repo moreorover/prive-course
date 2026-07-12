@@ -8,7 +8,7 @@ function AdminLayout() {
   const { session } = Route.useRouteContext();
 
   if (session.data?.user.role !== "admin") {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/courses" />;
   }
 
   return <Outlet />;

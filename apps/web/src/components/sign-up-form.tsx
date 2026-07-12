@@ -40,7 +40,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
             }
 
             navigate({
-              to: "/dashboard",
+              to: "/courses",
             });
             toast.success("Sign up successful");
           },

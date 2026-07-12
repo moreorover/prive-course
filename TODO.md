@@ -36,30 +36,30 @@ reviewable steps; each checkbox should leave the app in a working state.
 
 ## Phase 2: Free Lesson Access
 
-- [ ] Add a lesson-level free access field.
+- [x] Add a lesson-level free access field.
   - Scope: Add a boolean-style Drizzle field to lessons for free preview access.
   - Acceptance: Existing lessons default to access-gated behavior.
   - Validate: `vp run db:generate`, `vp run check`, and `vp run test`.
-- [ ] Add admin UI support for configuring free lessons.
+- [x] Add admin UI support for configuring free lessons.
   - Scope: Add the field to lesson create/edit validation, API input, and the lesson form.
   - Acceptance: Admins can mark a lesson free or gated and see the saved value when reopening the lesson.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Update course detail API authorization for free lessons.
+- [x] Update course detail API authorization for free lessons.
   - Scope: Allow guests to view published course detail and published free lesson metadata without active course access.
   - Acceptance: Gated lesson metadata is visible enough to label it locked, but protected playback details are not exposed.
   - Validate: `vp run check` and `vp run test`.
-- [ ] Update lesson detail and playback authorization for free lessons.
+- [x] Update lesson detail and playback authorization for free lessons.
   - Scope: Allow guest playback for published free lessons without active course access; keep paid lessons restricted to signed-in users with active course access.
   - Acceptance: Free lesson playback succeeds for guests, paid lesson playback requires an account with active course access, and granted users can play all published paid lessons.
   - Validate: `vp run check`, `vp run test`, and relevant smoke checks.
 
 ## Phase 3: Course Detail UX
 
-- [ ] Show course description and published lesson list for every published course.
+- [x] Show course description and published lesson list for every published course.
   - Scope: Update the course detail route to work for guests, signed-in users without access, and signed-in users with active course access.
   - Acceptance: The page never implies a published course is unavailable just because access has not been granted.
   - Validate: `vp run check`, `vp run test`, and React Doctor.
-- [ ] Label lesson access states clearly.
+- [x] Label lesson access states clearly.
   - Scope: Show free, included, and locked states in the lesson list.
   - Acceptance: Free lessons are visibly open to guests, granted-course paid lessons are visibly included, and locked paid lessons do not link to playable content.
   - Validate: `vp run check`, `vp run test`, and React Doctor.

@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
-import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
@@ -17,7 +16,6 @@ export const Route = createFileRoute("/courses/")({
 
 function CoursesRoute() {
   const courses = useQuery(publishedCoursesQueryOptions);
-  const { data: session, isPending: isSessionPending } = authClient.useSession();
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -45,27 +43,15 @@ function CoursesRoute() {
                     {course.title}
                   </Title>
                   <Badge color={course.hasActiveAccess ? "teal" : "gray"} variant="light">
-                    {course.hasActiveAccess ? "Access granted" : "Account access required"}
+                    {course.hasActiveAccess ? "Access granted" : "Public course"}
                   </Badge>
                 </Group>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>
-                {course.hasActiveAccess ? (
-                  <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                    <Button>Open course</Button>
-                  </Link>
-                ) : session ? (
-                  <Button disabled variant="light">
-                    Access required
-                  </Button>
-                ) : (
-                  <Link to="/login">
-                    <Button loading={isSessionPending} variant="light">
-                      Sign in for access
-                    </Button>
-                  </Link>
-                )}
+                <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
+                  <Button variant={course.hasActiveAccess ? "filled" : "light"}>View course</Button>
+                </Link>
               </Stack>
             </Paper>
           ))}

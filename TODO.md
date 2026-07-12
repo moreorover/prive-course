@@ -85,6 +85,12 @@ reviewable steps; each checkbox should leave the app in a working state.
 
 ## Phase 5: UI Facelift
 
+- Constraints:
+  - Existing UI can change freely when it improves the product.
+  - Light and dark modes must both look intentional.
+  - Prefer Mantine v9 components and props before creating custom complex components.
+  - The main reading flow should be mobile-first and single-column; desktop can use two columns, but no more.
+
 - [ ] Use `$frontend-design` to define the visual direction.
   - Scope: Establish a premium, trustworthy, clean interface direction before changing app styling.
   - Acceptance: The design direction is specific enough to guide Mantine theme, spacing, typography, and page composition.

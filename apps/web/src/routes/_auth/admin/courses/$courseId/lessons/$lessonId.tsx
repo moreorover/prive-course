@@ -40,8 +40,8 @@ function EditLessonRoute() {
     }),
   );
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <Stack gap="lg">
+    <main className="pc-page-narrow">
+      <Stack gap="xl">
         <Link to="/admin/courses/$courseId" params={{ courseId }}>
           <Button variant="subtle">Back to course</Button>
         </Link>
@@ -69,7 +69,7 @@ function EditLessonRoute() {
             />
           </>
         ) : (
-          <Paper withBorder p="lg" radius="sm">
+          <Paper withBorder p="lg" className="pc-panel">
             <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>
           </Paper>
         )}

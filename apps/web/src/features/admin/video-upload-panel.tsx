@@ -209,7 +209,7 @@ export function VideoUploadPanel({
   const status = videoStatus.data?.status;
 
   return (
-    <Paper withBorder p="md" radius="sm">
+    <Paper withBorder p="lg" className="pc-panel">
       <Stack gap="md">
         <div>
           <Group justify="space-between" align="center">

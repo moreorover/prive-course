@@ -27,7 +27,7 @@ function NewCourseRoute() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
+    <main className="pc-page-narrow">
       <Stack gap="lg">
         <Link to="/admin">
           <Button variant="subtle">Back to courses</Button>

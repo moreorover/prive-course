@@ -47,7 +47,7 @@ export function CourseForm({
   });
 
   return (
-    <Paper withBorder p="md" radius="sm">
+    <Paper withBorder p="lg" className="pc-panel">
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="md">
           <Title order={1} size="h3">

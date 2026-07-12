@@ -1,3 +1,4 @@
+import { Box, Button, Group, Text } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
@@ -15,23 +16,47 @@ export default function Header() {
   ] as const;
 
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
-          {links.map(({ to, label }) => {
-            return (
-              <Link key={to} to={to}>
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="flex items-center gap-2">
+    <Box
+      component="header"
+      className="border-b"
+      style={{
+        background: "color-mix(in srgb, var(--pc-panel) 88%, transparent)",
+        borderColor: "var(--pc-border)",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      <div
+        className="mx-auto flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+        style={{ width: "min(100% - 1rem, 72rem)" }}
+      >
+        <Group gap="lg" wrap="nowrap">
+          <Link to="/" className="no-underline">
+            <div>
+              <Text fw={800} lh={1}>
+                Prive Course
+              </Text>
+              <Text size="xs" c="dimmed">
+                Private video learning
+              </Text>
+            </div>
+          </Link>
+          <nav className="flex flex-wrap gap-2 text-sm">
+            {links.map(({ to, label }) => {
+              return (
+                <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
+                  <Button component="span" size="xs" variant="subtle">
+                    {label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
+        </Group>
+        <Group gap="xs" wrap="nowrap">
           <ModeToggle />
           <UserMenu />
-        </div>
+        </Group>
       </div>
-      <hr />
-    </div>
+    </Box>
   );
 }

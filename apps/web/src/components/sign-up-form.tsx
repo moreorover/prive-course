@@ -1,4 +1,4 @@
-import { Button, PasswordInput, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -64,11 +64,12 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
   }
 
   return (
-    <main className="mx-auto w-full mt-10 max-w-md p-6">
+    <Paper withBorder p="xl" className="pc-panel">
       <Stack gap="md">
-        <Title order={1} ta="center">
-          Create Account
-        </Title>
+        <Stack gap={4} ta="center">
+          <Title order={1}>Create account</Title>
+          <Text c="dimmed">Set up access for private course lessons.</Text>
+        </Stack>
 
         <form
           onSubmit={(e) => {
@@ -129,7 +130,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
             >
               {({ canSubmit, isSubmitting }) => (
                 <Button type="submit" fullWidth loading={isSubmitting} disabled={!canSubmit}>
-                  Sign Up
+                  Sign up
                 </Button>
               )}
             </form.Subscribe>
@@ -137,9 +138,9 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignIn}>
-          Already have an account? Sign In
+          Already have an account? Sign in
         </Button>
       </Stack>
-    </main>
+    </Paper>
   );
 }

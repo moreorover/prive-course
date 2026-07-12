@@ -42,15 +42,13 @@ function CoursesRoute() {
                   <Title order={2} size="h4">
                     {course.title}
                   </Title>
-                  <Badge color={course.hasActiveAccess ? "teal" : "gray"} variant="light">
-                    {course.hasActiveAccess ? "Access granted" : "Public course"}
-                  </Badge>
+                  <Badge variant="light">{course.status}</Badge>
                 </Group>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>
                 <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button variant={course.hasActiveAccess ? "filled" : "light"}>View course</Button>
+                  <Button>View course</Button>
                 </Link>
               </Stack>
             </Paper>

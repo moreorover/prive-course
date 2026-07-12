@@ -354,8 +354,6 @@ describe("API authorization boundaries", () => {
         slug: "published-course",
         description: "Visible to guests",
         status: "published",
-        hasActiveAccess: false,
-        grantedAt: null,
       },
     ]);
   });
@@ -384,75 +382,6 @@ describe("API authorization boundaries", () => {
       expect.objectContaining({
         id: "published-course-id",
         status: "published",
-      }),
-    ]);
-  });
-
-  it("includes active course access state for signed-in users", async () => {
-    const grantedAt = new Date("2026-07-11T12:00:00.000Z");
-    const caller = createCaller({
-      session: createSession("user"),
-      results: [
-        {
-          expectedWhereTokens: ["status", "published"],
-          requireWhere: true,
-          result: [
-            {
-              id: "published-course-id",
-              title: "Published Course",
-              slug: "published-course",
-              description: null,
-              status: "published",
-            },
-          ],
-        },
-        {
-          expectedWhereTokens: ["user_id", "user-id", "course_id", "revoked_at", " is null"],
-          requireWhere: true,
-          result: [{ courseId: "published-course-id", grantedAt }],
-        },
-      ],
-    });
-
-    await expect(caller.courses.listPublished()).resolves.toEqual([
-      expect.objectContaining({
-        id: "published-course-id",
-        hasActiveAccess: true,
-        grantedAt,
-      }),
-    ]);
-  });
-
-  it("does not treat revoked course access as active", async () => {
-    const caller = createCaller({
-      session: createSession("user"),
-      results: [
-        {
-          expectedWhereTokens: ["status", "published"],
-          requireWhere: true,
-          result: [
-            {
-              id: "published-course-id",
-              title: "Published Course",
-              slug: "published-course",
-              description: null,
-              status: "published",
-            },
-          ],
-        },
-        {
-          expectedWhereTokens: ["user_id", "user-id", "course_id", "revoked_at", " is null"],
-          requireWhere: true,
-          result: [],
-        },
-      ],
-    });
-
-    await expect(caller.courses.listPublished()).resolves.toEqual([
-      expect.objectContaining({
-        id: "published-course-id",
-        hasActiveAccess: false,
-        grantedAt: null,
       }),
     ]);
   });

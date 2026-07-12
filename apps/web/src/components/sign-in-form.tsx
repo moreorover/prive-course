@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
-import { queryClient, trpc } from "@/utils/trpc";
 
 import Loader from "./loader";
 
@@ -30,8 +29,6 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
       navigate({
         to: "/dashboard",
       });
-      await queryClient.invalidateQueries({ queryKey: trpc.courses.listPublished.queryKey() });
-      await queryClient.invalidateQueries({ queryKey: trpc.courses.listGranted.queryKey() });
       toast.success("Sign in successful");
     } finally {
       setIsPasskeyPending(false);
@@ -54,10 +51,6 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
             navigate({
               to: "/dashboard",
             });
-            await queryClient.invalidateQueries({
-              queryKey: trpc.courses.listPublished.queryKey(),
-            });
-            await queryClient.invalidateQueries({ queryKey: trpc.courses.listGranted.queryKey() });
             toast.success("Sign in successful");
           },
           onError: (error) => {

@@ -7,7 +7,7 @@ import {
 } from "@prive-course/db/schema";
 import { env } from "@prive-course/env/server";
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq, gt, inArray, isNull } from "drizzle-orm";
+import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { protectedProcedure, publicProcedure, router } from "../index";
@@ -125,7 +125,7 @@ function getAuthSessionId(session: { session?: { id?: string } }) {
 
 export const courseRouter = router({
   listPublished: publicProcedure.query(async ({ ctx }) => {
-    const courses = await ctx.db
+    return ctx.db
       .select({
         id: course.id,
         title: course.title,
@@ -135,67 +135,6 @@ export const courseRouter = router({
       })
       .from(course)
       .where(eq(course.status, "published"))
-      .orderBy(asc(course.title));
-
-    if (!ctx.session || courses.length === 0) {
-      return courses.map((publishedCourse) => ({
-        ...publishedCourse,
-        hasActiveAccess: false,
-        grantedAt: null,
-      }));
-    }
-
-    const activeAccessRows = await ctx.db
-      .select({
-        courseId: courseAccess.courseId,
-        grantedAt: courseAccess.grantedAt,
-      })
-      .from(courseAccess)
-      .where(
-        and(
-          eq(courseAccess.userId, ctx.session.user.id),
-          inArray(
-            courseAccess.courseId,
-            courses.map((publishedCourse) => publishedCourse.id),
-          ),
-          isNull(courseAccess.revokedAt),
-        ),
-      )
-      .orderBy(asc(courseAccess.grantedAt));
-    const activeAccessByCourseId = new Map(
-      activeAccessRows.map((access) => [access.courseId, access.grantedAt]),
-    );
-
-    return courses.map((publishedCourse) => {
-      const grantedAt = activeAccessByCourseId.get(publishedCourse.id) ?? null;
-
-      return {
-        ...publishedCourse,
-        hasActiveAccess: grantedAt !== null,
-        grantedAt,
-      };
-    });
-  }),
-
-  listGranted: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
-      .select({
-        id: course.id,
-        title: course.title,
-        slug: course.slug,
-        description: course.description,
-        status: course.status,
-        grantedAt: courseAccess.grantedAt,
-      })
-      .from(courseAccess)
-      .innerJoin(course, eq(course.id, courseAccess.courseId))
-      .where(
-        and(
-          eq(courseAccess.userId, ctx.session.user.id),
-          isNull(courseAccess.revokedAt),
-          eq(course.status, "published"),
-        ),
-      )
       .orderBy(asc(course.title));
   }),
 

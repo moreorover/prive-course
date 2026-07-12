@@ -227,7 +227,9 @@ export function VideoUploadPanel({
             ) : null}
           </Group>
           <Text c="dimmed">
-            {videoUid ? `Cloudflare Stream UID: ${videoUid}` : "No video uploaded yet."}
+            {videoUid
+              ? "Video uploaded. Processing may continue before playback is ready."
+              : "No video uploaded yet."}
           </Text>
           {status?.pctComplete ? <Text c="dimmed">Processing: {status.pctComplete}%</Text> : null}
           {status?.errorReasonText ? <Text c="red">{status.errorReasonText}</Text> : null}
@@ -237,7 +239,7 @@ export function VideoUploadPanel({
         <FileInput
           accept="video/*"
           clearable
-          description="Videos are uploaded with resumable Cloudflare Stream tus chunks."
+          description="Choose a video file for this lesson."
           label="Video file"
           value={videoFile}
           onChange={(file) => {
@@ -251,15 +253,15 @@ export function VideoUploadPanel({
             Selected {videoFile.name} ({formatBytes(videoFile.size)})
           </Text>
         ) : null}
-        <Alert color="blue" title="Resumable upload">
-          Uploads use Cloudflare Stream tus chunks, so interrupted transfers can recover during the
-          current browser session.
+        <Alert color="blue" title="Upload note">
+          Large videos may take time to upload and process. Keep this tab open until the upload
+          completes.
         </Alert>
         {isUploading ? (
           <Stack gap={4}>
             <Progress value={uploadProgress} />
             <Text c="dimmed" size="sm">
-              Uploading with tus {uploadProgress}%
+              Uploading {uploadProgress}%
             </Text>
           </Stack>
         ) : null}

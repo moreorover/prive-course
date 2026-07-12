@@ -1,4 +1,4 @@
-import { Badge, Button, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
+import { Badge, Button, Paper, Stack, Table, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -30,10 +30,7 @@ function CourseDetailRoute() {
         {course.data ? (
           <>
             <div>
-              <Group gap="sm">
-                <Title order={1}>{course.data.title}</Title>
-                <Badge variant="light">{course.data.status}</Badge>
-              </Group>
+              <Title order={1}>{course.data.title}</Title>
               <Text c="dimmed">{course.data.description || "No description yet."}</Text>
             </div>
 
@@ -44,8 +41,8 @@ function CourseDetailRoute() {
                 </Title>
                 {course.data.lessons.length === 0 ? (
                   <EmptyState
-                    title="No published lessons"
-                    description="Lessons will appear here after an admin publishes them."
+                    title="No lessons yet"
+                    description="Lessons will appear here when they are available."
                   />
                 ) : (
                   <Table striped highlightOnHover>

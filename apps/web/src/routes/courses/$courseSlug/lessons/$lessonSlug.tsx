@@ -109,7 +109,6 @@ function LessonRoute() {
               <div>
                 <Group gap="sm">
                   <Title order={1}>{lesson.data.lesson.title}</Title>
-                  <Badge variant="light">{lesson.data.lesson.status}</Badge>
                   {lesson.data.lesson.isFree ? (
                     <Badge color="teal" variant="light">
                       Free preview

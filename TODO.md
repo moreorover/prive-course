@@ -78,6 +78,10 @@ reviewable steps; each checkbox should leave the app in a working state.
   - Scope: On laptop and wider viewports, show the lesson list on the left and video plus description on the right; on mobile, keep a single-column flow.
   - Acceptance: The video, lesson description, and navigation remain usable on mobile and laptop widths without fixed-width layout assumptions.
   - Validate: `vp run check`, `vp run test`, React Doctor, and `vp run smoke` when practical.
+- [x] Hide implementation details from user-facing copy.
+  - Scope: Remove public publish-state labels and Cloudflare Stream/tus/UID wording from public and admin UI copy.
+  - Acceptance: Users see course, lesson, playback, upload, and processing states without vendor or protocol details.
+  - Validate: `vp run check`, `vp run test`, and React Doctor.
 
 ## Phase 5: UI Facelift
 

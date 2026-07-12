@@ -1,4 +1,4 @@
-import { Badge, Button, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Badge, Button, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -22,14 +22,14 @@ function CoursesRoute() {
       <Stack gap="lg">
         <div>
           <Title order={1}>Courses</Title>
-          <Text c="dimmed">Explore all published courses.</Text>
+          <Text c="dimmed">Explore available courses.</Text>
         </div>
 
         {courses.data?.length === 0 ? (
           <Paper withBorder radius="sm">
             <EmptyState
-              title="No published courses"
-              description="Courses will appear here after an admin publishes them."
+              title="No courses yet"
+              description="Courses will appear here when they are available."
             />
           </Paper>
         ) : null}
@@ -38,14 +38,16 @@ function CoursesRoute() {
           {courses.data?.map((course) => (
             <Paper key={course.id} withBorder p="md" radius="sm">
               <Stack gap="sm">
-                <Group justify="space-between" align="start">
+                <div>
                   <Title order={2} size="h4">
                     {course.title}
                   </Title>
-                  <Badge color={course.hasActiveAccess ? "teal" : "gray"} variant="light">
-                    {course.hasActiveAccess ? "Access granted" : "Public course"}
-                  </Badge>
-                </Group>
+                  {course.hasActiveAccess ? (
+                    <Badge color="teal" variant="light" mt="xs">
+                      Access granted
+                    </Badge>
+                  ) : null}
+                </div>
                 <Text c="dimmed" lineClamp={3}>
                   {course.description || "No description yet."}
                 </Text>

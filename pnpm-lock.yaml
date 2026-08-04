@@ -34,8 +34,8 @@ catalogs:
       specifier: ^17.4.2
       version: 17.4.2
     hono:
-      specifier: ^4.12.27
-      version: 4.12.28
+      specifier: ^4.12.34
+      version: 4.13.0
     lucide-react:
       specifier: ^1.23.0
       version: 1.24.0
@@ -88,7 +88,7 @@ importers:
     dependencies:
       '@hono/trpc-server':
         specifier: ^0.4.2
-        version: 0.4.2(@trpc/server@11.18.0(typescript@6.0.3))(hono@4.12.28)
+        version: 0.4.2(@trpc/server@11.18.0(typescript@6.0.3))(hono@4.13.0)
       '@prive-course/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -103,7 +103,7 @@ importers:
         version: 11.18.0(typescript@6.0.3)
       hono:
         specifier: 'catalog:'
-        version: 4.12.28
+        version: 4.13.0
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 'catalog:'
@@ -244,7 +244,7 @@ importers:
         version: link:../config
       hono:
         specifier: 'catalog:'
-        version: 4.12.28
+        version: 4.13.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -392,6 +392,7 @@ packages:
   '@aws-sdk/credential-providers@3.1084.0':
     resolution: {integrity: sha512-6MT9xigrduBftpOEq2HKzGqp2Up0Jwe8dK5W3GyBpePywzgMK6029XEYXkCC5wRYwXwhSPzpjnjRlWUA7K/KNQ==}
     engines: {node: '>=20.0.0'}
+    deprecated: This version was deprecated due to a caching bug in fromNodeProviderChain. Please update to v3.1086.0 or higher. https://github.com/aws/aws-sdk-js-v3/issues/8184
 
   '@aws-sdk/nested-clients@3.997.31':
     resolution: {integrity: sha512-BDHTpwcsZHEBNEJzOg/B1BkFYJxAXY50dau/NyVWs3d51F0WgIUGSWZot/Os+N3KpDhXeaXnz37mWffAvduREw==}
@@ -707,11 +708,11 @@ packages:
 
   '@esbuild-kit/core-utils@3.3.2':
     resolution: {integrity: sha512-sPRAnw9CdSsRmEtnsl2WXWdyquogVpB3yZ3dgwJfe8zrOzTsV7cJvmwrKVa+0ma5BoiGJ+BoqkMvawbayKUsqQ==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild-kit/esm-loader@2.6.5':
     resolution: {integrity: sha512-FxEMIkJKnodyA1OaCUoEvbYRkoZlLZ4d/eXFu9Fh8CbBBgP5EmZxrfTRyN0qpXZ4vOvqnE5YdRdcrmUUXuU+dA==}
-    deprecated: 'Merged into tsx: https://tsx.is'
+    deprecated: 'Merged into tsx: https://tsx.hirok.io'
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -4220,8 +4221,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.12.28:
-    resolution: {integrity: sha512-YwUvVpSF7m1yOblFPrU3Hbo8XhPheBoiyfGuII6z19LnOr6JpDnyyp7LFNrfV56wS8tpvtBFGRISHN02pDdLOA==}
+  hono@4.13.0:
+    resolution: {integrity: sha512-jhunvfHWxd7J5EFfSgH4xsYJzSe/lfqbUCxiyyeaQasUsXeEHXtzVid+7EOGByc5JnFa23SSFL3Y2RV/z1T+eQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
@@ -6228,10 +6229,10 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/trpc-server@0.4.2(@trpc/server@11.18.0(typescript@6.0.3))(hono@4.12.28)':
+  '@hono/trpc-server@0.4.2(@trpc/server@11.18.0(typescript@6.0.3))(hono@4.13.0)':
     dependencies:
       '@trpc/server': 11.18.0(typescript@6.0.3)
-      hono: 4.12.28
+      hono: 4.13.0
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -8616,7 +8617,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.12.28: {}
+  hono@4.13.0: {}
 
   hookable@6.1.1: {}
 

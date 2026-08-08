@@ -6,121 +6,229 @@ import {
   SimpleGrid,
   Stack,
   Text,
+  TextInput,
   ThemeIcon,
   Title,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpen, LockKeyhole, PlayCircle } from "lucide-react";
+import { ArrowRight, AtSign, BookOpen, Mail, Phone, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+import { EmptyState } from "@/components/empty-state";
+import { trpc } from "@/utils/trpc";
+
+const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
+const salonServices = ["lashes", "shape", "retention", "finish"] as const;
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(publishedCoursesQueryOptions);
+  },
 });
 
-const highlights = [
-  {
-    description: "Explore published courses before creating an account.",
-    icon: BookOpen,
-    title: "Browse the catalog",
-  },
-  {
-    description: "Open free lessons first and see whether the course fits.",
-    icon: PlayCircle,
-    title: "Preview lessons",
-  },
-  {
-    description: "Protected lessons stay available only to learners with course access.",
-    icon: LockKeyhole,
-    title: "Continue privately",
-  },
-] as const;
-
 function HomeComponent() {
+  const courses = useQuery(publishedCoursesQueryOptions);
+  const courseCards = courses.data ?? [];
+  const featuredCourse = courseCards[0];
+  const visibleCourses = courseCards.slice(0, 4);
+  const form = useForm({
+    initialValues: {
+      email: "",
+      fullName: "",
+      instagram: "",
+      phone: "",
+    },
+    validate: {
+      email: (value) =>
+        /^\S+@\S+\.\S+$/.test(value.trim()) ? null : "Enter a valid email address",
+    },
+  });
+
   return (
-    <main className="pc-page">
-      <Stack gap={56}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
-          <Stack gap="lg">
-            <Badge color="gold" variant="light" w="fit-content">
-              Private video courses
-            </Badge>
-            <Title order={1} size="3.75rem" lh={0.98}>
-              Private courses. Clear previews. Protected lessons.
+    <main className="pc-page pc-home pc-home-boutique">
+      <Stack gap={76}>
+        <section className="pc-boutique-hero">
+          <div className="pc-boutique-intro">
+            <div className="pc-boutique-kicker">
+              <span>priauginimas.lt</span>
+              <span>private video classes</span>
+            </div>
+            <Title order={1} className="pc-boutique-title">
+              Salon technique, taught close up.
             </Title>
-            <Text c="dimmed" size="xl" maw={760}>
-              Prive Course helps learners browse available courses, inspect lesson outlines, and
-              start with free previews before entering protected course material.
+            <Text c="dimmed" className="pc-boutique-lede">
+              Beauty education for women who want calm, practical instruction before bringing a
+              technique to the table. Browse current classes and leave your details for new
+              releases.
             </Text>
             <Group>
               <Link to="/courses">
-                <Button color="gold" size="md" leftSection={<BookOpen size={18} />}>
-                  Browse courses
+                <Button size="md" rightSection={<ArrowRight size={18} />}>
+                  View classes
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button color="gold" size="md" variant="light">
-                  Sign in
+              <a href="#updates" className="no-underline">
+                <Button size="md" variant="light" leftSection={<Mail size={18} />}>
+                  Leave details
                 </Button>
-              </Link>
+              </a>
             </Group>
-          </Stack>
+          </div>
 
-          <Paper
-            withBorder
-            p="xl"
-            className="pc-panel"
-            style={{ borderTop: "3px solid var(--pc-accent)" }}
-          >
-            <Stack gap="md">
-              <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                Course flow
-              </Text>
-              <Title order={2} size="h3">
-                Browse, preview, continue
-              </Title>
-              <Text c="dimmed">
-                The public pages work as the course storefront. The private lesson pages stay
-                focused on playback and progress.
-              </Text>
-            </Stack>
-          </Paper>
-        </div>
-
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
-          {highlights.map((highlight) => {
-            const Icon = highlight.icon;
-
-            return (
-              <Paper key={highlight.title} withBorder p="lg" className="pc-panel">
-                <Stack gap="sm">
-                  <ThemeIcon color="gold" variant="light" size="lg">
-                    <Icon size={18} />
+          <div className="pc-boutique-stage">
+            <div className="pc-boutique-service-strip" aria-label="Salon focus areas">
+              {salonServices.map((service) => (
+                <span key={service}>{service}</span>
+              ))}
+            </div>
+            <Paper withBorder className="pc-panel pc-boutique-note">
+              <Stack gap="lg">
+                <Group gap="sm">
+                  <ThemeIcon variant="light" radius="xl">
+                    <Sparkles size={18} />
                   </ThemeIcon>
-                  <Title order={2} size="h4">
-                    {highlight.title}
-                  </Title>
-                  <Text c="dimmed">{highlight.description}</Text>
-                </Stack>
-              </Paper>
-            );
-          })}
-        </SimpleGrid>
+                  <Text fw={800}>Current class</Text>
+                </Group>
+                {featuredCourse ? (
+                  <>
+                    <Title order={2} size="h2">
+                      {featuredCourse.title}
+                    </Title>
+                    <Text c="dimmed">
+                      {featuredCourse.description ||
+                        "A practical salon class made to be watched, paused, repeated, and brought back to your own table."}
+                    </Text>
+                    <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
+                      <Button fullWidth rightSection={<ArrowRight size={18} />}>
+                        View class
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <EmptyState
+                    title="New classes are being prepared"
+                    description="Published courses will appear here when they are ready."
+                  />
+                )}
+              </Stack>
+            </Paper>
+          </div>
+        </section>
 
-        <Paper withBorder p="xl" className="pc-panel">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        <section>
+          <Group justify="space-between" align="end" mb="lg">
             <div>
-              <Title order={2}>Ready to see what is available?</Title>
-              <Text c="dimmed" mt="xs">
-                Start with the course catalog. Each course shows its lesson outline and access
-                states clearly.
+              <Text size="xs" tt="uppercase" fw={800} c="dimmed">
+                Class menu
               </Text>
+              <Title order={2}>Available salon classes</Title>
             </div>
             <Link to="/courses">
-              <Button color="gold" size="md">
-                View courses
+              <Button variant="subtle" rightSection={<ArrowRight size={16} />}>
+                See all
               </Button>
             </Link>
+          </Group>
+
+          {courseCards.length === 0 ? (
+            <EmptyState
+              title="New classes are being prepared"
+              description="The class menu will open as soon as the first course is published."
+            />
+          ) : null}
+
+          <div className="pc-boutique-menu">
+            {visibleCourses.map((course) => (
+              <Paper key={course.id} withBorder p="lg" className="pc-panel pc-boutique-course">
+                <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
+                  <Stack gap={6} className="md:col-span-2">
+                    <Text size="xs" tt="uppercase" fw={800} c="dimmed">
+                      Video class
+                    </Text>
+                    <Title order={3} size="h3">
+                      {course.title}
+                    </Title>
+                    <Text c="dimmed" lineClamp={2}>
+                      {course.description ||
+                        "A private salon lesson for learning technique with patient repetition."}
+                    </Text>
+                  </Stack>
+                  <Stack justify="space-between" align="stretch">
+                    <Badge variant="light" leftSection={<BookOpen size={12} />} w="fit-content">
+                      Private access
+                    </Badge>
+                    <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
+                      <Button variant="light" fullWidth>
+                        Open class
+                      </Button>
+                    </Link>
+                  </Stack>
+                </SimpleGrid>
+              </Paper>
+            ))}
           </div>
-        </Paper>
+        </section>
+
+        <section id="updates" className="pc-boutique-updates">
+          <Stack gap="sm">
+            <Text size="xs" tt="uppercase" fw={800} c="dimmed">
+              First look
+            </Text>
+            <Title order={2}>Leave your details for new class releases.</Title>
+            <Text c="dimmed" maw={560}>
+              Get updates about new courses, model days, and promotional offers from the studio.
+            </Text>
+          </Stack>
+
+          <Paper withBorder p="xl" className="pc-panel pc-boutique-form">
+            <form
+              onSubmit={form.onSubmit(() => {
+                toast.success("Thank you, your details have been added for course updates.");
+                form.reset();
+              })}
+            >
+              <Stack gap="md">
+                <TextInput
+                  label="Email"
+                  placeholder="you@example.com"
+                  type="email"
+                  leftSection={<Mail size={16} />}
+                  key={form.key("email")}
+                  {...form.getInputProps("email")}
+                />
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                  <TextInput
+                    label="Full name"
+                    placeholder="Your name"
+                    key={form.key("fullName")}
+                    {...form.getInputProps("fullName")}
+                  />
+                  <TextInput
+                    label="Instagram"
+                    placeholder="@yourhandle"
+                    leftSection={<AtSign size={16} />}
+                    key={form.key("instagram")}
+                    {...form.getInputProps("instagram")}
+                  />
+                </SimpleGrid>
+                <TextInput
+                  label="Phone"
+                  placeholder="+370"
+                  type="tel"
+                  leftSection={<Phone size={16} />}
+                  key={form.key("phone")}
+                  {...form.getInputProps("phone")}
+                />
+                <Button type="submit" size="md">
+                  Join studio updates
+                </Button>
+              </Stack>
+            </form>
+          </Paper>
+        </section>
       </Stack>
     </main>
   );

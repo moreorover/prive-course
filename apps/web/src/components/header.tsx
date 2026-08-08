@@ -9,49 +9,32 @@ import UserMenu from "./user-menu";
 export default function Header() {
   const { data: session } = authClient.useSession();
   const links = [
-    { to: "/", label: "Home" },
-    { to: "/courses", label: "Courses" },
+    { to: "/", label: "Studio" },
+    { to: "/courses", label: "Classes" },
     ...(session?.user.role === "admin" ? [{ to: "/admin", label: "Admin" }] : []),
   ] as const;
 
   return (
-    <Box
-      component="header"
-      className="border-b"
-      style={{
-        background: "color-mix(in srgb, var(--pc-panel) 88%, transparent)",
-        borderColor: "var(--pc-border)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
-      <div
-        className="mx-auto flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between"
-        style={{ width: "min(100% - 1rem, 72rem)" }}
-      >
-        <Group gap="lg" wrap="nowrap">
-          <Link to="/" className="no-underline">
-            <div>
-              <Text fw={800} lh={1}>
-                Prive Course
-              </Text>
-              <Text size="xs" c="dimmed">
-                Private video learning
-              </Text>
-            </div>
-          </Link>
-          <nav className="flex flex-wrap gap-2 text-sm">
-            {links.map(({ to, label }) => {
-              return (
-                <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
-                  <Button component="span" size="xs" variant="subtle">
-                    {label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
-        </Group>
-        <Group gap="xs" wrap="nowrap">
+    <Box component="header" className="pc-boutique-header">
+      <div className="pc-boutique-header-inner">
+        <Link to="/" className="pc-boutique-wordmark">
+          <span>priauginimas.lt</span>
+          <Text size="xs" c="dimmed">
+            private salon classes
+          </Text>
+        </Link>
+
+        <nav className="pc-boutique-nav" aria-label="Main navigation">
+          {links.map(({ to, label }) => (
+            <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
+              <Button component="span" size="xs" variant="subtle">
+                {label}
+              </Button>
+            </Link>
+          ))}
+        </nav>
+
+        <Group gap="xs" wrap="nowrap" className="pc-boutique-actions">
           <ModeToggle />
           <UserMenu />
         </Group>

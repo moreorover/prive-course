@@ -18,29 +18,29 @@ body {
 }
 
 [data-mantine-color-scheme="light"] {
-  --pc-canvas: #fbf7ef;
-  --pc-canvas-glow: rgb(213 167 61 / 18%);
-  --pc-panel: #fffdf8;
-  --pc-panel-soft: #f1e8d7;
-  --pc-border: #ddd3c0;
-  --pc-text: #17140e;
-  --pc-muted: #6b6255;
-  --pc-accent: #d5a73d;
-  --pc-accent-strong: #23433f;
-  --pc-danger-soft: #8e3f35;
+  --pc-canvas: #fff8f6;
+  --pc-canvas-glow: rgb(204 103 132 / 18%);
+  --pc-panel: #fffdfb;
+  --pc-panel-soft: #f8e8e7;
+  --pc-border: #ead1ce;
+  --pc-text: #2d2020;
+  --pc-muted: #756564;
+  --pc-accent: #cc6784;
+  --pc-accent-strong: #55786f;
+  --pc-danger-soft: #a54854;
 }
 
 [data-mantine-color-scheme="dark"] {
-  --pc-canvas: #111318;
-  --pc-canvas-glow: rgb(213 167 61 / 16%);
-  --pc-panel: #1a1d23;
-  --pc-panel-soft: #22252d;
-  --pc-border: #37322a;
-  --pc-text: #fbf7ef;
-  --pc-muted: #bdb3a2;
-  --pc-accent: #e0b64d;
-  --pc-accent-strong: #84b8ad;
-  --pc-danger-soft: #d07b70;
+  --pc-canvas: #181314;
+  --pc-canvas-glow: rgb(213 116 145 / 16%);
+  --pc-panel: #211a1c;
+  --pc-panel-soft: #2b2023;
+  --pc-border: #493137;
+  --pc-text: #fff8f6;
+  --pc-muted: #d7c0bd;
+  --pc-accent: #e08aa2;
+  --pc-accent-strong: #8cb8aa;
+  --pc-danger-soft: #e1848c;
 }
 
 ::selection {
@@ -82,4 +82,90 @@ a:hover {
 
 .pc-muted {
   color: var(--pc-muted);
+}
+
+.pc-home {
+  position: relative;
+}
+
+.pc-home::before {
+  position: fixed;
+  inset: 5rem auto auto -7rem;
+  z-index: -1;
+  width: 18rem;
+  height: 18rem;
+  content: "";
+  background: color-mix(in srgb, var(--pc-accent) 18%, transparent);
+  border-radius: 999px;
+  filter: blur(24px);
+}
+
+.pc-home-hero,
+.pc-updates-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+}
+
+.pc-home-title {
+  max-width: 50rem;
+  font-size: clamp(3rem, 8vw, 5.9rem);
+  line-height: 0.9;
+}
+
+.pc-feature-card {
+  position: relative;
+  overflow: hidden;
+  border-top: 4px solid var(--pc-accent);
+  box-shadow: 0 24px 70px rgb(94 54 64 / 12%);
+}
+
+.pc-feature-card::after {
+  position: absolute;
+  right: -2rem;
+  bottom: -2.5rem;
+  width: 9rem;
+  height: 9rem;
+  content: "";
+  border: 1px solid color-mix(in srgb, var(--pc-accent) 34%, transparent);
+  border-radius: 999px;
+}
+
+.pc-course-card {
+  min-height: 16rem;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.pc-course-card:hover {
+  border-color: color-mix(in srgb, var(--pc-accent) 70%, var(--pc-border));
+  box-shadow: 0 18px 45px rgb(94 54 64 / 10%);
+  transform: translateY(-2px);
+}
+
+.pc-updates-section {
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--pc-border);
+  border-bottom: 1px solid var(--pc-border);
+}
+
+.pc-updates-form {
+  box-shadow: 0 20px 55px rgb(94 54 64 / 10%);
+}
+
+.pc-soft-badge {
+  letter-spacing: 0;
+}
+
+@media (min-width: 64rem) {
+  .pc-home-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 28rem);
+  }
+
+  .pc-updates-section {
+    grid-template-columns: minmax(0, 0.8fr) minmax(24rem, 1fr);
+  }
 }

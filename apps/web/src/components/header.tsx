@@ -32,10 +32,10 @@ export default function Header() {
           <Link to="/" className="no-underline">
             <div>
               <Text fw={800} lh={1}>
-                Prive Course
+                priauginimas.lt
               </Text>
               <Text size="xs" c="dimmed">
-                Private video learning
+                Beauty video courses
               </Text>
             </div>
           </Link>

@@ -1,0 +1,56 @@
+name: CodeQL
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "alchemy.run.ts"
+      - "apps/**/*.ts"
+      - "apps/**/*.tsx"
+      - "apps/**/*.js"
+      - "apps/**/*.jsx"
+      - "apps/**/*.mjs"
+      - "apps/**/*.cjs"
+      - "packages/**/*.ts"
+      - "packages/**/*.tsx"
+      - "packages/**/*.js"
+      - "packages/**/*.jsx"
+      - "packages/**/*.mjs"
+      - "packages/**/*.cjs"
+      - "scripts/**/*.mjs"
+      - ".github/workflows/codeql.yml"
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - javascript-typescript
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

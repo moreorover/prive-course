@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vp run --parallel --filter web --filter server dev",
-    "dev:infra": "ALCHEMY_TELEMETRY_DISABLED=1 vp run --filter @prive-course/infra dev",
+    "dev:infra": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy dev --stage dev",
     "build": "vp run -r build",
     "check-types": "vp run -r check-types",
     "check": "vp check && vp run -r check-types",
@@ -29,14 +29,21 @@
     "db:execute:local": "vp run --filter server db:execute:local",
     "db:migrate:local": "vp run --filter server db:migrate:local",
     "db:generate": "vp run --filter @prive-course/db db:generate",
-    "deploy": "vp run --filter @prive-course/infra deploy",
-    "destroy": "vp run --filter @prive-course/infra destroy"
+    "deploy": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy deploy --stage dev",
+    "deploy:dev": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy deploy --stage dev",
+    "deploy:prod": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy deploy --stage prod",
+    "destroy": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy destroy --stage dev",
+    "destroy:dev": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy destroy --stage dev",
+    "destroy:prod": "ALCHEMY_TELEMETRY_DISABLED=1 alchemy destroy --stage prod"
   },
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "catalog:"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
     "@prive-course/config": "workspace:*",
     "@types/node": "catalog:",
+    "alchemy": "catalog:",
     "knip": "^6.26.0",
     "react-doctor": "^0.7.4",
     "typescript": "catalog:",

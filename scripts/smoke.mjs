@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const productionWebUrl = "https://prive-course-web-mselvenis.mselvenis.workers.dev";
-const productionServerUrl = "https://prive-course-server-mselvenis.mselvenis.workers.dev";
+const productionWebUrl = "https://prive-course-web-prod.mselvenis.workers.dev";
+const productionServerUrl = "https://prive-course-server-prod.mselvenis.workers.dev";
 
 function parseArgs(argv) {
   const args = {

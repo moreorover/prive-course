@@ -21,27 +21,27 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 First, install the dependencies:
 
 ```bash
-pnpm install
+vp install
 ```
 
 ## Database Setup
 
 This project uses Cloudflare D1 (SQLite) with Drizzle ORM.
 
-Runtime database access uses the Cloudflare `DB` binding from `packages/infra/alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
+Runtime database access uses the Cloudflare `DB` binding from the root `alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
 
 Alchemy provisions the D1 database and applies migrations during `dev` and `deploy`.
 
 1. Generate migration files:
 
 ```bash
-pnpm run db:generate
+vp run db:generate
 ```
 
 Then, run the development server:
 
 ```bash
-pnpm run dev
+vp run dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
@@ -66,17 +66,19 @@ runtime flows, acceptance scenarios, and e2e scenario candidates.
 ### Cloudflare via Alchemy
 
 - Target: web + server
-- Dev: pnpm run dev
-- Deploy: pnpm run deploy
-- Destroy: pnpm run destroy
+- Dev: vp run dev
+- Deploy dev: vp run deploy
+- Deploy prod: vp run deploy:prod
+- Destroy dev: vp run destroy
+- Destroy prod: vp run destroy:prod
 
 For more details, see the guide on [Deploying to Cloudflare with Alchemy](https://www.better-t-stack.dev/docs/guides/cloudflare-alchemy).
 
 ## Git Hooks and Formatting
 
-- Optional native Vite+ hooks: `pnpm run hooks:setup`
+- Optional native Vite+ hooks: `vp run hooks:setup`
 - Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `pnpm run check`
+- Run checks: `vp run check`
 
 ## Project Structure
 
@@ -89,21 +91,24 @@ prive-course/
 │   ├── api/         # API layer / business logic
 │   ├── auth/        # Authentication configuration & logic
 │   └── db/          # Database schema & queries
+├── alchemy.run.ts   # Cloudflare infrastructure for dev and prod
 ```
 
 ## Available Scripts
 
-- `pnpm run dev`: Start all applications in development mode
-- `pnpm run build`: Build all applications
-- `pnpm run dev:web`: Start only the web application
-- `pnpm run dev:server`: Start only the server
-- `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run db:generate`: Generate database client/types
-- `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `pnpm run knip`: Run unused files, exports, and dependency checks
-- `pnpm run test`: Run workspace tests
-- `pnpm run smoke:checklist`: Print the manual smoke-test checklist location
-- `pnpm run lint`: Run Vite+ lint checks
-- `pnpm run format`: Run Vite+ formatting
-- `pnpm run staged`: Run Vite+ checks against staged files
-- `pnpm run hooks:setup`: Install Vite+ native Git hooks with `vp config`
+- `vp run dev`: Start all applications in development mode
+- `vp run build`: Build all applications
+- `vp run dev:web`: Start only the web application
+- `vp run dev:server`: Start only the server
+- `vp run check-types`: Check TypeScript types across all apps
+- `vp run db:generate`: Generate database client/types
+- `vp run check`: Run Vite+ format/lint checks and workspace TypeScript checks
+- `vp run deploy`: Deploy the dev Cloudflare environment through Alchemy
+- `vp run deploy:prod`: Deploy the prod Cloudflare environment through Alchemy
+- `vp run knip`: Run unused files, exports, and dependency checks
+- `vp run test`: Run workspace tests
+- `vp run smoke:checklist`: Print the manual smoke-test checklist location
+- `vp run lint`: Run Vite+ lint checks
+- `vp run format`: Run Vite+ formatting
+- `vp run staged`: Run Vite+ checks against staged files
+- `vp run hooks:setup`: Install Vite+ native Git hooks with `vp config`

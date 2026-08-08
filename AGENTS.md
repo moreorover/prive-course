@@ -24,7 +24,7 @@ Payment flows are intentionally out of scope for v1.
 - `packages/auth`: Better Auth server configuration.
 - `packages/db`: Drizzle schema, database factory, and generated migrations.
 - `packages/env`: shared environment typing and validation entrypoints.
-- `packages/infra`: Alchemy deployment definitions for web, server, D1, and migrations.
+- `alchemy.run.ts`: Alchemy deployment definitions for web, server, D1, and migrations.
 
 ## Frontend Rules
 
@@ -64,7 +64,7 @@ Payment flows are intentionally out of scope for v1.
 - Start web and server together: `vp run dev`.
 - Start only web: `vp run dev:web`.
 - Start only server: `vp run dev:server`.
-- Run Knip: `pnpm run knip`.
+- Run Knip: `vp run knip`.
 - Run repo checks: `vp run check`.
 - Run tests: `vp run test`.
 - Run React Doctor: `vp exec react-doctor --no-telemetry -y --verbose`.
@@ -72,7 +72,8 @@ Payment flows are intentionally out of scope for v1.
 - Run production automated smoke checks: `vp run smoke:production`.
 - Generate Drizzle migrations: `vp run db:generate`.
 - Apply local D1 migrations: `vp run db:migrate:local`.
-- Deploy through Alchemy: `vp run deploy`.
+- Deploy dev through Alchemy: `vp run deploy`.
+- Deploy prod through Alchemy: `vp run deploy:prod`.
 
 ## Validation Expectations
 

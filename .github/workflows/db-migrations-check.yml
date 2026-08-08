@@ -1,0 +1,43 @@
+name: DB Migrations Check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "packages/db/src/schema/**"
+      - "packages/db/src/migrations/**"
+      - "packages/db/drizzle.config.ts"
+      - "packages/db/package.json"
+
+jobs:
+  drift:
+    name: Drizzle Migration Drift
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Install Dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Generate migrations
+        run: vp run db:generate
+
+      - name: Verify migrations are committed
+        run: |
+          if ! git diff --quiet -- packages/db/src/migrations; then
+            echo "::error::Schema changed but migrations not regenerated. Run 'vp run db:generate' locally and commit the result."
+            git --no-pager diff -- packages/db/src/migrations
+            exit 1
+          fi

@@ -2,28 +2,38 @@
 
 ## Runtime
 
-The app deploys to Cloudflare through Alchemy:
+The app deploys to Cloudflare through the root `alchemy.run.ts`:
 
 - Web: Vite static assets from `apps/web`
 - API: Cloudflare Worker from `apps/server`
 - Database: Cloudflare D1 binding named `DB`
 - Video: Cloudflare Stream
 
-## Production URLs
+## Cloudflare Environments
 
-Current Cloudflare Workers URLs:
+- Dev stage: `dev`
+- Prod stage: `prod`
+- PRs deploy to dev.
+- Pushes to `main` deploy to prod.
+- `vp run deploy` is dev by default. Prod requires `vp run deploy:prod`.
+
+Alchemy provisions separate D1 databases and Workers per stage:
 
 ```txt
-Web:    https://prive-course-web-mselvenis.mselvenis.workers.dev
-Server: https://prive-course-server-mselvenis.mselvenis.workers.dev
+Dev web Worker:     prive-course-web-dev
+Dev server Worker:  prive-course-server-dev
+Dev D1 database:    prive-course-dev
+Prod web Worker:    prive-course-web-prod
+Prod server Worker: prive-course-server-prod
+Prod D1 database:   prive-course-prod
 ```
 
-Verified after deploy:
+After deploy, Alchemy prints the generated `workers.dev` URLs. Smoke-check the active stage:
 
 ```txt
 GET / -> OK
 GET /trpc/healthCheck -> OK
-CORS origin -> https://prive-course-web-mselvenis.mselvenis.workers.dev
+CORS origin -> deployed web URL for the same stage
 ```
 
 ## Required Environment
@@ -31,6 +41,8 @@ CORS origin -> https://prive-course-web-mselvenis.mselvenis.workers.dev
 Set these before running Cloudflare dev or deploy commands:
 
 ```txt
+ALCHEMY_PASSWORD
+ALCHEMY_STATE_TOKEN
 CORS_ORIGIN
 BETTER_AUTH_SECRET
 BETTER_AUTH_URL
@@ -39,7 +51,16 @@ CLOUDFLARE_STREAM_API_TOKEN
 CLOUDFLARE_API_TOKEN
 ```
 
-`CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create tus upload URLs, check video processing status, and create signed playback tokens.
+`ALCHEMY_PASSWORD` encrypts Alchemy-managed secrets in state. `ALCHEMY_STATE_TOKEN` authenticates the Cloudflare-backed Alchemy state store used by CI deploys. `CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create tus upload URLs, check video processing status, and create signed playback tokens.
+
+Root environment files are loaded in this order:
+
+```txt
+.env
+.env.dev or .env.prod
+```
+
+Stage-specific files override `.env`. App-local files such as `apps/server/.env` and `apps/web/.env` are for local app commands, not Alchemy deploys.
 
 ## Local Development
 
@@ -82,7 +103,7 @@ Current migrations live in `packages/db/src/migrations`.
 Alchemy is configured with:
 
 ```ts
-migrationsDir: "../../packages/db/src/migrations";
+migrationsDir: "./packages/db/src/migrations";
 ```
 
 Remote migrations have been applied to the Cloudflare D1 database bound as `DB`.
@@ -95,19 +116,53 @@ Run:
 vp run deploy
 ```
 
+This deploys the dev stage. Production is explicit:
+
+```sh
+vp run deploy:prod
+```
+
 The first deploy after manually creating D1 may need adoption:
 
 ```sh
-vp exec alchemy deploy --adopt
+vp exec alchemy deploy --stage dev --adopt
+vp exec alchemy deploy --stage prod --adopt
 ```
 
-Use production deploy values in `packages/infra/.env` so deployed auth and CORS do not inherit local `apps/server/.env` URLs.
+Use root `.env.dev` and `.env.prod` files for local deploys so deployed auth and CORS do not inherit local `apps/server/.env` URLs.
 
 Destroy non-production resources only when intentionally tearing down the stack:
 
 ```sh
 vp run destroy
 ```
+
+Destroy production only with the explicit prod command:
+
+```sh
+vp run destroy:prod
+```
+
+## GitHub Actions
+
+Create GitHub environments named `cloudflare-dev` and `cloudflare-prod`. Store the 1Password service account token as the only GitHub secret needed by the deploy workflows:
+
+```txt
+OP_SERVICE_ACCOUNT_TOKEN
+```
+
+Use a `prive-course` service account with `read_items` access to the `prive-course` vault. A token copied from another project will authenticate but fail when the workflow resolves `op://prive-course/...` secret references.
+
+Deployment secrets are loaded from the `prive-course` 1Password vault:
+
+```txt
+prive-course-cloudflare-dev
+prive-course-cloudflare-prod
+```
+
+Each item uses the same section layout as `prive-admin`: `cloudflare`, `workers`, `better-auth`, `web`, and `d1`. `prive-course` also includes an `alchemy` section for `ALCHEMY_PASSWORD` and `ALCHEMY_STATE_TOKEN`, plus `cloudflare/stream-api-token` for Cloudflare Stream.
+
+The PR workflow deploys dev after checks. The main workflow deploys prod after checks.
 
 ## Stream
 

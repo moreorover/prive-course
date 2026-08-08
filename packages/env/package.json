@@ -13,7 +13,6 @@
   },
   "devDependencies": {
     "@prive-course/config": "workspace:*",
-    "@prive-course/infra": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

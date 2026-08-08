@@ -1,5 +1,6 @@
 import alchemy from "alchemy";
 import { D1Database, Vite, Worker } from "alchemy/cloudflare";
+import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
 
 type Stage = "dev" | "prod";
@@ -24,6 +25,9 @@ config({ path: `.env.${stage}`, override: true });
 const app = await alchemy("prive-course", {
   stage,
   password: process.env.ALCHEMY_PASSWORD ?? process.env.PASSWORD,
+  stateStore: process.env.ALCHEMY_STATE_TOKEN
+    ? (scope) => new CloudflareStateStore(scope)
+    : undefined,
 });
 
 const isProd = stage === "prod";

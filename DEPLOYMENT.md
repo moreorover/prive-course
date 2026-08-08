@@ -42,6 +42,7 @@ Set these before running Cloudflare dev or deploy commands:
 
 ```txt
 ALCHEMY_PASSWORD
+ALCHEMY_STATE_TOKEN
 CORS_ORIGIN
 BETTER_AUTH_SECRET
 BETTER_AUTH_URL
@@ -50,7 +51,7 @@ CLOUDFLARE_STREAM_API_TOKEN
 CLOUDFLARE_API_TOKEN
 ```
 
-`ALCHEMY_PASSWORD` encrypts Alchemy-managed secrets in state. `CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create tus upload URLs, check video processing status, and create signed playback tokens.
+`ALCHEMY_PASSWORD` encrypts Alchemy-managed secrets in state. `ALCHEMY_STATE_TOKEN` authenticates the Cloudflare-backed Alchemy state store used by CI deploys. `CLOUDFLARE_STREAM_API_TOKEN` is used by the API to create tus upload URLs, check video processing status, and create signed playback tokens.
 
 Root environment files are loaded in this order:
 
@@ -148,6 +149,7 @@ Create GitHub environments named `cloudflare-dev` and `cloudflare-prod`. Store t
 
 ```txt
 ALCHEMY_PASSWORD
+ALCHEMY_STATE_TOKEN
 CLOUDFLARE_ACCOUNT_ID
 CLOUDFLARE_API_TOKEN
 CLOUDFLARE_STREAM_API_TOKEN

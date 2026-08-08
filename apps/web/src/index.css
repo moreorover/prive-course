@@ -11,36 +11,42 @@ body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   background:
-    radial-gradient(circle at top left, var(--pc-canvas-glow), transparent 28rem), var(--pc-canvas);
+    linear-gradient(180deg, rgb(255 255 255 / 80%), transparent 20rem),
+    radial-gradient(circle at 18% 8%, var(--pc-canvas-glow), transparent 28rem),
+    radial-gradient(circle at 86% 4%, var(--pc-cool-glow), transparent 24rem), var(--pc-canvas);
   color: var(--pc-text);
   font-size: 16px;
   line-height: 1.5;
 }
 
 [data-mantine-color-scheme="light"] {
-  --pc-canvas: #fbf7ef;
-  --pc-canvas-glow: rgb(213 167 61 / 18%);
-  --pc-panel: #fffdf8;
-  --pc-panel-soft: #f1e8d7;
-  --pc-border: #ddd3c0;
-  --pc-text: #17140e;
-  --pc-muted: #6b6255;
-  --pc-accent: #d5a73d;
-  --pc-accent-strong: #23433f;
-  --pc-danger-soft: #8e3f35;
+  --pc-canvas: #faf7f8;
+  --pc-canvas-glow: rgb(185 66 112 / 14%);
+  --pc-cool-glow: rgb(71 119 141 / 14%);
+  --pc-panel: #ffffff;
+  --pc-panel-soft: #f7e9ee;
+  --pc-border: #ead7dd;
+  --pc-text: #201c21;
+  --pc-muted: #6f6570;
+  --pc-accent: #b94270;
+  --pc-accent-strong: #47778d;
+  --pc-danger-soft: #a54854;
+  --pc-shadow: rgb(44 33 42 / 10%);
 }
 
 [data-mantine-color-scheme="dark"] {
-  --pc-canvas: #111318;
-  --pc-canvas-glow: rgb(213 167 61 / 16%);
-  --pc-panel: #1a1d23;
-  --pc-panel-soft: #22252d;
-  --pc-border: #37322a;
-  --pc-text: #fbf7ef;
-  --pc-muted: #bdb3a2;
-  --pc-accent: #e0b64d;
-  --pc-accent-strong: #84b8ad;
-  --pc-danger-soft: #d07b70;
+  --pc-canvas: #111217;
+  --pc-canvas-glow: rgb(212 102 143 / 13%);
+  --pc-cool-glow: rgb(80 140 164 / 10%);
+  --pc-panel: #191a20;
+  --pc-panel-soft: #241e25;
+  --pc-border: #39323b;
+  --pc-text: #faf7f8;
+  --pc-muted: #cac0c8;
+  --pc-accent: #df85a3;
+  --pc-accent-strong: #82bfd7;
+  --pc-danger-soft: #e1848c;
+  --pc-shadow: rgb(0 0 0 / 32%);
 }
 
 ::selection {
@@ -82,4 +88,95 @@ a:hover {
 
 .pc-muted {
   color: var(--pc-muted);
+}
+
+.pc-home-saas {
+  position: relative;
+}
+
+.pc-saas-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 4.5rem);
+  align-items: center;
+  min-height: min(47rem, calc(100svh - 5rem));
+  padding-block: clamp(2rem, 6vw, 5rem);
+}
+
+.pc-saas-title {
+  max-width: 58rem;
+  font-size: clamp(3rem, 8vw, 6.4rem);
+  line-height: 0.9;
+}
+
+.pc-saas-lede {
+  max-width: 44rem;
+  font-size: clamp(1.08rem, 2vw, 1.28rem);
+}
+
+.pc-dashboard {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-color: color-mix(in srgb, var(--pc-border) 70%, transparent);
+  box-shadow: 0 30px 90px var(--pc-shadow);
+}
+
+.pc-dashboard-stat {
+  background: color-mix(in srgb, var(--pc-panel-soft) 45%, var(--pc-panel));
+  border-color: var(--pc-border);
+}
+
+.pc-dashboard-feature {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--pc-accent) 10%, transparent), transparent),
+    var(--pc-panel);
+  border-color: color-mix(in srgb, var(--pc-accent) 35%, var(--pc-border));
+}
+
+.pc-saas-course {
+  min-height: 17rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--pc-panel-soft) 52%, transparent), transparent),
+    var(--pc-panel);
+  box-shadow: 0 14px 40px rgb(44 33 42 / 6%);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.pc-saas-course:hover {
+  border-color: color-mix(in srgb, var(--pc-accent) 60%, var(--pc-border));
+  box-shadow: 0 18px 55px var(--pc-shadow);
+  transform: translateY(-2px);
+}
+
+.pc-saas-updates {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(1.25rem, 5vw, 3rem);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--pc-accent-strong) 12%, transparent),
+      transparent
+    ),
+    var(--pc-panel);
+  border: 1px solid var(--pc-border);
+  box-shadow: 0 20px 65px rgb(44 33 42 / 7%);
+}
+
+.pc-saas-form {
+  box-shadow: 0 20px 55px var(--pc-shadow);
+}
+
+@media (min-width: 64rem) {
+  .pc-saas-hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(24rem, 0.95fr);
+  }
+
+  .pc-saas-updates {
+    grid-template-columns: minmax(0, 0.75fr) minmax(24rem, 1fr);
+  }
 }

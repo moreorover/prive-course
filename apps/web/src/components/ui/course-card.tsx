@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import { Surface } from "./surface";
 
-export type CourseCardVariant = "featured" | "standard" | "compact";
+type CourseCardVariant = "featured" | "standard" | "compact";
 
 export type CourseCardProps = {
   actionLabel?: string;

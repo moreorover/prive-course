@@ -1,8 +1,8 @@
 import { Paper, type PaperProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
-export type SurfaceVariant = "default" | "raised" | "subtle" | "accent" | "danger";
-export type SurfacePadding = "sm" | "md" | "lg" | "xl";
+type SurfaceVariant = "default" | "raised" | "subtle" | "accent" | "danger";
+type SurfacePadding = "sm" | "md" | "lg" | "xl";
 
 export type SurfaceProps = PaperProps & {
   children: ReactNode;

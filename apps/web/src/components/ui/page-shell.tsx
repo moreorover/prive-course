@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-export type PageShellSize = "narrow" | "default" | "wide" | "full";
-export type PageShellTone = "default" | "quiet" | "player";
+type PageShellSize = "narrow" | "default" | "wide" | "full";
+type PageShellTone = "default" | "quiet" | "player";
 
 export type PageShellProps = {
   children: ReactNode;

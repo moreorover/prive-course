@@ -1,4 +1,4 @@
-import { Button, Table, Text } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
 import { useState } from "react";
 import { toast } from "sonner";
 

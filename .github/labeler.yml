@@ -1,0 +1,43 @@
+web:
+  - changed-files:
+      - any-glob-to-any-file:
+          - apps/web/**
+
+db:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/db/**
+
+api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/api/**
+
+auth:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/auth/**
+
+config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/config/**
+          - packages/env/**
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+
+infra:
+  - changed-files:
+      - any-glob-to-any-file:
+          - alchemy.run.ts
+          - apps/server/wrangler.jsonc
+          - DEPLOYMENT.md
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/package.json"
+          - pnpm-lock.yaml

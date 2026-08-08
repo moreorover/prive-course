@@ -1,5 +1,7 @@
-import { Paper, Stack, Text, Title } from "@mantine/core";
+import { Stack, Text, Title } from "@mantine/core";
 import type { ReactNode } from "react";
+
+import { Surface } from "@/components/ui";
 
 export function EmptyState({
   title,
@@ -11,16 +13,16 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <Paper withBorder p="xl" className="pc-panel">
-      <Stack gap="xs" align="center" ta="center">
+    <Surface padding="xl">
+      <Stack gap="xs" align="center" ta="center" className="pc-empty-state">
         <Title order={2} size="h4">
           {title}
         </Title>
         <Text c="dimmed" maw={520}>
           {description}
         </Text>
-        {action ? <div className="mt-2">{action}</div> : null}
+        {action ? <div>{action}</div> : null}
       </Stack>
-    </Paper>
+    </Surface>
   );
 }

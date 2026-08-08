@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
+const workflowSteps = ["Browse", "Preview", "Request access"] as const;
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -53,15 +54,15 @@ function HomeComponent() {
         <section className="pc-saas-hero">
           <Stack gap="xl">
             <Badge variant="light" w="fit-content">
-              Beauty education hub
+              Launch-ready course catalog
             </Badge>
             <Stack gap="md">
               <Title order={1} className="pc-saas-title">
-                Salon courses, organized like a modern learning product.
+                A polished course hub for a modern beauty studio.
               </Title>
               <Text c="dimmed" className="pc-saas-lede">
-                Browse available video classes, join updates, and follow a clean path from first
-                preview to private course access.
+                Turn studio knowledge into a clean public catalog: course previews, private access,
+                and update capture wrapped in one focused experience.
               </Text>
             </Stack>
             <Group>
@@ -76,79 +77,113 @@ function HomeComponent() {
                 </Button>
               </a>
             </Group>
+            <div className="pc-saas-flow" aria-label="Course journey">
+              {workflowSteps.map((step) => (
+                <span key={step}>{step}</span>
+              ))}
+            </div>
           </Stack>
 
-          <Paper withBorder className="pc-panel pc-dashboard">
+          <Paper withBorder className="pc-panel pc-dashboard" aria-label="Course dashboard preview">
             <Stack gap="lg">
-              <Group justify="space-between" align="start">
-                <div>
+              <div className="pc-dashboard-topbar">
+                <Group gap="xs">
+                  <span />
+                  <span />
+                  <span />
+                </Group>
+                <Text size="xs" c="dimmed">
+                  course-console.priauginimas.lt
+                </Text>
+              </div>
+
+              <div className="pc-dashboard-grid">
+                <div className="pc-dashboard-rail">
                   <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                    Course workspace
+                    Console
                   </Text>
-                  <Title order={2} size="h3" mt={4}>
-                    Today at priauginimas.lt
-                  </Title>
-                </div>
-                <ThemeIcon variant="light" radius="xl">
-                  <Sparkles size={20} />
-                </ThemeIcon>
-              </Group>
-
-              <SimpleGrid cols={3} spacing="sm">
-                <Paper withBorder p="sm" className="pc-dashboard-stat">
-                  <Text fw={900} size="xl">
-                    {courseCards.length}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    available
-                  </Text>
-                </Paper>
-                <Paper withBorder p="sm" className="pc-dashboard-stat">
-                  <Text fw={900} size="xl">
-                    24/7
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    video access
-                  </Text>
-                </Paper>
-                <Paper withBorder p="sm" className="pc-dashboard-stat">
-                  <Text fw={900} size="xl">
-                    1:1
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    studio style
-                  </Text>
-                </Paper>
-              </SimpleGrid>
-
-              {featuredCourse ? (
-                <Paper withBorder p="lg" className="pc-dashboard-feature">
-                  <Stack gap="md">
-                    <Group justify="space-between" gap="md">
-                      <Badge variant="filled">Featured course</Badge>
-                      <Text size="xs" c="dimmed">
-                        preview ready
-                      </Text>
-                    </Group>
-                    <Title order={3}>{featuredCourse.title}</Title>
-                    <Text c="dimmed" size="sm" lineClamp={3}>
-                      {featuredCourse.description ||
-                        "A private beauty course with clear lesson flow and focused practice."}
-                    </Text>
-                    <Progress value={68} aria-label="Course preview progress" />
-                    <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
-                      <Button fullWidth rightSection={<ArrowRight size={18} />}>
-                        Open course
-                      </Button>
-                    </Link>
+                  <Stack gap="xs">
+                    <span aria-current="true">Catalog</span>
+                    <span>Updates</span>
+                    <span>Access</span>
                   </Stack>
-                </Paper>
-              ) : (
-                <EmptyState
-                  title="New classes are being prepared"
-                  description="Published courses will appear here when they are ready."
-                />
-              )}
+                </div>
+
+                <Stack gap="md">
+                  <Group justify="space-between" align="start">
+                    <div>
+                      <Text size="xs" tt="uppercase" fw={800} c="dimmed">
+                        Course workspace
+                      </Text>
+                      <Title order={2} size="h3" mt={4}>
+                        Today at priauginimas.lt
+                      </Title>
+                    </div>
+                    <ThemeIcon variant="light" radius="xl">
+                      <Sparkles size={20} />
+                    </ThemeIcon>
+                  </Group>
+
+                  <SimpleGrid cols={3} spacing="sm">
+                    <Paper withBorder p="sm" className="pc-dashboard-stat">
+                      <Text fw={900} size="xl">
+                        {courseCards.length}
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        available
+                      </Text>
+                    </Paper>
+                    <Paper withBorder p="sm" className="pc-dashboard-stat">
+                      <Text fw={900} size="xl">
+                        24/7
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        video access
+                      </Text>
+                    </Paper>
+                    <Paper withBorder p="sm" className="pc-dashboard-stat">
+                      <Text fw={900} size="xl">
+                        1:1
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        studio style
+                      </Text>
+                    </Paper>
+                  </SimpleGrid>
+
+                  {featuredCourse ? (
+                    <Paper withBorder p="lg" className="pc-dashboard-feature">
+                      <Stack gap="md">
+                        <Group justify="space-between" gap="md">
+                          <Badge variant="filled">Featured course</Badge>
+                          <Text size="xs" c="dimmed">
+                            preview ready
+                          </Text>
+                        </Group>
+                        <Title order={3}>{featuredCourse.title}</Title>
+                        <Text c="dimmed" size="sm" lineClamp={3}>
+                          {featuredCourse.description ||
+                            "A private beauty course with clear lesson flow and focused practice."}
+                        </Text>
+                        <Progress value={68} aria-label="Course preview progress" />
+                        <Link
+                          to="/courses/$courseSlug"
+                          params={{ courseSlug: featuredCourse.slug }}
+                        >
+                          <Button fullWidth rightSection={<ArrowRight size={18} />}>
+                            Open course
+                          </Button>
+                        </Link>
+                      </Stack>
+                    </Paper>
+                  ) : (
+                    <EmptyState
+                      title="New classes are being prepared"
+                      description="Published courses will appear here when they are ready."
+                    />
+                  )}
+                </Stack>
+              </div>
             </Stack>
           </Paper>
         </section>

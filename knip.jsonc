@@ -3,12 +3,17 @@
   "workspaces": {
     ".": {
       "entry": [
+        "alchemy.run.ts",
         "vite.config.ts",
         "scripts/**/*.mjs",
         "docs/superpowers/specs/**/*.md",
         "docs/superpowers/plans/**/*.md",
       ],
-      "project": ["*.{js,ts,json,jsonc}", "scripts/**/*.{js,mjs,ts}"],
+      "project": [
+        "*.{js,ts,json,jsonc}",
+        "scripts/**/*.{js,mjs,ts}",
+        ".github/workflows/*.{yml,yaml}",
+      ],
     },
     "apps/web": {
       "entry": ["src/main.tsx", "src/worker.ts", "src/routes/**/*.tsx", "vite.config.ts"],
@@ -40,11 +45,6 @@
     "packages/env": {
       "entry": ["src/**/*.ts", "env.d.ts"],
       "project": ["src/**/*.ts", "env.d.ts", "package.json"],
-    },
-    "packages/infra": {
-      "entry": ["alchemy.run.ts"],
-      "project": ["*.ts", "package.json"],
-      "ignore": [".alchemy/**"],
     },
   },
   "ignore": [

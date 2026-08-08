@@ -1,0 +1,43 @@
+name: Cloudflare Dev Deploy
+
+on:
+  pull_request:
+
+concurrency:
+  group: cloudflare-dev-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-dev:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment: cloudflare-dev
+    env:
+      ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_STREAM_API_TOKEN: ${{ secrets.CLOUDFLARE_STREAM_API_TOKEN }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+      CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Install Dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Check
+        run: vp run check
+
+      - name: Test
+        run: vp run test
+
+      - name: Deploy Dev
+        run: vp run deploy

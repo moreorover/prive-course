@@ -39,36 +39,24 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 const theme = createTheme({
   defaultRadius: "sm",
-  primaryColor: "rose",
+  primaryColor: "atelier",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headings: {
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-    fontWeight: "720",
+    fontWeight: "760",
   },
   colors: {
-    rose: [
-      "#fff0f3",
-      "#f8dce2",
-      "#eeb4c0",
-      "#e4889a",
-      "#d7627d",
-      "#ba3d5e",
-      "#9a304d",
-      "#79263e",
-      "#571c2d",
-      "#331019",
-    ],
-    gold: [
-      "#fff0f3",
-      "#f8dce2",
-      "#eeb4c0",
-      "#e4889a",
-      "#d7627d",
-      "#ba3d5e",
-      "#9a304d",
-      "#79263e",
-      "#571c2d",
-      "#331019",
+    atelier: [
+      "#f8eee7",
+      "#ecd9cd",
+      "#d9b79f",
+      "#c99474",
+      "#b77856",
+      "#7f4f3b",
+      "#6c4030",
+      "#553126",
+      "#3b211a",
+      "#24130f",
     ],
   },
   components: {
@@ -78,6 +66,26 @@ const theme = createTheme({
       },
     },
     Paper: {
+      defaultProps: {
+        radius: "md",
+      },
+    },
+    TextInput: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    PasswordInput: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    Textarea: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    Select: {
       defaultProps: {
         radius: "sm",
       },
@@ -90,7 +98,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <MantineProvider defaultColorScheme="auto" theme={theme}>
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        <div className="pc-app-root">
           <Header />
           <Outlet />
         </div>

@@ -1,4 +1,4 @@
-import { Box, Button, Group, Text } from "@mantine/core";
+import { Group, Text } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
@@ -9,41 +9,44 @@ import UserMenu from "./user-menu";
 export default function Header() {
   const { data: session } = authClient.useSession();
   const links = [
-    { to: "/", label: "Academy" },
+    { to: "/", label: "Home" },
     { to: "/courses", label: "Courses" },
     ...(session?.user.role === "admin" ? [{ to: "/admin", label: "Admin" }] : []),
   ] as const;
 
   return (
-    <Box component="header" className="pc-academy-header">
-      <div className="pc-academy-header-inner">
-        <Link to="/" className="pc-academy-brand">
-          <span className="pc-academy-monogram">P</span>
-          <span>
+    <header className="pc-header">
+      <div className="pc-header__inner">
+        <Link to="/" className="pc-brand">
+          <span className="pc-brand__mark">P</span>
+          <span className="pc-brand__text">
             <Text fw={850} lh={1}>
               priauginimas.lt
             </Text>
             <Text size="xs" c="dimmed">
-              private beauty academy
+              Private course studio
             </Text>
           </span>
         </Link>
 
-        <nav className="pc-academy-nav" aria-label="Main navigation">
+        <nav className="pc-nav" aria-label="Main navigation">
           {links.map(({ to, label }) => (
-            <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
-              <Button component="span" size="xs" variant="subtle">
-                {label}
-              </Button>
+            <Link
+              key={to}
+              to={to}
+              className="pc-nav__link"
+              activeProps={{ "aria-current": "page" }}
+            >
+              {label}
             </Link>
           ))}
         </nav>
 
-        <Group gap="xs" wrap="nowrap" className="pc-academy-actions">
+        <Group gap="xs" wrap="nowrap" className="pc-actions">
           <ModeToggle />
           <UserMenu />
         </Group>
       </div>
-    </Box>
+    </header>
   );
 }

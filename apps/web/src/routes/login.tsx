@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { PageShell } from "@/components/ui";
 import SignInForm from "@/components/sign-in-form";
 import SignUpForm from "@/components/sign-up-form";
 
@@ -12,12 +13,14 @@ function RouteComponent() {
   const [showSignIn, setShowSignIn] = useState(false);
 
   return (
-    <main className="pc-page-narrow">
-      {showSignIn ? (
-        <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
-      ) : (
-        <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
-      )}
-    </main>
+    <PageShell size="narrow">
+      <div className="pc-auth-panel">
+        {showSignIn ? (
+          <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
+        ) : (
+          <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
+        )}
+      </div>
+    </PageShell>
   );
 }

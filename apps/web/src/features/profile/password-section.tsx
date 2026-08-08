@@ -1,8 +1,9 @@
-import { Button, Group, Paper, PasswordInput, Stack, Title } from "@mantine/core";
+import { Button, Group, PasswordInput, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { FormSection } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 export function PasswordSection({
@@ -48,12 +49,9 @@ export function PasswordSection({
   }
 
   return (
-    <Paper withBorder p="md" radius="sm">
+    <FormSection title="Password">
       <form onSubmit={form.onSubmit(changePassword)}>
         <Stack gap="md">
-          <Title order={2} size="h4">
-            Password
-          </Title>
           <PasswordInput
             label="Current password"
             key={form.key("currentPassword")}
@@ -71,6 +69,6 @@ export function PasswordSection({
           </Group>
         </Stack>
       </form>
-    </Paper>
+    </FormSection>
   );
 }

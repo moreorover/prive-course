@@ -1,8 +1,9 @@
-import { Badge, Button, Group, Paper, Stack, TextInput, Title } from "@mantine/core";
+import { Badge, Button, Group, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { FormSection } from "@/components/ui";
 import type { SessionData } from "@/features/profile/auth-profile";
 import { authClient } from "@/lib/auth-client";
 
@@ -44,12 +45,9 @@ export function AccountSection({
   }
 
   return (
-    <Paper withBorder p="md" radius="sm">
+    <FormSection title="Account">
       <form onSubmit={form.onSubmit(updateProfile)}>
         <Stack gap="md">
-          <Title order={2} size="h4">
-            Account
-          </Title>
           <TextInput label="Name" key={form.key("name")} {...form.getInputProps("name")} />
           <Group justify="space-between">
             <Badge variant="light">
@@ -61,6 +59,6 @@ export function AccountSection({
           </Group>
         </Stack>
       </form>
-    </Paper>
+    </FormSection>
   );
 }

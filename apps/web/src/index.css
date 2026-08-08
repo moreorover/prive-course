@@ -477,6 +477,33 @@ a:hover {
   transform: rotate(-18deg);
 }
 
+.pc-auth-panel {
+  margin-block: clamp(1rem, 6vw, 4rem);
+}
+
+.pc-profile-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.pc-security-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.75rem;
+}
+
+.pc-security-row + .pc-security-row {
+  border-top: 1px solid var(--pc-border);
+}
+
+.pc-security-row__content {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
 @keyframes pc-spin {
   to {
     transform: rotate(360deg);
@@ -534,6 +561,11 @@ a:hover {
 
   .pc-lesson-row__position {
     min-width: 0;
+  }
+
+  .pc-security-row {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

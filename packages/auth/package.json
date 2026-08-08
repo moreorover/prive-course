@@ -11,7 +11,7 @@
   },
   "scripts": {},
   "dependencies": {
-    "@better-auth/passkey": "^1.6.23",
+    "@better-auth/passkey": "^1.6.25",
     "@prive-course/db": "workspace:*",
     "@prive-course/env": "workspace:*",
     "better-auth": "catalog:"

@@ -21,11 +21,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "prive-course",
+        title: "priauginimas.lt",
       },
       {
         name: "description",
-        content: "prive-course is a web application",
+        content: "Beauty video courses from priauginimas.lt",
       },
     ],
     links: [
@@ -39,24 +39,36 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 const theme = createTheme({
   defaultRadius: "sm",
-  primaryColor: "gold",
+  primaryColor: "rose",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headings: {
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
     fontWeight: "720",
   },
   colors: {
+    rose: [
+      "#fff1f4",
+      "#f9dde4",
+      "#efb5c5",
+      "#e58ba3",
+      "#d86688",
+      "#c84c72",
+      "#a7375c",
+      "#842b49",
+      "#5f2138",
+      "#35131f",
+    ],
     gold: [
-      "#fff8e1",
-      "#f7e8b5",
-      "#ecd47e",
-      "#dfbf48",
-      "#d5a73d",
-      "#bd8f31",
-      "#946b25",
-      "#6d4d1d",
-      "#493315",
-      "#281b0b",
+      "#fff1f4",
+      "#f9dde4",
+      "#efb5c5",
+      "#e58ba3",
+      "#d86688",
+      "#c84c72",
+      "#a7375c",
+      "#842b49",
+      "#5f2138",
+      "#35131f",
     ],
   },
   components: {

@@ -11,28 +11,33 @@ body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   background:
-    radial-gradient(circle at top left, var(--pc-canvas-glow), transparent 28rem), var(--pc-canvas);
+    linear-gradient(135deg, rgb(255 255 255 / 58%), transparent 18rem),
+    radial-gradient(circle at top left, var(--pc-canvas-glow), transparent 30rem),
+    radial-gradient(circle at 86% 8%, var(--pc-sage-glow), transparent 22rem), var(--pc-canvas);
   color: var(--pc-text);
   font-size: 16px;
   line-height: 1.5;
 }
 
 [data-mantine-color-scheme="light"] {
-  --pc-canvas: #fff8f6;
-  --pc-canvas-glow: rgb(204 103 132 / 18%);
+  --pc-canvas: #fff7f4;
+  --pc-canvas-glow: rgb(200 76 114 / 18%);
+  --pc-sage-glow: rgb(110 142 126 / 16%);
   --pc-panel: #fffdfb;
-  --pc-panel-soft: #f8e8e7;
-  --pc-border: #ead1ce;
-  --pc-text: #2d2020;
-  --pc-muted: #756564;
-  --pc-accent: #cc6784;
-  --pc-accent-strong: #55786f;
+  --pc-panel-soft: #fae6e8;
+  --pc-border: #ebcdd0;
+  --pc-text: #2b1d21;
+  --pc-muted: #766165;
+  --pc-accent: #c84c72;
+  --pc-accent-strong: #526f64;
   --pc-danger-soft: #a54854;
+  --pc-shadow: rgb(92 50 62 / 12%);
 }
 
 [data-mantine-color-scheme="dark"] {
   --pc-canvas: #181314;
   --pc-canvas-glow: rgb(213 116 145 / 16%);
+  --pc-sage-glow: rgb(117 158 140 / 12%);
   --pc-panel: #211a1c;
   --pc-panel-soft: #2b2023;
   --pc-border: #493137;
@@ -41,6 +46,7 @@ body {
   --pc-accent: #e08aa2;
   --pc-accent-strong: #8cb8aa;
   --pc-danger-soft: #e1848c;
+  --pc-shadow: rgb(0 0 0 / 28%);
 }
 
 ::selection {
@@ -90,35 +96,74 @@ a:hover {
 
 .pc-home::before {
   position: fixed;
-  inset: 5rem auto auto -7rem;
+  inset: 4rem auto auto -10rem;
   z-index: -1;
-  width: 18rem;
-  height: 18rem;
+  width: 24rem;
+  height: 24rem;
   content: "";
-  background: color-mix(in srgb, var(--pc-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--pc-accent) 16%, transparent);
   border-radius: 999px;
-  filter: blur(24px);
+  filter: blur(28px);
 }
 
-.pc-home-hero,
-.pc-updates-section {
+.pc-home::after {
+  position: fixed;
+  inset: auto -7rem 8rem auto;
+  z-index: -1;
+  width: 18rem;
+  height: 26rem;
+  content: "";
+  background: color-mix(in srgb, var(--pc-accent-strong) 16%, transparent);
+  border-radius: 999px;
+  filter: blur(30px);
+}
+
+.pc-home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 2rem;
+  gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
+  min-height: min(47rem, calc(100svh - 5.5rem));
+  padding-block: clamp(2rem, 6vw, 5rem);
 }
 
 .pc-home-title {
-  max-width: 50rem;
-  font-size: clamp(3rem, 8vw, 5.9rem);
-  line-height: 0.9;
+  max-width: 53rem;
+  font-size: clamp(3.2rem, 9vw, 7rem);
+  line-height: 0.86;
+}
+
+.pc-home-lede {
+  font-size: clamp(1.1rem, 2vw, 1.32rem);
+}
+
+.pc-hero-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  max-width: 43rem;
+}
+
+.pc-hero-notes span {
+  padding: 0.45rem 0.7rem;
+  color: var(--pc-muted);
+  background: color-mix(in srgb, var(--pc-panel) 74%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pc-border) 74%, transparent);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+.pc-hero-showcase {
+  position: relative;
+  isolation: isolate;
 }
 
 .pc-feature-card {
   position: relative;
   overflow: hidden;
+  min-height: 28rem;
   border-top: 4px solid var(--pc-accent);
-  box-shadow: 0 24px 70px rgb(94 54 64 / 12%);
+  box-shadow: 0 30px 90px var(--pc-shadow);
 }
 
 .pc-feature-card::after {
@@ -132,8 +177,22 @@ a:hover {
   border-radius: 999px;
 }
 
+.pc-studio-card {
+  margin-top: -2.2rem;
+  margin-inline: 1.2rem;
+  border-color: color-mix(in srgb, var(--pc-accent-strong) 42%, var(--pc-border));
+  box-shadow: 0 22px 55px var(--pc-shadow);
+}
+
+.pc-course-menu {
+  padding-block: 0.5rem;
+}
+
 .pc-course-card {
   min-height: 16rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--pc-panel-soft) 54%, transparent), transparent),
+    var(--pc-panel);
   transition:
     border-color 160ms ease,
     transform 160ms ease,
@@ -142,18 +201,25 @@ a:hover {
 
 .pc-course-card:hover {
   border-color: color-mix(in srgb, var(--pc-accent) 70%, var(--pc-border));
-  box-shadow: 0 18px 45px rgb(94 54 64 / 10%);
+  box-shadow: 0 18px 45px var(--pc-shadow);
   transform: translateY(-2px);
 }
 
 .pc-updates-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
   padding-block: clamp(2rem, 5vw, 3.5rem);
   border-top: 1px solid var(--pc-border);
   border-bottom: 1px solid var(--pc-border);
 }
 
 .pc-updates-form {
-  box-shadow: 0 20px 55px rgb(94 54 64 / 10%);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--pc-panel-soft) 60%, transparent), transparent),
+    var(--pc-panel);
+  box-shadow: 0 20px 55px var(--pc-shadow);
 }
 
 .pc-soft-badge {
@@ -162,7 +228,7 @@ a:hover {
 
 @media (min-width: 64rem) {
   .pc-home-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(22rem, 28rem);
+    grid-template-columns: minmax(0, 1.18fr) minmax(22rem, 0.82fr);
   }
 
   .pc-updates-section {

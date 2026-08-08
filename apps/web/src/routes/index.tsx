@@ -32,6 +32,7 @@ function HomeComponent() {
   const courses = useQuery(publishedCoursesQueryOptions);
   const courseCards = courses.data ?? [];
   const featuredCourse = courses.data?.[0];
+  const spotlightCourses = courseCards.slice(0, 3);
   const form = useForm({
     initialValues: {
       email: "",
@@ -47,94 +48,113 @@ function HomeComponent() {
 
   return (
     <main className="pc-page pc-home">
-      <Stack gap={64}>
+      <Stack gap={72}>
         <section className="pc-home-hero">
-          <Stack gap="xl" className="pc-home-hero-copy">
-            <Badge color="pink" variant="light" w="fit-content" className="pc-soft-badge">
+          <Stack gap="xl">
+            <Badge variant="light" w="fit-content" className="pc-soft-badge">
               priauginimas.lt
             </Badge>
             <Stack gap="md">
               <Title order={1} className="pc-home-title">
-                Beauty courses for soft, confident salon work
+                Beauty courses shaped for real salon work
               </Title>
-              <Text c="dimmed" size="xl" maw={720}>
-                Browse private video courses for lash and beauty services, prepared for students who
-                want clear technique, calm pacing, and repeatable salon results.
+              <Text c="dimmed" size="xl" maw={680} className="pc-home-lede">
+                Learn lash and beauty techniques through calm private video classes, built for women
+                who want practical steps, polished results, and space to practice.
               </Text>
             </Stack>
             <Group>
               <Link to="/courses">
-                <Button color="pink" size="md" rightSection={<ArrowRight size={18} />}>
+                <Button size="md" rightSection={<ArrowRight size={18} />}>
                   View courses
                 </Button>
               </Link>
               <a href="#updates" className="no-underline">
-                <Button color="pink" size="md" variant="light" leftSection={<Mail size={18} />}>
+                <Button size="md" variant="light" leftSection={<Mail size={18} />}>
                   Get updates
                 </Button>
               </a>
             </Group>
+            <div className="pc-hero-notes" aria-label="Course highlights">
+              <span>Private video lessons</span>
+              <span>Free previews where available</span>
+              <span>Student access controlled by the studio</span>
+            </div>
           </Stack>
 
-          <Paper withBorder p="xl" className="pc-panel pc-feature-card">
-            <Stack gap="lg">
-              <Group justify="space-between" align="start" gap="md">
-                <ThemeIcon color="pink" variant="light" size="xl" radius="xl">
+          <div className="pc-hero-showcase">
+            <Paper withBorder p="xl" className="pc-panel pc-feature-card">
+              <Stack gap="lg">
+                <Group justify="space-between" align="start" gap="md">
+                  <ThemeIcon variant="light" size="xl" radius="xl">
+                    <Sparkles size={22} />
+                  </ThemeIcon>
+                  <Badge variant="light">Featured</Badge>
+                </Group>
+
+                {featuredCourse ? (
+                  <Stack gap="md">
+                    <div>
+                      <Text size="xs" tt="uppercase" fw={800} c="dimmed">
+                        Available course
+                      </Text>
+                      <Title order={2} size="h2" mt={6}>
+                        {featuredCourse.title}
+                      </Title>
+                    </div>
+                    <Text c="dimmed" lineClamp={4}>
+                      {featuredCourse.description ||
+                        "A private salon class with focused video lessons and clear practice steps."}
+                    </Text>
+                    <Group gap="xs">
+                      <Badge leftSection={<BookOpen size={12} />} variant="light">
+                        Private lessons
+                      </Badge>
+                      <Badge leftSection={<Heart size={12} />} variant="light">
+                        Salon paced
+                      </Badge>
+                    </Group>
+                    <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
+                      <Button fullWidth rightSection={<ArrowRight size={18} />}>
+                        View this course
+                      </Button>
+                    </Link>
+                  </Stack>
+                ) : (
+                  <EmptyState
+                    title="New classes are being prepared"
+                    description="Published courses will appear here when they are ready."
+                  />
+                )}
+              </Stack>
+            </Paper>
+
+            <Paper withBorder p="md" className="pc-panel pc-studio-card">
+              <Group gap="sm" wrap="nowrap">
+                <ThemeIcon variant="light" radius="xl">
                   <Sparkles size={22} />
                 </ThemeIcon>
-                <Badge color="grape" variant="light">
-                  Featured
-                </Badge>
-              </Group>
-
-              {featuredCourse ? (
-                <Stack gap="md">
-                  <div>
-                    <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                      Available course
-                    </Text>
-                    <Title order={2} size="h2" mt={6}>
-                      {featuredCourse.title}
-                    </Title>
-                  </div>
-                  <Text c="dimmed" lineClamp={4}>
-                    {featuredCourse.description ||
-                      "A private salon class with focused video lessons and clear practice steps."}
+                <div>
+                  <Text fw={800}>Studio course list</Text>
+                  <Text size="sm" c="dimmed">
+                    {courseCards.length || "New"} classes prepared for private access
                   </Text>
-                  <Group gap="xs">
-                    <Badge leftSection={<BookOpen size={12} />} color="pink" variant="light">
-                      Private lessons
-                    </Badge>
-                    <Badge leftSection={<Heart size={12} />} color="teal" variant="light">
-                      Salon paced
-                    </Badge>
-                  </Group>
-                  <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
-                    <Button color="pink" fullWidth rightSection={<ArrowRight size={18} />}>
-                      View this course
-                    </Button>
-                  </Link>
-                </Stack>
-              ) : (
-                <EmptyState
-                  title="New classes are being prepared"
-                  description="Published courses will appear here when they are ready."
-                />
-              )}
-            </Stack>
-          </Paper>
+                </div>
+              </Group>
+            </Paper>
+          </div>
         </section>
 
-        <section>
+        <section className="pc-course-menu">
           <Group justify="space-between" align="end" mb="lg" gap="md">
             <div>
               <Text size="xs" tt="uppercase" fw={800} c="dimmed">
                 Course menu
               </Text>
-              <Title order={2}>Available classes</Title>
+              <Title order={2}>Choose your next class</Title>
             </div>
             <Link to="/courses">
-              <Button color="pink" variant="subtle" rightSection={<ArrowRight size={16} />}>
+              <Button variant="subtle" rightSection={<ArrowRight size={16} />}>
                 See all
               </Button>
             </Link>
@@ -148,7 +168,7 @@ function HomeComponent() {
           ) : null}
 
           <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="md">
-            {courseCards.map((course) => (
+            {spotlightCourses.map((course) => (
               <Paper key={course.id} withBorder p="lg" className="pc-panel pc-course-card">
                 <Stack gap="md" h="100%">
                   <Stack gap={6}>
@@ -164,7 +184,7 @@ function HomeComponent() {
                       "A private class for building salon confidence at your own pace."}
                   </Text>
                   <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                    <Button color="pink" variant="light" fullWidth>
+                    <Button variant="light" fullWidth>
                       Open course
                     </Button>
                   </Link>
@@ -227,7 +247,7 @@ function HomeComponent() {
                   key={form.key("phone")}
                   {...form.getInputProps("phone")}
                 />
-                <Button color="pink" type="submit" size="md" rightSection={<Heart size={18} />}>
+                <Button type="submit" size="md" rightSection={<Heart size={18} />}>
                   Join update list
                 </Button>
               </Stack>

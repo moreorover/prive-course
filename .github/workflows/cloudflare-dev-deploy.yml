@@ -13,14 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: cloudflare-dev
     env:
-      ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
-      ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_STREAM_API_TOKEN: ${{ secrets.CLOUDFLARE_STREAM_API_TOKEN }}
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
-      CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -33,6 +26,20 @@ jobs:
 
       - name: Install Dependencies
         run: vp install --frozen-lockfile
+
+      - name: Load Deployment Secrets
+        uses: 1password/load-secrets-action@v5
+        with:
+          export-env: true
+        env:
+          ALCHEMY_PASSWORD: op://prive-course/prive-course-cloudflare-dev/alchemy/ALCHEMY_PASSWORD
+          ALCHEMY_STATE_TOKEN: op://prive-course/prive-course-cloudflare-dev/alchemy/ALCHEMY_STATE_TOKEN
+          CLOUDFLARE_ACCOUNT_ID: op://prive-course/prive-course-cloudflare-dev/cloudflare/account-id
+          CLOUDFLARE_API_TOKEN: op://prive-course/prive-course-cloudflare-dev/cloudflare/api-token
+          CLOUDFLARE_STREAM_API_TOKEN: op://prive-course/prive-course-cloudflare-dev/cloudflare/stream-api-token
+          BETTER_AUTH_SECRET: op://prive-course/prive-course-cloudflare-dev/better-auth/BETTER_AUTH_SECRET
+          BETTER_AUTH_URL: op://prive-course/prive-course-cloudflare-dev/better-auth/BETTER_AUTH_URL
+          CORS_ORIGIN: op://prive-course/prive-course-cloudflare-dev/workers/cors-origin
 
       - name: Check
         run: vp run check

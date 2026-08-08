@@ -145,18 +145,20 @@ vp run destroy:prod
 
 ## GitHub Actions
 
-Create GitHub environments named `cloudflare-dev` and `cloudflare-prod`. Store the same secret names in each environment:
+Create GitHub environments named `cloudflare-dev` and `cloudflare-prod`. Store the 1Password service account token as the only GitHub secret needed by the deploy workflows:
 
 ```txt
-ALCHEMY_PASSWORD
-ALCHEMY_STATE_TOKEN
-CLOUDFLARE_ACCOUNT_ID
-CLOUDFLARE_API_TOKEN
-CLOUDFLARE_STREAM_API_TOKEN
-BETTER_AUTH_SECRET
-BETTER_AUTH_URL
-CORS_ORIGIN
+OP_SERVICE_ACCOUNT_TOKEN
 ```
+
+Deployment secrets are loaded from the `prive-course` 1Password vault:
+
+```txt
+prive-course-cloudflare-dev
+prive-course-cloudflare-prod
+```
+
+Each item uses the same section layout as `prive-admin`: `cloudflare`, `workers`, `better-auth`, `web`, and `d1`. `prive-course` also includes an `alchemy` section for `ALCHEMY_PASSWORD` and `ALCHEMY_STATE_TOKEN`, plus `cloudflare/stream-api-token` for Cloudflare Stream.
 
 The PR workflow deploys dev after checks. The main workflow deploys prod after checks.
 

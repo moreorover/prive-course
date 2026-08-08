@@ -20,6 +20,7 @@ import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
+const salonServices = ["lashes", "shape", "retention", "finish"] as const;
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -51,15 +52,17 @@ function HomeComponent() {
       <Stack gap={76}>
         <section className="pc-boutique-hero">
           <div className="pc-boutique-intro">
-            <Badge variant="light" w="fit-content">
-              priauginimas.lt
-            </Badge>
+            <div className="pc-boutique-kicker">
+              <span>priauginimas.lt</span>
+              <span>private video classes</span>
+            </div>
             <Title order={1} className="pc-boutique-title">
-              Learn beauty work from a salon, not a template.
+              Salon technique, taught close up.
             </Title>
             <Text c="dimmed" className="pc-boutique-lede">
-              Private video classes for lash and beauty services, made for women who want a calm,
-              practical way to learn before practicing on real clients.
+              Beauty education for women who want calm, practical instruction before bringing a
+              technique to the table. Browse current classes and leave your details for new
+              releases.
             </Text>
             <Group>
               <Link to="/courses">
@@ -75,30 +78,44 @@ function HomeComponent() {
             </Group>
           </div>
 
-          <Paper withBorder className="pc-panel pc-boutique-note">
-            <Stack gap="lg">
-              <Group gap="sm">
-                <ThemeIcon variant="light" radius="xl">
-                  <Sparkles size={18} />
-                </ThemeIcon>
-                <Text fw={800}>Studio note</Text>
-              </Group>
-              <Title order={2} size="h2">
-                Courses are released in small, practical sets.
-              </Title>
-              <Text c="dimmed">
-                Each class is meant to be watched, paused, repeated, and brought back to your own
-                table until the movement feels natural.
-              </Text>
-              {featuredCourse ? (
-                <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
-                  <Button fullWidth rightSection={<ArrowRight size={18} />}>
-                    Start with {featuredCourse.title}
-                  </Button>
-                </Link>
-              ) : null}
-            </Stack>
-          </Paper>
+          <div className="pc-boutique-stage">
+            <div className="pc-boutique-service-strip" aria-label="Salon focus areas">
+              {salonServices.map((service) => (
+                <span key={service}>{service}</span>
+              ))}
+            </div>
+            <Paper withBorder className="pc-panel pc-boutique-note">
+              <Stack gap="lg">
+                <Group gap="sm">
+                  <ThemeIcon variant="light" radius="xl">
+                    <Sparkles size={18} />
+                  </ThemeIcon>
+                  <Text fw={800}>Current class</Text>
+                </Group>
+                {featuredCourse ? (
+                  <>
+                    <Title order={2} size="h2">
+                      {featuredCourse.title}
+                    </Title>
+                    <Text c="dimmed">
+                      {featuredCourse.description ||
+                        "A practical salon class made to be watched, paused, repeated, and brought back to your own table."}
+                    </Text>
+                    <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
+                      <Button fullWidth rightSection={<ArrowRight size={18} />}>
+                        View class
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <EmptyState
+                    title="New classes are being prepared"
+                    description="Published courses will appear here when they are ready."
+                  />
+                )}
+              </Stack>
+            </Paper>
+          </div>
         </section>
 
         <section>

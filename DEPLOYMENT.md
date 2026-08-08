@@ -151,6 +151,8 @@ Create GitHub environments named `cloudflare-dev` and `cloudflare-prod`. Store t
 OP_SERVICE_ACCOUNT_TOKEN
 ```
 
+Use a `prive-course` service account with `read_items` access to the `prive-course` vault. A token copied from another project will authenticate but fail when the workflow resolves `op://prive-course/...` secret references.
+
 Deployment secrets are loaded from the `prive-course` 1Password vault:
 
 ```txt

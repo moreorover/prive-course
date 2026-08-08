@@ -4,7 +4,6 @@ import {
   Button,
   FileInput,
   Group,
-  Paper,
   Progress,
   Stack,
   Text,
@@ -14,13 +13,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Surface } from "@/components/ui";
 import { queryClient, trpc } from "@/utils/trpc";
 
 const tusChunkSizeBytes = 50 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
   if (readyToStream || state === "ready") {
-    return "gold";
+    return "atelier";
   }
 
   if (state === "error") {
@@ -209,7 +209,7 @@ export function VideoUploadPanel({
   const status = videoStatus.data?.status;
 
   return (
-    <Paper withBorder p="lg" className="pc-panel">
+    <Surface variant="raised" className="pc-upload-stack">
       <Stack gap="md">
         <div>
           <Group justify="space-between" align="center">
@@ -280,6 +280,6 @@ export function VideoUploadPanel({
           </Button>
         </Group>
       </Stack>
-    </Paper>
+    </Surface>
   );
 }

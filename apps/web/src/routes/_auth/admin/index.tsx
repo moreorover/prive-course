@@ -1,8 +1,9 @@
-import { Badge, Button, Group, Paper, Stack, Table, Text, Title } from "@mantine/core";
+import { Badge, Button, Table } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
+import { DataTableShell, PageHeader, PageShell, StatusBadge } from "@/components/ui";
 import { trpc } from "@/utils/trpc";
 
 const coursesQueryOptions = trpc.admin.listCourses.queryOptions();
@@ -14,27 +15,34 @@ export const Route = createFileRoute("/_auth/admin/")({
   },
 });
 
+function courseStatusBadge(status: string) {
+  if (status === "published" || status === "draft" || status === "archived") {
+    return <StatusBadge status={status} />;
+  }
+
+  return <Badge variant="light">{status}</Badge>;
+}
+
 function AdminCourses() {
   const courses = useQuery(coursesQueryOptions);
 
   return (
-    <main className="pc-page">
-      <Stack gap="xl">
-        <Group justify="space-between" align="end">
-          <div>
-            <Title order={1}>Admin</Title>
-            <Text c="dimmed">Manage courses and publication state.</Text>
-          </div>
+    <PageShell size="wide">
+      <PageHeader
+        title="Admin"
+        description="Manage courses, lessons, publication state, and private access."
+        actions={
           <Link to="/admin/courses/new">
             <Button>New course</Button>
           </Link>
-        </Group>
+        }
+      />
 
-        <Stack gap="md">
-          <Title order={2} size="h4">
-            Courses
-          </Title>
-          {courses.data?.length === 0 ? (
+      <DataTableShell
+        title="Courses"
+        description="Create and maintain the course catalog."
+        empty={
+          courses.data?.length === 0 ? (
             <EmptyState
               title="No courses yet"
               description="Create the first course, then add lessons and grant users access."
@@ -44,40 +52,36 @@ function AdminCourses() {
                 </Link>
               }
             />
-          ) : (
-            <Paper withBorder p="lg" className="pc-panel">
-              <Table striped highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Title</Table.Th>
-                    <Table.Th>Slug</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th />
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {courses.data?.map((course) => (
-                    <Table.Tr key={course.id}>
-                      <Table.Td>{course.title}</Table.Td>
-                      <Table.Td>{course.slug}</Table.Td>
-                      <Table.Td>
-                        <Badge variant="light">{course.status}</Badge>
-                      </Table.Td>
-                      <Table.Td>
-                        <Link to="/admin/courses/$courseId" params={{ courseId: course.id }}>
-                          <Button variant="subtle" size="xs">
-                            Edit
-                          </Button>
-                        </Link>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Paper>
-          )}
-        </Stack>
-      </Stack>
-    </main>
+          ) : undefined
+        }
+      >
+        <Table striped highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Title</Table.Th>
+              <Table.Th>Slug</Table.Th>
+              <Table.Th>Status</Table.Th>
+              <Table.Th />
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {courses.data?.map((course) => (
+              <Table.Tr key={course.id}>
+                <Table.Td>{course.title}</Table.Td>
+                <Table.Td>{course.slug}</Table.Td>
+                <Table.Td>{courseStatusBadge(course.status)}</Table.Td>
+                <Table.Td className="pc-table-action">
+                  <Link to="/admin/courses/$courseId" params={{ courseId: course.id }}>
+                    <Button variant="subtle" size="xs">
+                      Edit
+                    </Button>
+                  </Link>
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </DataTableShell>
+    </PageShell>
   );
 }

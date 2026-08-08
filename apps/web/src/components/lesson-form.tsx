@@ -1,5 +1,7 @@
-import { Button, Checkbox, Paper, Select, Stack, TextInput, Textarea, Title } from "@mantine/core";
+import { Button, Checkbox, Select, Stack, TextInput, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+
+import { FormSection } from "@/components/ui";
 
 type PublishStatus = "draft" | "published" | "archived";
 
@@ -49,12 +51,9 @@ export function LessonForm({
   });
 
   return (
-    <Paper withBorder p="lg" className="pc-panel">
+    <FormSection title={title}>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="md">
-          <Title order={1} size="h3">
-            {title}
-          </Title>
           <TextInput
             label="Title"
             {...form.getInputProps("title")}
@@ -100,6 +99,6 @@ export function LessonForm({
           </Button>
         </Stack>
       </form>
-    </Paper>
+    </FormSection>
   );
 }

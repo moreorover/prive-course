@@ -504,6 +504,34 @@ a:hover {
   gap: 0.15rem;
 }
 
+.pc-admin-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.pc-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.pc-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pc-table-action {
+  white-space: nowrap;
+}
+
+.pc-upload-stack {
+  display: grid;
+  gap: 1rem;
+}
+
 @keyframes pc-spin {
   to {
     transform: rotate(360deg);
@@ -549,6 +577,12 @@ a:hover {
 
 @media (max-width: 48rem) {
   .pc-course-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 64rem) {
+  .pc-admin-grid {
     grid-template-columns: 1fr;
   }
 }

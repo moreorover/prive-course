@@ -1,9 +1,10 @@
-import { Button, Paper, Stack, Text } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { LessonForm, type LessonFormValue } from "@/components/lesson-form";
+import { PageHeader, PageShell, Surface } from "@/components/ui";
 import { VideoUploadPanel } from "@/features/admin/video-upload-panel";
 import { queryClient, trpc } from "@/utils/trpc";
 
@@ -39,41 +40,42 @@ function EditLessonRoute() {
       },
     }),
   );
+
   return (
-    <main className="pc-page-narrow">
-      <Stack gap="xl">
-        <Link to="/admin/courses/$courseId" params={{ courseId }}>
-          <Button variant="subtle">Back to course</Button>
-        </Link>
+    <PageShell size="wide">
+      <PageHeader
+        title={lesson.data?.title ?? "Edit lesson"}
+        description="Update lesson details and manage its protected video."
+        backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
+      />
 
-        {lesson.data ? (
-          <>
-            <LessonForm
-              title="Edit lesson"
-              submitLabel="Save changes"
-              isSubmitting={updateLesson.isPending}
-              initialValue={{
-                title: lesson.data.title,
-                slug: lesson.data.slug,
-                description: lesson.data.description ?? "",
-                isFree: lesson.data.isFree,
-                status: lesson.data.status,
-              }}
-              onSubmit={(value: LessonFormValue) => updateLesson.mutate({ id: lessonId, ...value })}
-            />
+      {lesson.data ? (
+        <Stack gap="xl">
+          <LessonForm
+            title="Edit lesson"
+            submitLabel="Save changes"
+            isSubmitting={updateLesson.isPending}
+            initialValue={{
+              title: lesson.data.title,
+              slug: lesson.data.slug,
+              description: lesson.data.description ?? "",
+              isFree: lesson.data.isFree,
+              status: lesson.data.status,
+            }}
+            onSubmit={(value: LessonFormValue) => updateLesson.mutate({ id: lessonId, ...value })}
+          />
 
-            <VideoUploadPanel
-              courseId={courseId}
-              lessonId={lessonId}
-              videoUid={lesson.data.videoUid}
-            />
-          </>
-        ) : (
-          <Paper withBorder p="lg" className="pc-panel">
-            <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>
-          </Paper>
-        )}
-      </Stack>
-    </main>
+          <VideoUploadPanel
+            courseId={courseId}
+            lessonId={lessonId}
+            videoUid={lesson.data.videoUid}
+          />
+        </Stack>
+      ) : (
+        <Surface>
+          <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>
+        </Surface>
+      )}
+    </PageShell>
   );
 }

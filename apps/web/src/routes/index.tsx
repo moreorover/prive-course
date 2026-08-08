@@ -20,6 +20,7 @@ import { EmptyState } from "@/components/empty-state";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
+const academyMarks = ["Technique", "Practice", "Client-ready"] as const;
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -51,16 +52,17 @@ function HomeComponent() {
       <Stack gap={86}>
         <section className="pc-academy-hero">
           <Stack gap="xl" className="pc-academy-copy">
-            <Badge variant="light" w="fit-content">
-              priauginimas.lt academy
-            </Badge>
+            <div className="pc-academy-kicker">
+              <span>priauginimas.lt academy</span>
+              <span>private course edition</span>
+            </div>
             <Stack gap="md">
               <Title order={1} className="pc-academy-title">
-                Learn salon beauty with quiet precision.
+                Precision beauty training, edited like a masterclass.
               </Title>
               <Text c="dimmed" className="pc-academy-lede">
-                Premium private video courses for beauty work that needs clean technique, repeatable
-                hands, and confidence before the next client sits down.
+                A curated learning space for salon techniques that need close-up instruction,
+                repeated practice, and client-ready confidence.
               </Text>
             </Stack>
             <Group>
@@ -75,9 +77,30 @@ function HomeComponent() {
                 </Button>
               </a>
             </Group>
+            <div className="pc-academy-proof" aria-label="Academy method">
+              {academyMarks.map((mark) => (
+                <span key={mark}>{mark}</span>
+              ))}
+            </div>
           </Stack>
 
           <div className="pc-academy-showcase">
+            <div className="pc-academy-index">
+              {visibleCourses.length > 0 ? (
+                visibleCourses.slice(0, 3).map((course, index) => (
+                  <Link
+                    key={course.id}
+                    to="/courses/$courseSlug"
+                    params={{ courseSlug: course.slug }}
+                  >
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{course.title}</strong>
+                  </Link>
+                ))
+              ) : (
+                <span>New classes soon</span>
+              )}
+            </div>
             <Paper withBorder className="pc-panel pc-academy-card">
               <Stack gap="xl">
                 <Group justify="space-between" align="start">

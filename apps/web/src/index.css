@@ -11,36 +11,42 @@ body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   background:
-    radial-gradient(circle at top left, var(--pc-canvas-glow), transparent 28rem), var(--pc-canvas);
+    linear-gradient(120deg, rgb(255 255 255 / 65%), transparent 26rem),
+    radial-gradient(circle at 12% 12%, var(--pc-canvas-glow), transparent 29rem),
+    radial-gradient(circle at 88% 14%, var(--pc-moss-glow), transparent 22rem), var(--pc-canvas);
   color: var(--pc-text);
   font-size: 16px;
   line-height: 1.5;
 }
 
 [data-mantine-color-scheme="light"] {
-  --pc-canvas: #fbf7ef;
-  --pc-canvas-glow: rgb(213 167 61 / 18%);
-  --pc-panel: #fffdf8;
-  --pc-panel-soft: #f1e8d7;
-  --pc-border: #ddd3c0;
-  --pc-text: #17140e;
-  --pc-muted: #6b6255;
-  --pc-accent: #d5a73d;
-  --pc-accent-strong: #23433f;
-  --pc-danger-soft: #8e3f35;
+  --pc-canvas: #fff7f2;
+  --pc-canvas-glow: rgb(170 72 86 / 17%);
+  --pc-moss-glow: rgb(101 124 98 / 14%);
+  --pc-panel: #fffdf9;
+  --pc-panel-soft: #f8e7e2;
+  --pc-border: #e9cbc1;
+  --pc-text: #2c1f1d;
+  --pc-muted: #75625d;
+  --pc-accent: #aa4856;
+  --pc-accent-strong: #657c62;
+  --pc-danger-soft: #a54854;
+  --pc-shadow: rgb(76 45 40 / 12%);
 }
 
 [data-mantine-color-scheme="dark"] {
-  --pc-canvas: #111318;
-  --pc-canvas-glow: rgb(213 167 61 / 16%);
-  --pc-panel: #1a1d23;
-  --pc-panel-soft: #22252d;
-  --pc-border: #37322a;
-  --pc-text: #fbf7ef;
-  --pc-muted: #bdb3a2;
-  --pc-accent: #e0b64d;
-  --pc-accent-strong: #84b8ad;
-  --pc-danger-soft: #d07b70;
+  --pc-canvas: #171211;
+  --pc-canvas-glow: rgb(206 103 112 / 14%);
+  --pc-moss-glow: rgb(108 140 104 / 10%);
+  --pc-panel: #211917;
+  --pc-panel-soft: #2d211f;
+  --pc-border: #4c332f;
+  --pc-text: #fff7f2;
+  --pc-muted: #d8c0ba;
+  --pc-accent: #df8d8e;
+  --pc-accent-strong: #9cb996;
+  --pc-danger-soft: #e1848c;
+  --pc-shadow: rgb(0 0 0 / 30%);
 }
 
 ::selection {
@@ -82,4 +88,100 @@ a:hover {
 
 .pc-muted {
   color: var(--pc-muted);
+}
+
+.pc-home-boutique {
+  position: relative;
+}
+
+.pc-boutique-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 4rem);
+  align-items: center;
+  min-height: min(47rem, calc(100svh - 5rem));
+  padding-block: clamp(2rem, 6vw, 5rem);
+}
+
+.pc-boutique-intro {
+  display: grid;
+  gap: 1.35rem;
+}
+
+.pc-boutique-title {
+  max-width: 55rem;
+  font-size: clamp(3.1rem, 8.2vw, 6.8rem);
+  line-height: 0.88;
+}
+
+.pc-boutique-lede {
+  max-width: 42rem;
+  font-size: clamp(1.08rem, 2vw, 1.3rem);
+}
+
+.pc-boutique-note {
+  position: relative;
+  padding: clamp(1.25rem, 4vw, 2.1rem);
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--pc-accent) 38%, var(--pc-border));
+  box-shadow: 0 30px 80px var(--pc-shadow);
+}
+
+.pc-boutique-note::after {
+  position: absolute;
+  right: -3rem;
+  bottom: -3rem;
+  width: 12rem;
+  height: 12rem;
+  content: "";
+  border: 1px solid color-mix(in srgb, var(--pc-accent) 34%, transparent);
+  border-radius: 999px;
+}
+
+.pc-boutique-menu {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.pc-boutique-course {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--pc-panel-soft) 56%, transparent), transparent),
+    var(--pc-panel);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.pc-boutique-course:hover {
+  border-color: color-mix(in srgb, var(--pc-accent) 62%, var(--pc-border));
+  box-shadow: 0 18px 50px var(--pc-shadow);
+  transform: translateY(-2px);
+}
+
+.pc-boutique-updates {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(1.25rem, 5vw, 3rem);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--pc-panel-soft) 65%, transparent), transparent),
+    var(--pc-panel);
+  border: 1px solid var(--pc-border);
+  box-shadow: 0 20px 60px rgb(76 45 40 / 8%);
+}
+
+.pc-boutique-form {
+  box-shadow: 0 20px 55px var(--pc-shadow);
+}
+
+@media (min-width: 64rem) {
+  .pc-boutique-hero {
+    grid-template-columns: minmax(0, 1.12fr) minmax(22rem, 0.88fr);
+  }
+
+  .pc-boutique-updates {
+    grid-template-columns: minmax(0, 0.8fr) minmax(24rem, 1fr);
+  }
 }

@@ -137,22 +137,6 @@ a:hover {
   font-size: clamp(1.1rem, 2vw, 1.32rem);
 }
 
-.pc-hero-notes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  max-width: 43rem;
-}
-
-.pc-hero-notes span {
-  padding: 0.45rem 0.7rem;
-  color: var(--pc-muted);
-  background: color-mix(in srgb, var(--pc-panel) 74%, transparent);
-  border: 1px solid color-mix(in srgb, var(--pc-border) 74%, transparent);
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-}
-
 .pc-hero-showcase {
   position: relative;
   isolation: isolate;

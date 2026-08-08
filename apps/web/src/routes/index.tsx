@@ -75,11 +75,6 @@ function HomeComponent() {
                 </Button>
               </a>
             </Group>
-            <div className="pc-hero-notes" aria-label="Course highlights">
-              <span>Private video lessons</span>
-              <span>Free previews where available</span>
-              <span>Student access controlled by the studio</span>
-            </div>
           </Stack>
 
           <div className="pc-hero-showcase">

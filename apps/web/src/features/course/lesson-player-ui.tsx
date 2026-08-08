@@ -1,14 +1,13 @@
 import { Stream, type StreamPlayerApi } from "@cloudflare/stream-react";
-import { Alert, Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { Alert, Badge, Button, Group, Stack, Text } from "@mantine/core";
 import type { RefObject } from "react";
+
+import { Surface } from "@/components/ui";
 
 export function NoVideoPanel() {
   return (
-    <Paper withBorder p="md" className="pc-panel">
-      <div
-        className="grid aspect-video place-items-center border border-dashed"
-        style={{ borderColor: "var(--pc-border)", background: "var(--pc-panel-soft)" }}
-      >
+    <Surface className="pc-player-panel">
+      <div className="pc-video-placeholder">
         <Stack align="center" gap={4}>
           <Text fw={700}>No video uploaded</Text>
           <Text c="dimmed" ta="center">
@@ -16,7 +15,7 @@ export function NoVideoPanel() {
           </Text>
         </Stack>
       </div>
-    </Paper>
+    </Surface>
   );
 }
 
@@ -30,23 +29,20 @@ export function ProtectedVideoPanel({
   onStart: () => void;
 }) {
   return (
-    <Paper withBorder p="md" className="pc-panel">
-      <div
-        className="grid aspect-video place-items-center border border-dashed"
-        style={{ borderColor: "var(--pc-border)", background: "var(--pc-panel-soft)" }}
-      >
+    <Surface className="pc-player-panel">
+      <div className="pc-video-placeholder">
         <Stack align="center" gap="xs">
           <Text fw={700}>Video is protected</Text>
           <Text c="dimmed" ta="center" maw={480}>
-            Start playback when you're ready.
+            Start playback when you are ready.
           </Text>
-          <Button color="gold" loading={isPending} onClick={onStart}>
+          <Button loading={isPending} onClick={onStart}>
             Start playback
           </Button>
           {errorMessage ? <Text c="red">{errorMessage}</Text> : null}
         </Stack>
       </div>
-    </Paper>
+    </Surface>
   );
 }
 
@@ -84,9 +80,9 @@ export function ActiveVideoPanel({
   watermarkText: string;
 }) {
   return (
-    <Paper withBorder p="md" className="pc-panel">
+    <Surface className="pc-player-panel">
       <Stack gap="md">
-        <div className="relative aspect-video overflow-hidden bg-black">
+        <div className="pc-video-frame">
           <Stream
             controls
             streamRef={streamRef}
@@ -100,12 +96,10 @@ export function ActiveVideoPanel({
             onEnded={onEnded}
           />
           {showWatermark ? (
-            <div className="pointer-events-none absolute inset-0 grid grid-cols-2 grid-rows-2 text-xs font-medium text-white/35">
+            <div className="pc-video-watermark">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="flex items-center justify-center">
-                  <span className="rotate-[-18deg] rounded bg-black/20 px-2 py-1">
-                    {watermarkText}
-                  </span>
+                <div key={index} className="pc-video-watermark__cell">
+                  <span className="pc-video-watermark__text">{watermarkText}</span>
                 </div>
               ))}
             </div>
@@ -113,7 +107,7 @@ export function ActiveVideoPanel({
         </div>
         <Group justify="space-between" gap="md">
           <Text c="dimmed">Saved at {savedProgressLabel}</Text>
-          {completed ? <Badge color="gold">Complete</Badge> : null}
+          {completed ? <Badge color="green">Complete</Badge> : null}
         </Group>
         {playerError ? (
           <Alert color="red" title="Playback failed">
@@ -128,6 +122,6 @@ export function ActiveVideoPanel({
           </Alert>
         ) : null}
       </Stack>
-    </Paper>
+    </Surface>
   );
 }

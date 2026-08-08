@@ -364,6 +364,119 @@ a:hover {
   background: color-mix(in srgb, var(--pc-bg-subtle) 70%, transparent);
 }
 
+.pc-home-layout {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.pc-home-hero {
+  min-height: min(40rem, calc(100dvh - 5rem));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(19rem, 0.95fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.pc-home-hero__copy {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.pc-home-hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pc-course-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.pc-detail-layout,
+.pc-lesson-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.pc-access-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.pc-access-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pc-section-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.pc-lesson-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pc-lesson-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pc-player-panel {
+  overflow: hidden;
+}
+
+.pc-video-placeholder,
+.pc-video-frame {
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed var(--pc-border);
+  background: var(--pc-bg-subtle);
+}
+
+.pc-video-frame {
+  position: relative;
+  border: 0;
+  background: #11100d;
+}
+
+.pc-video-watermark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  color: rgb(255 255 255 / 35%);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.pc-video-watermark__cell {
+  display: grid;
+  place-items: center;
+}
+
+.pc-video-watermark__text {
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 20%);
+  transform: rotate(-18deg);
+}
+
 @keyframes pc-spin {
   to {
     transform: rotate(360deg);
@@ -396,6 +509,20 @@ a:hover {
 
   .pc-page-header__actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 64rem) {
+  .pc-home-hero,
+  .pc-detail-layout,
+  .pc-lesson-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .pc-course-grid {
+    grid-template-columns: 1fr;
   }
 }
 

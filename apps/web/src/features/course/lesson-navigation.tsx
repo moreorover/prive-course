@@ -1,6 +1,8 @@
-import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Button, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { LessonRow } from "@/components/ui";
 
 export type NavigationLesson = {
   id: string;
@@ -13,30 +15,6 @@ export type NavigationLesson = {
   isCurrent: boolean;
 };
 
-function getAccessBadge(lesson: NavigationLesson) {
-  if (lesson.accessState === "free") {
-    return (
-      <Badge color="gold" variant="light">
-        Free
-      </Badge>
-    );
-  }
-
-  if (lesson.accessState === "included") {
-    return (
-      <Badge color="gold" variant="filled">
-        Included
-      </Badge>
-    );
-  }
-
-  return (
-    <Badge color="gray" variant="light">
-      Locked
-    </Badge>
-  );
-}
-
 export function LessonList({
   courseSlug,
   lessons,
@@ -45,57 +23,35 @@ export function LessonList({
   lessons: NavigationLesson[];
 }) {
   return (
-    <section>
-      <Stack gap="md">
-        <Title order={2} size="h4">
-          Lessons
-        </Title>
-        <Stack gap="xs">
-          {lessons.map((navigationLesson) => {
-            const lessonTitle = (
-              <Group justify="space-between" align="start" gap="sm" wrap="nowrap">
-                <div>
-                  <Text fw={navigationLesson.isCurrent ? 700 : 500}>
-                    {navigationLesson.position + 1}. {navigationLesson.title}
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    {navigationLesson.durationSeconds
-                      ? `${Math.round(navigationLesson.durationSeconds / 60)} min`
-                      : "Pending"}
-                  </Text>
-                </div>
-                {getAccessBadge(navigationLesson)}
-              </Group>
-            );
-
-            if (navigationLesson.accessState === "locked") {
-              return (
-                <Paper key={navigationLesson.id} withBorder p="sm" className="pc-panel">
-                  {lessonTitle}
-                </Paper>
-              );
+    <section className="pc-section-stack">
+      <Title order={2} size="h4">
+        Lessons
+      </Title>
+      <div className="pc-lesson-list">
+        {lessons.map((navigationLesson) => (
+          <LessonRow
+            key={navigationLesson.id}
+            position={navigationLesson.position + 1}
+            title={navigationLesson.title}
+            meta={
+              navigationLesson.durationSeconds
+                ? `${Math.round(navigationLesson.durationSeconds / 60)} min`
+                : "Duration pending"
             }
-
-            return (
-              <Link
-                key={navigationLesson.id}
-                to="/courses/$courseSlug/lessons/$lessonSlug"
-                params={{ courseSlug, lessonSlug: navigationLesson.slug }}
-                style={{ color: "inherit", textDecoration: "none" }}
-              >
-                <Paper
-                  withBorder
-                  p="sm"
-                  className="pc-panel"
-                  bg={navigationLesson.isCurrent ? "var(--mantine-color-gold-light)" : undefined}
-                >
-                  {lessonTitle}
-                </Paper>
-              </Link>
-            );
-          })}
-        </Stack>
-      </Stack>
+            status={navigationLesson.accessState}
+            href={
+              navigationLesson.accessState === "locked"
+                ? undefined
+                : "/courses/$courseSlug/lessons/$lessonSlug"
+            }
+            params={
+              navigationLesson.accessState === "locked"
+                ? undefined
+                : { courseSlug, lessonSlug: navigationLesson.slug }
+            }
+          />
+        ))}
+      </div>
     </section>
   );
 }
@@ -110,7 +66,7 @@ export function LessonNavControls({
   nextLesson: NavigationLesson | null;
 }) {
   return (
-    <Group justify="space-between">
+    <div className="pc-lesson-nav">
       {previousLesson ? (
         <Link
           to="/courses/$courseSlug/lessons/$lessonSlug"
@@ -137,6 +93,6 @@ export function LessonNavControls({
           Next lesson
         </Button>
       )}
-    </Group>
+    </div>
   );
 }

@@ -1,26 +1,15 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  TextInput,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Button, SimpleGrid, Stack, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, AtSign, BookOpen, Mail, Phone, Sparkles } from "lucide-react";
+import { ArrowRight, AtSign, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 import { EmptyState } from "@/components/empty-state";
+import { CourseCard, FormSection, PageHeader, PageShell, StatusBadge } from "@/components/ui";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
-const academyMarks = ["Technique", "Practice", "Client-ready"] as const;
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -48,157 +37,79 @@ function HomeComponent() {
   });
 
   return (
-    <main className="pc-page pc-home pc-home-academy">
-      <Stack gap={86}>
-        <section className="pc-academy-hero">
-          <Stack gap="xl" className="pc-academy-copy">
-            <div className="pc-academy-kicker">
-              <span>priauginimas.lt academy</span>
-              <span>private course edition</span>
-            </div>
-            <Stack gap="md">
-              <Title order={1} className="pc-academy-title">
-                Precision beauty training, edited like a masterclass.
-              </Title>
-              <Text c="dimmed" className="pc-academy-lede">
-                A curated learning space for salon techniques that need close-up instruction,
-                repeated practice, and client-ready confidence.
-              </Text>
-            </Stack>
-            <Group>
+    <PageShell>
+      <div className="pc-home-layout">
+        <section className="pc-home-hero">
+          <div className="pc-home-hero__copy">
+            <Title order={1}>Private beauty courses, taught with care.</Title>
+            <Text c="dimmed" size="lg" maw={620}>
+              Learn protected salon techniques through focused lessons, clear previews, and
+              access-managed course libraries.
+            </Text>
+            <div className="pc-home-hero__actions">
               <Link to="/courses">
                 <Button size="md" rightSection={<ArrowRight size={18} />}>
-                  Explore courses
+                  View courses
                 </Button>
               </Link>
-              <a href="#updates" className="no-underline">
-                <Button size="md" variant="outline" leftSection={<Mail size={18} />}>
+              <a href="#updates">
+                <Button size="md" variant="light" leftSection={<Mail size={18} />}>
                   Course updates
                 </Button>
               </a>
-            </Group>
-            <div className="pc-academy-proof" aria-label="Academy method">
-              {academyMarks.map((mark) => (
-                <span key={mark}>{mark}</span>
-              ))}
             </div>
-          </Stack>
-
-          <div className="pc-academy-showcase">
-            <div className="pc-academy-index">
-              {visibleCourses.length > 0 ? (
-                visibleCourses.slice(0, 3).map((course, index) => (
-                  <Link
-                    key={course.id}
-                    to="/courses/$courseSlug"
-                    params={{ courseSlug: course.slug }}
-                  >
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{course.title}</strong>
-                  </Link>
-                ))
-              ) : (
-                <span>New classes soon</span>
-              )}
-            </div>
-            <Paper withBorder className="pc-panel pc-academy-card">
-              <Stack gap="xl">
-                <Group justify="space-between" align="start">
-                  <ThemeIcon size="xl" radius="xl" variant="light">
-                    <Sparkles size={22} />
-                  </ThemeIcon>
-                  <Badge variant="filled">Open for viewing</Badge>
-                </Group>
-
-                {featuredCourse ? (
-                  <Stack gap="lg">
-                    <div>
-                      <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                        Featured course
-                      </Text>
-                      <Title order={2} className="pc-academy-card-title">
-                        {featuredCourse.title}
-                      </Title>
-                    </div>
-                    <Text c="dimmed" lineClamp={5}>
-                      {featuredCourse.description ||
-                        "A focused private course designed for salon practice, careful repetition, and confident client-ready results."}
-                    </Text>
-                    <Link to="/courses/$courseSlug" params={{ courseSlug: featuredCourse.slug }}>
-                      <Button fullWidth rightSection={<ArrowRight size={18} />}>
-                        View course details
-                      </Button>
-                    </Link>
-                  </Stack>
-                ) : (
-                  <EmptyState
-                    title="New classes are being prepared"
-                    description="Published courses will appear here when they are ready."
-                  />
-                )}
-              </Stack>
-            </Paper>
-            <div className="pc-academy-mark">01</div>
           </div>
+
+          {featuredCourse ? (
+            <CourseCard
+              variant="featured"
+              title={featuredCourse.title}
+              description={featuredCourse.description}
+              href="/courses/$courseSlug"
+              params={{ courseSlug: featuredCourse.slug }}
+              actionLabel="Open course"
+              meta={<StatusBadge status="preview" />}
+            />
+          ) : (
+            <EmptyState
+              title="New classes are being prepared"
+              description="Published courses will appear here when they are ready."
+            />
+          )}
         </section>
 
         <section>
-          <div className="pc-section-heading">
-            <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-              Course edit
-            </Text>
-            <Title order={2}>A short list, carefully taught</Title>
-          </div>
-
+          <PageHeader
+            title="Available courses"
+            description="A focused course library for private salon training."
+          />
           {courseCards.length === 0 ? (
             <EmptyState
-              title="New classes are being prepared"
+              title="No courses yet"
               description="The course menu will open as soon as the first class is published."
             />
-          ) : null}
-
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            {visibleCourses.map((course) => (
-              <Paper key={course.id} withBorder p="xl" className="pc-panel pc-academy-course">
-                <Stack gap="md" h="100%">
-                  <Group justify="space-between" align="start">
-                    <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                      Private class
-                    </Text>
-                    <ThemeIcon variant="light" radius="xl">
-                      <BookOpen size={17} />
-                    </ThemeIcon>
-                  </Group>
-                  <Title order={3} size="h3">
-                    {course.title}
-                  </Title>
-                  <Text c="dimmed" lineClamp={3} className="grow">
-                    {course.description ||
-                      "A refined video class for practicing technique at a calm, realistic pace."}
-                  </Text>
-                  <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                    <Button variant="light" fullWidth>
-                      Open class
-                    </Button>
-                  </Link>
-                </Stack>
-              </Paper>
-            ))}
-          </SimpleGrid>
+          ) : (
+            <div className="pc-course-grid">
+              {visibleCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  title={course.title}
+                  description={course.description}
+                  href="/courses/$courseSlug"
+                  params={{ courseSlug: course.slug }}
+                  actionLabel="Open course"
+                  meta={<StatusBadge status="preview" />}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
-        <section id="updates" className="pc-academy-updates">
-          <Stack gap="sm">
-            <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-              Private list
-            </Text>
-            <Title order={2}>Be first to hear when the next class opens.</Title>
-            <Text c="dimmed" maw={560}>
-              Leave your details for new course releases, model days, and studio offers.
-            </Text>
-          </Stack>
-
-          <Paper withBorder p="xl" className="pc-panel pc-academy-form">
+        <section id="updates">
+          <FormSection
+            title="Get course updates"
+            description="Leave your details for new course releases and studio updates."
+          >
             <form
               onSubmit={form.onSubmit(() => {
                 toast.success("Thank you, your details have been added for course updates.");
@@ -242,9 +153,9 @@ function HomeComponent() {
                 </Button>
               </Stack>
             </form>
-          </Paper>
+          </FormSection>
         </section>
-      </Stack>
-    </main>
+      </div>
+    </PageShell>
   );
 }

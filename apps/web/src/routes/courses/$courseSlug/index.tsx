@@ -1,10 +1,10 @@
 import { Badge, Button, Divider, Group, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, BookOpen, PlayCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
-import { LessonRow, PageHeader, PageShell, StatusBadge, Surface } from "@/components/ui";
+import { LessonRow, PageShell, StatusBadge, Surface } from "@/components/ui";
 import { trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseSlug: string) {

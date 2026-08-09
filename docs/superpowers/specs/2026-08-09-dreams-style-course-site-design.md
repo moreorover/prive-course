@@ -96,18 +96,22 @@ Purpose: let the user watch the video and read lesson notes.
 
 Structure:
 
-- Compact course and lesson context.
-- Video player as the dominant full-width surface.
+- Mantine `AppShell` layout for the learning view.
+- `AppShell.Navbar` sidebar listing all lessons in the current course.
+- Sidebar should show lesson number, title, current lesson state, watched state, and locked state when access is missing.
+- On desktop, keep the lesson sidebar visible so students can move through the course without returning to the course detail page.
+- On mobile, collapse the lesson sidebar behind a lesson-list control so the video remains primary.
+- Main area contains compact course and lesson context.
+- Video player as the dominant surface inside the main content area.
 - Lesson description or notes directly below the video, like a course article.
 - Next lesson block below the notes.
-- Compact course contents strip below the main content.
 - Locked state when access is missing.
 
 The lesson page should feel like a quiet learning view, not a marketing page.
 
 Avoid:
 
-- Persistent right sidebar card competing with the video.
+- A floating card-style sidebar competing visually with the video.
 - Repeating previous/next controls above and below the player.
 - Dashboard-like lesson queue panels on the public learning surface.
 

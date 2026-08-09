@@ -83,6 +83,7 @@ function LessonRoute() {
       {lesson.data ? (
         <AppShell
           className="pc-learning-appshell"
+          header={{ height: { base: 58, md: 0 } }}
           navbar={{
             width: 340,
             breakpoint: "md",
@@ -90,6 +91,17 @@ function LessonRoute() {
           }}
           padding={0}
         >
+          <AppShell.Header className="pc-learning-shell-header">
+            <Burger
+              aria-label="Toggle lesson list"
+              onClick={toggleNavbar}
+              opened={navbarOpened}
+              size="sm"
+            />
+            <Text fw={780}>Course lessons</Text>
+            <Badge variant="light">{lesson.data.navigation.lessons.length}</Badge>
+          </AppShell.Header>
+
           <AppShell.Navbar p="md" className="pc-learning-navbar">
             <LessonList
               courseSlug={courseSlug}
@@ -106,13 +118,6 @@ function LessonRoute() {
                   <span>Back to course</span>
                 </Link>
                 <div className="pc-learning-rail__content">
-                  <Burger
-                    aria-label="Toggle lesson list"
-                    hiddenFrom="md"
-                    onClick={toggleNavbar}
-                    opened={navbarOpened}
-                    size="sm"
-                  />
                   <div>
                     <Text className="pc-eyebrow">Learning workspace</Text>
                     <Title order={1}>{lesson.data.lesson.title}</Title>

@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved direction: simplify Product Atelier toward a creator-led course site similar in structure to Dreams of Code.
+Approved direction: simplify Product Atelier toward a creator-led course site similar in structure and information architecture to Dreams of Code.
 
 This replaces the broader SaaS-funnel direction for public pages.
 
@@ -48,7 +48,7 @@ Purpose: help the visitor choose one course path.
 
 Structure:
 
-- Dark, focused course catalog similar to Dreams of Code.
+- Focused course catalog inspired by Dreams of Code structure, not its color scheme.
 - Short page intro: “Deep-dive into practical beauty skills with focused video courses.”
 - Three media-backed course cards with:
   - Course image or image slot.
@@ -136,7 +136,7 @@ Use this board for the next planning pass:
 
 - `docs/wiremocks/product-atelier-dreams-style-redesign.excalidraw`
 
-The older structural board remains useful as history, but this Dreams-style board is the current direction.
+The older structural board remains useful as history, but this Dreams-style board is the current direction for layout and page architecture only. Color, typography, and final brand treatment remain Product Atelier decisions.
 
 ## Self-Review
 

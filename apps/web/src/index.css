@@ -995,6 +995,48 @@ a:hover {
   gap: 0.45rem;
 }
 
+.pc-lesson-error {
+  min-height: min(42rem, calc(100vh - 9rem));
+  display: grid;
+  align-content: center;
+  gap: clamp(1.25rem, 4vw, 2rem);
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(247, 245, 238, 0.92)),
+    radial-gradient(circle at 10% 10%, rgba(207, 147, 110, 0.2), transparent 32%), var(--pc-surface);
+}
+
+.pc-lesson-error__panel {
+  width: min(100%, 42rem);
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pc-lesson-error__panel h1 {
+  max-width: 12ch;
+  font-size: clamp(2.25rem, 6vw, 4.8rem);
+  line-height: 0.94;
+  letter-spacing: 0;
+}
+
+.pc-lesson-error__icon {
+  width: 3.75rem;
+  height: 3.75rem;
+  display: grid;
+  place-items: center;
+  color: var(--pc-accent-strong);
+  background: rgba(199, 104, 66, 0.12);
+  border: 1px solid rgba(199, 104, 66, 0.2);
+  border-radius: 0.9rem;
+}
+
+.pc-lesson-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+}
+
 .pc-player-hero .pc-page-header {
   margin-bottom: 0;
 }
@@ -1318,6 +1360,9 @@ a:hover {
   .pc-home-hero__actions button,
   .pc-course-product-hero__actions a,
   .pc-course-product-hero__actions button,
+  .pc-lesson-error__actions,
+  .pc-lesson-error__actions a,
+  .pc-lesson-error__actions button,
   .pc-learning-stage__nav,
   .pc-learning-stage__nav a,
   .pc-learning-stage__nav button {

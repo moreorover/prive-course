@@ -1,9 +1,9 @@
-import { Badge, Button, Group, Text, Title } from "@mantine/core";
+import { Badge, Button, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, type ErrorComponentProps } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LockKeyhole } from "lucide-react";
 
-import { PageHeader, PageShell, Surface } from "@/components/ui";
+import { PageShell, Surface } from "@/components/ui";
 import { LessonList, LessonNavControls } from "@/features/course/lesson-navigation";
 import { LessonPlayer } from "@/features/course/lesson-player";
 import { queryClient, trpc } from "@/utils/trpc";
@@ -31,47 +31,42 @@ function isCourseAccessError(error: unknown) {
 
 function LessonError({ error }: ErrorComponentProps) {
   const { courseSlug } = Route.useParams();
-
-  if (!isCourseAccessError(error)) {
-    return (
-      <PageShell>
-        <PageHeader
-          title="Lesson unavailable"
-          backTo={{ to: "/courses/$courseSlug", params: { courseSlug }, label: "Back to course" }}
-        />
-        <Surface>
-          <Text c="dimmed">
-            {error instanceof Error ? error.message : "This lesson could not be loaded."}
-          </Text>
-        </Surface>
-      </PageShell>
-    );
-  }
+  const isAccessError = isCourseAccessError(error);
+  const title = isAccessError ? "This lesson is part of the private track" : "Lesson unavailable";
+  const description = isAccessError
+    ? "Sign in with an account that has course access, or return to the course page to continue with available preview lessons."
+    : error instanceof Error
+      ? error.message
+      : "This lesson could not be loaded.";
 
   return (
-    <PageShell>
-      <PageHeader
-        title="This lesson is included with course access"
-        description="Free preview lessons can be watched without signing in. This lesson requires an account with active access to the course."
-        backTo={{ to: "/courses/$courseSlug", params: { courseSlug }, label: "Back to course" }}
-        meta={
-          <>
-            <Badge color="gray" variant="light">
-              Locked
-            </Badge>
-            <Text c="dimmed">Course access required</Text>
-          </>
-        }
-      />
-      <Surface>
-        <Group>
-          <Link to="/login">
-            <Button>Sign in</Button>
-          </Link>
-          <Link to="/courses/$courseSlug" params={{ courseSlug }}>
-            <Button variant="light">View course lessons</Button>
-          </Link>
-        </Group>
+    <PageShell tone="player">
+      <Surface padding="xl" className="pc-lesson-error">
+        <Link to="/courses/$courseSlug" params={{ courseSlug }} className="pc-back-link">
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Back to course</span>
+        </Link>
+
+        <div className="pc-lesson-error__panel">
+          <div className="pc-lesson-error__icon">
+            <LockKeyhole size={28} aria-hidden="true" />
+          </div>
+          <Badge color={isAccessError ? "gray" : "red"} variant="light">
+            {isAccessError ? "Course access required" : "Playback unavailable"}
+          </Badge>
+          <Title order={1}>{title}</Title>
+          <Text c="dimmed">{description}</Text>
+          <div className="pc-lesson-error__actions">
+            {isAccessError ? (
+              <Link to="/login">
+                <Button>Sign in</Button>
+              </Link>
+            ) : null}
+            <Link to="/courses/$courseSlug" params={{ courseSlug }}>
+              <Button variant={isAccessError ? "light" : "filled"}>View course lessons</Button>
+            </Link>
+          </div>
+        </div>
       </Surface>
     </PageShell>
   );

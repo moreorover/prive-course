@@ -1,7 +1,7 @@
-import { Badge, Button, Divider, Group, Stack, Text, Title } from "@mantine/core";
+import { Badge, Button, Divider, Group, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { PlayCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, PlayCircle } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { LessonRow, PageHeader, PageShell, StatusBadge, Surface } from "@/components/ui";
@@ -26,43 +26,60 @@ function CourseDetailRoute() {
     (lesson) => lesson.isFree || course.data?.hasActiveAccess,
   );
   const freeLessonCount = lessons.filter((lesson) => lesson.isFree).length;
+  const courseOutcomes = [
+    {
+      title: "Build a cleaner service method",
+      description:
+        "Move through the course with a structured lesson order instead of scattered tips.",
+    },
+    {
+      title: "Know what opens now",
+      description:
+        "Free previews, included lessons, and locked lessons are visible before you start.",
+    },
+    {
+      title: "Continue inside protected lessons",
+      description: "Private playback and account access keep the learning experience contained.",
+    },
+  ];
+  const primaryAction = firstAccessibleLesson ? (
+    <Link
+      to="/courses/$courseSlug/lessons/$lessonSlug"
+      params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
+    >
+      <Button leftSection={<PlayCircle size={18} />}>Start learning</Button>
+    </Link>
+  ) : (
+    <Link to="/login">
+      <Button>Sign in for access</Button>
+    </Link>
+  );
 
   return (
     <PageShell>
       {course.data ? (
-        <Stack gap="xl">
-          <section className="pc-course-detail-hero">
-            <div className="pc-course-detail-hero__copy">
-              <PageHeader
-                eyebrow="Private course"
-                title={course.data.title}
-                description={
-                  course.data.description ||
-                  "A Product Atelier course with protected lessons and private account access."
-                }
-                backTo={{ to: "/courses", label: "Back to courses" }}
-                actions={
-                  <Group>
-                    {firstAccessibleLesson ? (
-                      <Link
-                        to="/courses/$courseSlug/lessons/$lessonSlug"
-                        params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
-                      >
-                        <Button leftSection={<PlayCircle size={18} />}>Start learning</Button>
-                      </Link>
-                    ) : (
-                      <Link to="/login">
-                        <Button>Sign in for access</Button>
-                      </Link>
-                    )}
-                    <Button variant="light" component="a" href="#lessons">
-                      View lesson outline
-                    </Button>
-                  </Group>
-                }
-              />
+        <div className="pc-course-product">
+          <section className="pc-course-product-hero">
+            <div className="pc-course-product-hero__copy">
+              <Link to="/courses" className="pc-back-link">
+                <ArrowLeft size={16} aria-hidden="true" />
+                <span>Back to courses</span>
+              </Link>
+              <Text className="pc-eyebrow">Private course</Text>
+              <Title order={1}>{course.data.title}</Title>
+              <Text c="dimmed" size="lg" maw={720}>
+                {course.data.description ||
+                  "A Product Atelier course with protected lessons and private account access."}
+              </Text>
+              <Group className="pc-course-product-hero__actions">
+                {primaryAction}
+                <Button variant="light" component="a" href="#syllabus">
+                  View syllabus
+                </Button>
+              </Group>
             </div>
-            <Surface variant="raised" className="pc-course-detail-hero__panel">
+
+            <Surface variant="raised" className="pc-course-product-hero__panel">
               <Badge variant="light">
                 {course.data.hasActiveAccess ? "Access active" : "Preview mode"}
               </Badge>
@@ -75,13 +92,40 @@ function CourseDetailRoute() {
                 Lessons stay inside the Product Atelier learning workspace. Free previews are open
                 when available, and protected lessons unlock for granted accounts.
               </Text>
+              <div className="pc-course-product-hero__stats">
+                <div>
+                  <Text fw={850}>{lessons.length}</Text>
+                  <Text c="dimmed" size="sm">
+                    Lessons
+                  </Text>
+                </div>
+                <div>
+                  <Text fw={850}>{freeLessonCount}</Text>
+                  <Text c="dimmed" size="sm">
+                    Free previews
+                  </Text>
+                </div>
+              </div>
             </Surface>
           </section>
 
+          <section className="pc-course-outcomes" aria-label="Course outcomes">
+            {courseOutcomes.map((outcome) => (
+              <article className="pc-course-outcome" key={outcome.title}>
+                <BookOpen size={18} aria-hidden="true" />
+                <Title order={3}>{outcome.title}</Title>
+                <Text c="dimmed">{outcome.description}</Text>
+              </article>
+            ))}
+          </section>
+
           <div className="pc-detail-layout">
-            <section id="lessons" className="pc-section-stack">
-              <div>
-                <Title order={2}>Lesson outline</Title>
+            <section id="syllabus" className="pc-course-syllabus">
+              <div className="pc-course-syllabus__header">
+                <div>
+                  <Text className="pc-eyebrow">Syllabus</Text>
+                  <Title order={2}>Course curriculum</Title>
+                </div>
                 <Text c="dimmed">
                   Preview free lessons and see what is included with full course access.
                 </Text>
@@ -123,7 +167,7 @@ function CourseDetailRoute() {
               )}
             </section>
 
-            <Surface variant="raised" className="pc-access-panel">
+            <Surface variant="raised" className="pc-course-access-card pc-access-panel">
               <Text fw={800}>Private access</Text>
               <Divider />
               <div className="pc-access-stat">
@@ -139,13 +183,15 @@ function CourseDetailRoute() {
                 <StatusBadge status={course.data.hasActiveAccess ? "accessGranted" : "preview"} />
               </div>
               <Divider />
+              {primaryAction}
+              <Divider />
               <Text c="dimmed" size="sm">
                 Buying Basic + Pro includes the Basic course. Course grants are managed by the
                 Product Atelier team.
               </Text>
             </Surface>
           </div>
-        </Stack>
+        </div>
       ) : (
         <Surface>
           <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>

@@ -29,8 +29,9 @@ function NewCourseRoute() {
   return (
     <PageShell size="wide">
       <PageHeader
-        title="New course"
-        description="Create a course shell before adding lessons."
+        eyebrow="Catalog setup"
+        title="Create course"
+        description="Create the course shell, then add lessons, upload protected videos, and grant access when ready."
         backTo={{ to: "/admin", label: "Back to admin" }}
       />
       <CourseForm

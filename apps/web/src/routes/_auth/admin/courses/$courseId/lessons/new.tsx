@@ -38,8 +38,9 @@ function NewLessonRoute() {
   return (
     <PageShell size="wide">
       <PageHeader
-        title="New lesson"
-        description="Create a lesson shell before uploading protected video."
+        eyebrow="Lesson setup"
+        title="Create lesson"
+        description="Create the lesson shell first, then upload the protected video after the lesson exists."
         backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
       />
       <LessonForm

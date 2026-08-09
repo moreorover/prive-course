@@ -51,7 +51,10 @@ export function LessonForm({
   });
 
   return (
-    <FormSection title={title}>
+    <FormSection
+      title={title}
+      description="Define the lesson shell, preview state, and publication status before managing video."
+    >
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="md">
           <TextInput

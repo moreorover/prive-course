@@ -984,6 +984,17 @@ a:hover {
   gap: 1.5rem;
 }
 
+.pc-admin-stat {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.pc-admin-stat h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .pc-admin-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

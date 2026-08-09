@@ -44,8 +44,9 @@ function EditLessonRoute() {
   return (
     <PageShell size="wide">
       <PageHeader
+        eyebrow="Lesson operations"
         title={lesson.data?.title ?? "Edit lesson"}
-        description="Update lesson details and manage its protected video."
+        description="Update lesson metadata, preview status, publication state, and protected video upload."
         backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
       />
 

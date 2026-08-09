@@ -214,7 +214,7 @@ export function VideoUploadPanel({
         <div>
           <Group justify="space-between" align="center">
             <Title order={2} size="h4">
-              Video
+              Protected video
             </Title>
             {videoUid ? (
               <Badge
@@ -228,8 +228,8 @@ export function VideoUploadPanel({
           </Group>
           <Text c="dimmed">
             {videoUid
-              ? "Video uploaded. Processing may continue before playback is ready."
-              : "No video uploaded yet."}
+              ? "Video uploaded. Cloudflare Stream processing may continue before playback is ready."
+              : "Upload a video file to attach protected playback to this lesson."}
           </Text>
           {status?.pctComplete ? <Text c="dimmed">Processing: {status.pctComplete}%</Text> : null}
           {status?.errorReasonText ? <Text c="red">{status.errorReasonText}</Text> : null}
@@ -253,7 +253,7 @@ export function VideoUploadPanel({
             Selected {videoFile.name} ({formatBytes(videoFile.size)})
           </Text>
         ) : null}
-        <Alert color="blue" title="Upload note">
+        <Alert color="blue" title="Protected upload note">
           Large videos may take time to upload and process. Keep this tab open until the upload
           completes.
         </Alert>

@@ -63,13 +63,21 @@ function CourseAccessRoute() {
   return (
     <PageShell size="wide">
       <PageHeader
+        eyebrow="Access control"
         title="Course access"
-        description={course.data?.title ?? "Manage course access."}
+        description={
+          course.data?.title
+            ? `Grant or revoke private access for ${course.data.title}.`
+            : "Grant or revoke private course access."
+        }
         backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
       />
 
       <div className="pc-admin-grid">
-        <DataTableShell title="Grant access" description="Search users and grant this course.">
+        <DataTableShell
+          title="Grant access"
+          description="Search accounts and grant this course to selected students."
+        >
           <TextInput
             label="Search users"
             placeholder="Email or name"
@@ -115,7 +123,7 @@ function CourseAccessRoute() {
 
         <DataTableShell
           title="Active access"
-          description="Revoke access when a student should no longer watch this course."
+          description="Review active grants and revoke access when a student should no longer watch this course."
         >
           <Table striped highlightOnHover>
             <Table.Thead>

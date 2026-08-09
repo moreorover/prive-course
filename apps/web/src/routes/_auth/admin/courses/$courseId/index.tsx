@@ -97,8 +97,9 @@ function EditCourseRoute() {
   return (
     <PageShell size="wide">
       <PageHeader
+        eyebrow="Course operations"
         title={course.data?.title ?? "Edit course"}
-        description="Update course metadata, manage lessons, and control access."
+        description="Update catalog metadata, manage lesson order, and open the access controls for this course."
         backTo={{ to: "/admin", label: "Back to admin" }}
         actions={
           <Link to="/admin/courses/$courseId/access" params={{ courseId }}>
@@ -124,7 +125,7 @@ function EditCourseRoute() {
 
           <DataTableShell
             title="Lessons"
-            description="Create and edit lessons for this course."
+            description="Create lesson shells, control order, and open each lesson to manage protected video."
             actions={
               <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
                 <Button>New lesson</Button>

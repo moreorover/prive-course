@@ -49,7 +49,10 @@ export function CourseForm({
   });
 
   return (
-    <FormSection title={title}>
+    <FormSection
+      title={title}
+      description="Set the catalog-facing course details before adding lessons or granting access."
+    >
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="md">
           <TextInput

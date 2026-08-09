@@ -1,9 +1,9 @@
-import { Badge, Button, Table } from "@mantine/core";
+import { Badge, Button, SimpleGrid, Table, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 import { EmptyState } from "@/components/empty-state";
-import { DataTableShell, PageHeader, PageShell, StatusBadge } from "@/components/ui";
+import { DataTableShell, PageHeader, PageShell, StatusBadge, Surface } from "@/components/ui";
 import { trpc } from "@/utils/trpc";
 
 const coursesQueryOptions = trpc.admin.listCourses.queryOptions();
@@ -25,12 +25,16 @@ function courseStatusBadge(status: string) {
 
 function AdminCourses() {
   const courses = useQuery(coursesQueryOptions);
+  const publishedCount =
+    courses.data?.filter((course) => course.status === "published").length ?? 0;
+  const draftCount = courses.data?.filter((course) => course.status === "draft").length ?? 0;
 
   return (
     <PageShell size="wide">
       <PageHeader
-        title="Admin"
-        description="Manage courses, lessons, publication state, and private access."
+        eyebrow="Operations"
+        title="Course control room"
+        description="Manage Product Atelier courses, lesson readiness, publication state, and private access grants."
         actions={
           <Link to="/admin/courses/new">
             <Button>New course</Button>
@@ -38,9 +42,33 @@ function AdminCourses() {
         }
       />
 
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" mb="lg">
+        <Surface padding="md" className="pc-admin-stat">
+          <Text className="pc-eyebrow">Catalog</Text>
+          <Title order={2}>{courses.data?.length ?? 0}</Title>
+          <Text c="dimmed" size="sm">
+            Total courses
+          </Text>
+        </Surface>
+        <Surface padding="md" className="pc-admin-stat">
+          <Text className="pc-eyebrow">Live</Text>
+          <Title order={2}>{publishedCount}</Title>
+          <Text c="dimmed" size="sm">
+            Published courses
+          </Text>
+        </Surface>
+        <Surface padding="md" className="pc-admin-stat">
+          <Text className="pc-eyebrow">Pipeline</Text>
+          <Title order={2}>{draftCount}</Title>
+          <Text c="dimmed" size="sm">
+            Draft courses
+          </Text>
+        </Surface>
+      </SimpleGrid>
+
       <DataTableShell
-        title="Courses"
-        description="Create and maintain the course catalog."
+        title="Course catalog"
+        description="Create the course shells students can later browse, access, and watch."
         empty={
           courses.data?.length === 0 ? (
             <EmptyState

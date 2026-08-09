@@ -23,12 +23,12 @@ export function LessonList({
   lessons: NavigationLesson[];
 }) {
   return (
-    <Surface padding="md" className="pc-lesson-sidebar">
+    <Surface padding="md" className="pc-lesson-sidebar pc-lesson-queue">
       <div className="pc-lesson-sidebar__header">
         <div>
-          <Text className="pc-eyebrow">Course outline</Text>
+          <Text className="pc-eyebrow">Learning queue</Text>
           <Title order={2} size="h4">
-            Lessons
+            Course lessons
           </Title>
         </div>
         <Badge variant="light">{lessons.length}</Badge>

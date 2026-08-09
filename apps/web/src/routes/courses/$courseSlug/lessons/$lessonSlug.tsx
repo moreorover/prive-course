@@ -1,6 +1,7 @@
-import { Badge, Button, Group, Stack, Text } from "@mantine/core";
+import { Badge, Button, Group, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, type ErrorComponentProps } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 
 import { PageHeader, PageShell, Surface } from "@/components/ui";
 import { LessonList, LessonNavControls } from "@/features/course/lesson-navigation";
@@ -83,63 +84,70 @@ function LessonRoute() {
   return (
     <PageShell size="full" tone="player">
       {lesson.data ? (
-        <div className="pc-lesson-layout">
-          <Stack gap="lg" className="pc-player-main">
-            <section className="pc-player-hero">
-              <PageHeader
-                eyebrow="Private lesson"
-                title={lesson.data.lesson.title}
-                description={lesson.data.course.title}
-                backTo={{
-                  to: "/courses/$courseSlug",
-                  params: { courseSlug },
-                  label: "Back to course",
-                }}
-                meta={
-                  lesson.data.lesson.isFree ? (
+        <div className="pc-learning-workspace">
+          <section className="pc-learning-stage">
+            <div className="pc-learning-rail">
+              <Link to="/courses/$courseSlug" params={{ courseSlug }} className="pc-back-link">
+                <ArrowLeft size={16} aria-hidden="true" />
+                <span>Back to course</span>
+              </Link>
+              <div className="pc-learning-rail__content">
+                <div>
+                  <Text className="pc-eyebrow">Learning workspace</Text>
+                  <Title order={1}>{lesson.data.lesson.title}</Title>
+                  <Text c="dimmed">{lesson.data.course.title}</Text>
+                </div>
+                <div className="pc-learning-rail__meta">
+                  {lesson.data.lesson.isFree ? (
                     <Badge color="green" variant="light">
                       Free preview
                     </Badge>
                   ) : (
                     <Badge variant="light">Protected playback</Badge>
-                  )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pc-learning-stage__panel">
+              <div className="pc-learning-stage__header">
+                <div>
+                  <Text className="pc-eyebrow">Lesson player</Text>
+                  <Text c="dimmed" size="sm">
+                    Watch inside the private Product Atelier workspace.
+                  </Text>
+                </div>
+                <div className="pc-learning-stage__nav">
+                  <LessonNavControls
+                    courseSlug={courseSlug}
+                    previousLesson={lesson.data.navigation.previousLesson}
+                    nextLesson={lesson.data.navigation.nextLesson}
+                  />
+                </div>
+              </div>
+
+              <LessonPlayer
+                key={lesson.data.lesson.id}
+                lessonId={lesson.data.lesson.id}
+                videoUid={lesson.data.lesson.videoUid}
+                durationSeconds={lesson.data.lesson.durationSeconds}
+                initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
+                isCompleted={Boolean(lesson.data.progress?.completedAt)}
+                onProgressSaved={() =>
+                  queryClient.invalidateQueries({
+                    queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
+                  })
                 }
               />
-            </section>
-
-            <LessonNavControls
-              courseSlug={courseSlug}
-              previousLesson={lesson.data.navigation.previousLesson}
-              nextLesson={lesson.data.navigation.nextLesson}
-            />
-
-            <LessonPlayer
-              key={lesson.data.lesson.id}
-              lessonId={lesson.data.lesson.id}
-              videoUid={lesson.data.lesson.videoUid}
-              durationSeconds={lesson.data.lesson.durationSeconds}
-              initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
-              isCompleted={Boolean(lesson.data.progress?.completedAt)}
-              onProgressSaved={() =>
-                queryClient.invalidateQueries({
-                  queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
-                })
-              }
-            />
-
-            <LessonNavControls
-              courseSlug={courseSlug}
-              previousLesson={lesson.data.navigation.previousLesson}
-              nextLesson={lesson.data.navigation.nextLesson}
-            />
+            </div>
 
             {lesson.data.lesson.description ? (
-              <Surface padding="md" className="pc-player-notes">
+              <Surface padding="md" className="pc-learning-notes">
                 <Text className="pc-eyebrow">Lesson notes</Text>
                 <Text>{lesson.data.lesson.description}</Text>
               </Surface>
             ) : null}
-          </Stack>
+          </section>
 
           <LessonList courseSlug={courseSlug} lessons={lesson.data.navigation.lessons} />
         </div>

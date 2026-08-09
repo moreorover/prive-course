@@ -21,10 +21,10 @@ export default function Header() {
           <span className="pc-brand__mark">P</span>
           <span className="pc-brand__text">
             <Text fw={850} lh={1}>
-              priauginimas.lt
+              Product Atelier
             </Text>
             <Text size="xs" c="dimmed">
-              Private course studio
+              Technique and strategy courses
             </Text>
           </span>
         </Link>

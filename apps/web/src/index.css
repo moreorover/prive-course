@@ -727,6 +727,64 @@ a:hover {
   gap: 1rem;
 }
 
+.pc-course-path-strip {
+  display: grid;
+  grid-template-columns: 0.9fr 1.2fr 0.9fr;
+  gap: 1rem;
+  align-items: stretch;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+}
+
+.pc-course-path-strip__item {
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--pc-border);
+  border-radius: 16px;
+  background: var(--pc-surface);
+}
+
+.pc-course-path-strip__item--primary {
+  color: var(--pc-surface);
+  border-color: var(--pc-text);
+  background: var(--pc-text);
+  box-shadow: var(--pc-shadow-soft);
+}
+
+.pc-course-path-strip__item--primary [data-dimmed] {
+  color: color-mix(in srgb, var(--pc-surface) 72%, transparent);
+}
+
+.pc-catalog-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pc-catalog-heading > div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pc-course-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: end;
+}
+
+.pc-course-detail-hero__copy .pc-page-header {
+  margin-bottom: 0;
+}
+
+.pc-course-detail-hero__panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
 .pc-detail-layout,
 .pc-lesson-layout {
   display: grid;
@@ -909,6 +967,8 @@ a:hover {
   .pc-subscribe,
   .pc-trust,
   .pc-final-cta,
+  .pc-course-path-strip,
+  .pc-course-detail-hero,
   .pc-detail-layout,
   .pc-lesson-layout {
     grid-template-columns: 1fr;

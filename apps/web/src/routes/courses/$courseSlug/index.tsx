@@ -1,4 +1,4 @@
-import { Button, Divider, Group, Stack, Text, Title } from "@mantine/core";
+import { Badge, Button, Divider, Group, Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { PlayCircle } from "lucide-react";
@@ -31,30 +31,52 @@ function CourseDetailRoute() {
     <PageShell>
       {course.data ? (
         <Stack gap="xl">
-          <PageHeader
-            title={course.data.title}
-            description={course.data.description || "No description yet."}
-            backTo={{ to: "/courses", label: "Back to courses" }}
-            actions={
-              <Group>
-                {firstAccessibleLesson ? (
-                  <Link
-                    to="/courses/$courseSlug/lessons/$lessonSlug"
-                    params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
-                  >
-                    <Button leftSection={<PlayCircle size={18} />}>Start learning</Button>
-                  </Link>
-                ) : (
-                  <Link to="/login">
-                    <Button>Sign in for access</Button>
-                  </Link>
-                )}
-                <Button variant="light" component="a" href="#lessons">
-                  View lesson outline
-                </Button>
-              </Group>
-            }
-          />
+          <section className="pc-course-detail-hero">
+            <div className="pc-course-detail-hero__copy">
+              <PageHeader
+                eyebrow="Private course"
+                title={course.data.title}
+                description={
+                  course.data.description ||
+                  "A Product Atelier course with protected lessons and private account access."
+                }
+                backTo={{ to: "/courses", label: "Back to courses" }}
+                actions={
+                  <Group>
+                    {firstAccessibleLesson ? (
+                      <Link
+                        to="/courses/$courseSlug/lessons/$lessonSlug"
+                        params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
+                      >
+                        <Button leftSection={<PlayCircle size={18} />}>Start learning</Button>
+                      </Link>
+                    ) : (
+                      <Link to="/login">
+                        <Button>Sign in for access</Button>
+                      </Link>
+                    )}
+                    <Button variant="light" component="a" href="#lessons">
+                      View lesson outline
+                    </Button>
+                  </Group>
+                }
+              />
+            </div>
+            <Surface variant="raised" className="pc-course-detail-hero__panel">
+              <Badge variant="light">
+                {course.data.hasActiveAccess ? "Access active" : "Preview mode"}
+              </Badge>
+              <Title order={2}>
+                {course.data.hasActiveAccess
+                  ? "Your private lessons are ready."
+                  : "Preview the outline before access is granted."}
+              </Title>
+              <Text c="dimmed">
+                Lessons stay inside the Product Atelier learning workspace. Free previews are open
+                when available, and protected lessons unlock for granted accounts.
+              </Text>
+            </Surface>
+          </section>
 
           <div className="pc-detail-layout">
             <section id="lessons" className="pc-section-stack">
@@ -102,7 +124,7 @@ function CourseDetailRoute() {
             </section>
 
             <Surface variant="raised" className="pc-access-panel">
-              <Text fw={800}>Course access</Text>
+              <Text fw={800}>Private access</Text>
               <Divider />
               <div className="pc-access-stat">
                 <Text c="dimmed">Lessons</Text>
@@ -116,6 +138,11 @@ function CourseDetailRoute() {
                 <Text c="dimmed">Status</Text>
                 <StatusBadge status={course.data.hasActiveAccess ? "accessGranted" : "preview"} />
               </div>
+              <Divider />
+              <Text c="dimmed" size="sm">
+                Buying Basic + Pro includes the Basic course. Course grants are managed by the
+                Product Atelier team.
+              </Text>
             </Surface>
           </div>
         </Stack>

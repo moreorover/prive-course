@@ -83,7 +83,6 @@ function LessonRoute() {
       {lesson.data ? (
         <AppShell
           className="pc-learning-appshell"
-          header={{ height: { base: 58, md: 0 } }}
           navbar={{
             width: 340,
             breakpoint: "md",
@@ -91,7 +90,7 @@ function LessonRoute() {
           }}
           padding={0}
         >
-          <AppShell.Header className="pc-learning-shell-header">
+          <div className="pc-learning-mobile-toolbar">
             <Burger
               aria-label="Toggle lesson list"
               onClick={toggleNavbar}
@@ -100,7 +99,7 @@ function LessonRoute() {
             />
             <Text fw={780}>Course lessons</Text>
             <Badge variant="light">{lesson.data.navigation.lessons.length}</Badge>
-          </AppShell.Header>
+          </div>
 
           <AppShell.Navbar p="md" className="pc-learning-navbar">
             <LessonList

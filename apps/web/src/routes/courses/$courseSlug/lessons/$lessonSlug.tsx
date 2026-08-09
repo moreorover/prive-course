@@ -84,23 +84,28 @@ function LessonRoute() {
     <PageShell size="full" tone="player">
       {lesson.data ? (
         <div className="pc-lesson-layout">
-          <Stack gap="xl">
-            <PageHeader
-              title={lesson.data.lesson.title}
-              description={lesson.data.course.title}
-              backTo={{
-                to: "/courses/$courseSlug",
-                params: { courseSlug },
-                label: "Back to course",
-              }}
-              meta={
-                lesson.data.lesson.isFree ? (
-                  <Badge color="green" variant="light">
-                    Free preview
-                  </Badge>
-                ) : null
-              }
-            />
+          <Stack gap="lg" className="pc-player-main">
+            <section className="pc-player-hero">
+              <PageHeader
+                eyebrow="Private lesson"
+                title={lesson.data.lesson.title}
+                description={lesson.data.course.title}
+                backTo={{
+                  to: "/courses/$courseSlug",
+                  params: { courseSlug },
+                  label: "Back to course",
+                }}
+                meta={
+                  lesson.data.lesson.isFree ? (
+                    <Badge color="green" variant="light">
+                      Free preview
+                    </Badge>
+                  ) : (
+                    <Badge variant="light">Protected playback</Badge>
+                  )
+                }
+              />
+            </section>
 
             <LessonNavControls
               courseSlug={courseSlug}
@@ -129,7 +134,8 @@ function LessonRoute() {
             />
 
             {lesson.data.lesson.description ? (
-              <Surface padding="md">
+              <Surface padding="md" className="pc-player-notes">
+                <Text className="pc-eyebrow">Lesson notes</Text>
                 <Text>{lesson.data.lesson.description}</Text>
               </Surface>
             ) : null}

@@ -8,6 +8,7 @@ import { Surface } from "./surface";
 
 export type LessonRowProps = {
   action?: ReactNode;
+  className?: string;
   href?: LinkProps["to"];
   meta?: ReactNode;
   params?: LinkProps["params"];
@@ -16,14 +17,26 @@ export type LessonRowProps = {
   title: string;
 };
 
-export function LessonRow({ action, href, meta, params, position, status, title }: LessonRowProps) {
+export function LessonRow({
+  action,
+  className,
+  href,
+  meta,
+  params,
+  position,
+  status,
+  title,
+}: LessonRowProps) {
   const canOpen = Boolean(href);
+  const surfaceClassName = [
+    "pc-lesson-row",
+    status === "locked" ? "pc-lesson-row--locked" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const row = (
-    <Surface
-      interactive={canOpen}
-      padding="md"
-      className={`pc-lesson-row ${status === "locked" ? "pc-lesson-row--locked" : ""}`}
-    >
+    <Surface interactive={canOpen} padding="md" className={surfaceClassName}>
       <span className="pc-lesson-row__position">{String(position).padStart(2, "0")}</span>
       <Group gap="md" wrap="nowrap">
         <ThemeIcon color={canOpen ? "atelier" : "gray"} variant="light">
@@ -39,10 +52,10 @@ export function LessonRow({ action, href, meta, params, position, status, title 
   );
 
   return href ? (
-    <Link to={href} params={params} className="pc-lesson-row">
+    <Link to={href} params={params} className="pc-lesson-row-link">
       {row}
     </Link>
   ) : (
-    <div className="pc-lesson-row">{row}</div>
+    <div className="pc-lesson-row-link">{row}</div>
   );
 }

@@ -1,8 +1,8 @@
-import { Button, Title } from "@mantine/core";
+import { Badge, Button, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { LessonRow } from "@/components/ui";
+import { LessonRow, Surface } from "@/components/ui";
 
 export type NavigationLesson = {
   id: string;
@@ -23,10 +23,16 @@ export function LessonList({
   lessons: NavigationLesson[];
 }) {
   return (
-    <section className="pc-section-stack">
-      <Title order={2} size="h4">
-        Lessons
-      </Title>
+    <Surface padding="md" className="pc-lesson-sidebar">
+      <div className="pc-lesson-sidebar__header">
+        <div>
+          <Text className="pc-eyebrow">Course outline</Text>
+          <Title order={2} size="h4">
+            Lessons
+          </Title>
+        </div>
+        <Badge variant="light">{lessons.length}</Badge>
+      </div>
       <div className="pc-lesson-list">
         {lessons.map((navigationLesson) => (
           <LessonRow
@@ -49,10 +55,11 @@ export function LessonList({
                 ? undefined
                 : { courseSlug, lessonSlug: navigationLesson.slug }
             }
+            className={navigationLesson.isCurrent ? "pc-lesson-row--current" : undefined}
           />
         ))}
       </div>
-    </section>
+    </Surface>
   );
 }
 
@@ -66,7 +73,7 @@ export function LessonNavControls({
   nextLesson: NavigationLesson | null;
 }) {
   return (
-    <div className="pc-lesson-nav">
+    <nav className="pc-lesson-nav" aria-label="Lesson navigation">
       {previousLesson ? (
         <Link
           to="/courses/$courseSlug/lessons/$lessonSlug"
@@ -93,6 +100,6 @@ export function LessonNavControls({
           Next lesson
         </Button>
       )}
-    </div>
+    </nav>
   );
 }

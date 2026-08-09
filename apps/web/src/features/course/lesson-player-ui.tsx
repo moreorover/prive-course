@@ -11,7 +11,7 @@ export function NoVideoPanel() {
         <Stack align="center" gap={4}>
           <Text fw={700}>No video uploaded</Text>
           <Text c="dimmed" ta="center">
-            This lesson does not have a video yet.
+            This protected lesson space is ready. The video will appear after upload.
           </Text>
         </Stack>
       </div>
@@ -34,7 +34,7 @@ export function ProtectedVideoPanel({
         <Stack align="center" gap="xs">
           <Text fw={700}>Video is protected</Text>
           <Text c="dimmed" ta="center" maw={480}>
-            Start playback when you are ready.
+            Start a private playback session when you are ready to watch this lesson.
           </Text>
           <Button loading={isPending} onClick={onStart}>
             Start playback
@@ -105,8 +105,8 @@ export function ActiveVideoPanel({
             </div>
           ) : null}
         </div>
-        <Group justify="space-between" gap="md">
-          <Text c="dimmed">Saved at {savedProgressLabel}</Text>
+        <Group justify="space-between" gap="md" className="pc-player-status">
+          <Text c="dimmed">Progress saved at {savedProgressLabel}</Text>
           {completed ? <Badge color="green">Complete</Badge> : null}
         </Group>
         {playerError ? (

@@ -11,6 +11,23 @@ function courseQueryOptions(courseSlug: string) {
   return trpc.courses.bySlug.queryOptions({ slug: courseSlug });
 }
 
+const courseOutcomes = [
+  {
+    title: "Build a cleaner service method",
+    description:
+      "Move through the course with a structured lesson order instead of scattered tips.",
+  },
+  {
+    title: "Know what opens now",
+    description:
+      "Free previews, included lessons, and locked lessons are visible before you start.",
+  },
+  {
+    title: "Continue inside protected lessons",
+    description: "Private playback and account access keep the learning experience contained.",
+  },
+];
+
 export const Route = createFileRoute("/courses/$courseSlug/")({
   component: CourseDetailRoute,
   loader: async ({ context, params }) => {
@@ -26,22 +43,6 @@ function CourseDetailRoute() {
     (lesson) => lesson.isFree || course.data?.hasActiveAccess,
   );
   const freeLessonCount = lessons.filter((lesson) => lesson.isFree).length;
-  const courseOutcomes = [
-    {
-      title: "Build a cleaner service method",
-      description:
-        "Move through the course with a structured lesson order instead of scattered tips.",
-    },
-    {
-      title: "Know what opens now",
-      description:
-        "Free previews, included lessons, and locked lessons are visible before you start.",
-    },
-    {
-      title: "Continue inside protected lessons",
-      description: "Private playback and account access keep the learning experience contained.",
-    },
-  ];
   const primaryAction = firstAccessibleLesson ? (
     <Link
       to="/courses/$courseSlug/lessons/$lessonSlug"

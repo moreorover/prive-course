@@ -1,9 +1,9 @@
-import { Button, Stack } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { LessonForm, type LessonFormValue } from "@/components/lesson-form";
+import { PageHeader, PageShell } from "@/components/ui";
 import { queryClient, trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseId: string) {
@@ -36,30 +36,31 @@ function NewLessonRoute() {
   );
 
   return (
-    <main className="pc-page-narrow">
-      <Stack gap="lg">
-        <Link to="/admin/courses/$courseId" params={{ courseId }}>
-          <Button variant="subtle">Back to course</Button>
-        </Link>
-        <LessonForm
-          title="New lesson"
-          submitLabel="Create lesson"
-          isSubmitting={createLesson.isPending}
-          initialValue={{
-            title: "",
-            slug: "",
-            description: "",
-            isFree: false,
-            status: "draft",
-          }}
-          onSubmit={(value: LessonFormValue) =>
-            createLesson.mutate({
-              courseId,
-              ...value,
-            })
-          }
-        />
-      </Stack>
-    </main>
+    <PageShell size="wide">
+      <PageHeader
+        eyebrow="Lesson setup"
+        title="Create lesson"
+        description="Create the lesson shell first, then upload the protected video after the lesson exists."
+        backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
+      />
+      <LessonForm
+        title="New lesson"
+        submitLabel="Create lesson"
+        isSubmitting={createLesson.isPending}
+        initialValue={{
+          title: "",
+          slug: "",
+          description: "",
+          isFree: false,
+          status: "draft",
+        }}
+        onSubmit={(value: LessonFormValue) =>
+          createLesson.mutate({
+            courseId,
+            ...value,
+          })
+        }
+      />
+    </PageShell>
   );
 }

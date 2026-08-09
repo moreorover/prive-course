@@ -1,127 +1,129 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Badge, Button, Text, Title } from "@mantine/core";
+import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpen, LockKeyhole, PlayCircle } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
+
+import { COURSE_OFFERS, OUTCOME_POINTS } from "@/features/marketing/course-offers";
+import { SubscribeForm } from "@/features/marketing/subscribe-form";
+import { trpc } from "@/utils/trpc";
+
+const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(publishedCoursesQueryOptions);
+  },
 });
 
-const highlights = [
-  {
-    description: "Explore published courses before creating an account.",
-    icon: BookOpen,
-    title: "Browse the catalog",
-  },
-  {
-    description: "Open free lessons first and see whether the course fits.",
-    icon: PlayCircle,
-    title: "Preview lessons",
-  },
-  {
-    description: "Protected lessons stay available only to learners with course access.",
-    icon: LockKeyhole,
-    title: "Continue privately",
-  },
-] as const;
-
 function HomeComponent() {
+  const courses = useQuery(publishedCoursesQueryOptions);
+  const publishedCourseCount = courses.data?.length ?? 0;
+
   return (
-    <main className="pc-page">
-      <Stack gap={56}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
-          <Stack gap="lg">
-            <Badge color="gold" variant="light" w="fit-content">
-              Private video courses
-            </Badge>
-            <Title order={1} size="3.75rem" lh={0.98}>
-              Private courses. Clear previews. Protected lessons.
-            </Title>
-            <Text c="dimmed" size="xl" maw={760}>
-              Prive Course helps learners browse available courses, inspect lesson outlines, and
-              start with free previews before entering protected course material.
-            </Text>
-            <Group>
-              <Link to="/courses">
-                <Button color="gold" size="md" leftSection={<BookOpen size={18} />}>
-                  Browse courses
-                </Button>
-              </Link>
-              <Link to="/login">
-                <Button color="gold" size="md" variant="light">
-                  Sign in
-                </Button>
-              </Link>
-            </Group>
-          </Stack>
-
-          <Paper
-            withBorder
-            p="xl"
-            className="pc-panel"
-            style={{ borderTop: "3px solid var(--pc-accent)" }}
-          >
-            <Stack gap="md">
-              <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                Course flow
+    <main className="pc-home-page">
+      <div className="pc-page-shell pc-page-shell--wide">
+        <div className="pc-creator-site">
+          <section className="pc-creator-hero">
+            <div className="pc-creator-hero__portrait" aria-hidden="true">
+              <span>Product Atelier</span>
+            </div>
+            <div className="pc-creator-hero__copy">
+              <Badge variant="light" size="lg">
+                Private course library
+              </Badge>
+              <Title order={1}>Learn beauty services from a focused course library.</Title>
+              <Text c="dimmed" size="xl">
+                Product Atelier teaches hair extension technique and social media strategy through
+                private video courses built for beauty professionals who want clear, practical
+                progress.
               </Text>
-              <Title order={2} size="h3">
-                Browse, preview, continue
-              </Title>
+              <div className="pc-creator-actions">
+                <Link to="/courses">
+                  <Button size="md" rightSection={<ArrowRight size={18} />}>
+                    Browse courses
+                  </Button>
+                </Link>
+                <a href="#updates">
+                  <Button size="md" variant="subtle" leftSection={<Mail size={18} />}>
+                    Subscribe for updates
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section className="pc-creator-section">
+            <div className="pc-creator-section__header">
+              <Text className="pc-eyebrow">Courses</Text>
+              <Title order={2}>Three ways to build the next layer of your work.</Title>
               <Text c="dimmed">
-                The public pages work as the course storefront. The private lesson pages stay
-                focused on playback and progress.
-              </Text>
-            </Stack>
-          </Paper>
-        </div>
-
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
-          {highlights.map((highlight) => {
-            const Icon = highlight.icon;
-
-            return (
-              <Paper key={highlight.title} withBorder p="lg" className="pc-panel">
-                <Stack gap="sm">
-                  <ThemeIcon color="gold" variant="light" size="lg">
-                    <Icon size={18} />
-                  </ThemeIcon>
-                  <Title order={2} size="h4">
-                    {highlight.title}
-                  </Title>
-                  <Text c="dimmed">{highlight.description}</Text>
-                </Stack>
-              </Paper>
-            );
-          })}
-        </SimpleGrid>
-
-        <Paper withBorder p="xl" className="pc-panel">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <div>
-              <Title order={2}>Ready to see what is available?</Title>
-              <Text c="dimmed" mt="xs">
-                Start with the course catalog. Each course shows its lesson outline and access
-                states clearly.
+                Start with the extension foundation, take the full pro path, or focus on the content
+                strategy that helps people understand what you offer.
               </Text>
             </div>
-            <Link to="/courses">
-              <Button color="gold" size="md">
-                View courses
-              </Button>
-            </Link>
-          </div>
-        </Paper>
-      </Stack>
+            <div className="pc-course-preview-list">
+              {COURSE_OFFERS.map((offer, index) => (
+                <article className="pc-course-preview" key={offer.id}>
+                  <div className="pc-course-preview__media">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div className="pc-course-preview__content">
+                    <Badge variant={offer.emphasis === "primary" ? "filled" : "light"}>
+                      {offer.eyebrow}
+                    </Badge>
+                    <Title order={3}>{offer.title}</Title>
+                    <Text c="dimmed">{offer.summary}</Text>
+                    <Text className="pc-course-preview__access">{offer.accessNote}</Text>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="pc-creator-footnote">
+              <Text c="dimmed">{publishedCourseCount || 3} course paths are planned for v1.</Text>
+              <Link to="/courses">
+                <Button variant="light" rightSection={<ArrowRight size={16} />}>
+                  Open course catalog
+                </Button>
+              </Link>
+            </div>
+          </section>
+
+          <section className="pc-creator-section pc-teacher-note">
+            <div>
+              <Text className="pc-eyebrow">About the teacher</Text>
+              <Title order={2}>
+                A direct learning space for technique, service confidence, and demand.
+              </Title>
+            </div>
+            <div className="pc-teacher-note__body">
+              <Text c="dimmed" size="lg">
+                The site is intentionally small: teacher introduction, course paths, private
+                lessons, and updates. No blog, no marketplace, no generic platform funnel.
+              </Text>
+              <div className="pc-outcome-lines">
+                {OUTCOME_POINTS.map((point) => (
+                  <article key={point.title}>
+                    <Title order={3}>{point.title}</Title>
+                    <Text c="dimmed">{point.description}</Text>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="pc-subscribe pc-subscribe--creator" id="updates">
+            <div>
+              <Text className="pc-eyebrow">Stay close to new releases</Text>
+              <Title order={2}>Subscribe for course updates.</Title>
+              <Text c="dimmed" size="lg">
+                Get release notes, access-window updates, and new lesson announcements.
+              </Text>
+            </div>
+            <SubscribeForm />
+          </section>
+        </div>
+      </div>
     </main>
   );
 }

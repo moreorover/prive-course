@@ -1,10 +1,11 @@
-import { Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Button, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
+import { FormSection } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 import Loader from "./loader";
@@ -72,13 +73,11 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
   }
 
   return (
-    <Paper withBorder p="xl" className="pc-panel">
+    <FormSection
+      title="Welcome back"
+      description="Continue into your Product Atelier course library."
+    >
       <Stack gap="md">
-        <Stack gap={4} ta="center">
-          <Title order={1}>Welcome back</Title>
-          <Text c="dimmed">Continue your private course access.</Text>
-        </Stack>
-
         <Button type="button" fullWidth loading={isPasskeyPending} onClick={signInWithPasskey}>
           {isPasskeyPending ? "Waiting for passkey..." : "Sign in with passkey"}
         </Button>
@@ -136,9 +135,9 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignUp}>
-          Need an account? Sign up
+          Create a private learning account
         </Button>
       </Stack>
-    </Paper>
+    </FormSection>
   );
 }

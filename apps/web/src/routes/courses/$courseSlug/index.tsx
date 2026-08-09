@@ -1,9 +1,11 @@
-import { Badge, Button, Divider, Group, Paper, Stack, Text, ThemeIcon, Title } from "@mantine/core";
+import { Badge, Button, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Lock, PlayCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, PlayCircle } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { LessonRow, PageShell, Surface } from "@/components/ui";
+import { getCourseOffer } from "@/features/marketing/course-offers";
 import { trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseSlug: string) {
@@ -21,172 +23,128 @@ function CourseDetailRoute() {
   const { courseSlug } = Route.useParams();
   const course = useQuery(courseQueryOptions(courseSlug));
   const lessons = course.data?.lessons ?? [];
+  const offer = course.data ? getCourseOffer(course.data) : null;
   const firstAccessibleLesson = lessons.find(
     (lesson) => lesson.isFree || course.data?.hasActiveAccess,
   );
-  const freeLessonCount = lessons.filter((lesson) => lesson.isFree).length;
+  const primaryAction = firstAccessibleLesson ? (
+    <Link
+      to="/courses/$courseSlug/lessons/$lessonSlug"
+      params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
+    >
+      <Button leftSection={<PlayCircle size={18} />}>Start Learning</Button>
+    </Link>
+  ) : (
+    <Link to="/login">
+      <Button>Sign in for access</Button>
+    </Link>
+  );
 
   return (
-    <main className="pc-page">
-      <Stack gap={48}>
-        <Link to="/courses">
-          <Button variant="subtle">Back to courses</Button>
-        </Link>
-
-        {course.data ? (
-          <>
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-              <Stack gap="lg">
-                <Badge color="gold" variant="light" w="fit-content">
-                  Private course
-                </Badge>
-                <Title order={1} size="3rem" lh={1.03}>
-                  {course.data.title}
-                </Title>
-                <Text c="dimmed" size="lg" maw={760}>
-                  {course.data.description || "No description yet."}
-                </Text>
-                <Group>
-                  {firstAccessibleLesson ? (
-                    <Link
-                      to="/courses/$courseSlug/lessons/$lessonSlug"
-                      params={{ courseSlug, lessonSlug: firstAccessibleLesson.slug }}
-                    >
-                      <Button color="gold" leftSection={<PlayCircle size={18} />}>
-                        Start learning
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link to="/login">
-                      <Button color="gold">Sign in for access</Button>
-                    </Link>
-                  )}
-                  <Button variant="light" color="gold" component="a" href="#lessons">
-                    View lesson outline
-                  </Button>
-                </Group>
-              </Stack>
-
-              <Paper
-                withBorder
-                p="lg"
-                className="pc-panel"
-                style={{ borderTop: "3px solid var(--pc-accent)" }}
-              >
-                <Stack gap="md">
-                  <Group gap="sm">
-                    <ThemeIcon color="gold" variant="light">
-                      <Sparkles size={18} />
-                    </ThemeIcon>
-                    <Text fw={800}>Course access</Text>
-                  </Group>
-                  <Divider />
-                  <Group justify="space-between">
-                    <Text c="dimmed">Lessons</Text>
-                    <Text fw={700}>{lessons.length}</Text>
-                  </Group>
-                  <Group justify="space-between">
-                    <Text c="dimmed">Free previews</Text>
-                    <Text fw={700}>{freeLessonCount}</Text>
-                  </Group>
-                  <Group justify="space-between" align="start">
-                    <Text c="dimmed">Status</Text>
-                    <Badge color={course.data.hasActiveAccess ? "gold" : "gray"} variant="light">
-                      {course.data.hasActiveAccess ? "Access granted" : "Preview available"}
-                    </Badge>
-                  </Group>
-                </Stack>
-              </Paper>
+    <PageShell size="wide">
+      {course.data ? (
+        <div className="pc-course-landing">
+          <section className="pc-course-landing__hero">
+            <div className="pc-course-landing__media" aria-hidden="true">
+              <span>{course.data.title}</span>
             </div>
 
-            <section id="lessons">
-              <Stack gap="md">
-                <div>
-                  <Title order={2}>Lesson outline</Title>
-                  <Text c="dimmed">
-                    Preview free lessons and see what is included with full course access.
-                  </Text>
-                </div>
-                {course.data.lessons.length === 0 ? (
-                  <EmptyState
-                    title="No lessons yet"
-                    description="Lessons will appear here when they are available."
-                  />
-                ) : (
-                  <Stack gap="sm">
-                    {course.data.lessons.map((lesson) => {
-                      const canOpenLesson = lesson.isFree || course.data.hasActiveAccess;
-                      const accessLabel = lesson.isFree
-                        ? "Free"
-                        : course.data.hasActiveAccess
-                          ? "Included"
-                          : "Locked";
-                      const lessonMeta = lesson.durationSeconds
-                        ? `${Math.round(lesson.durationSeconds / 60)} min`
-                        : "Duration pending";
-                      const badgeColor = lesson.isFree
-                        ? "gold"
-                        : course.data.hasActiveAccess
-                          ? "teal"
-                          : "gray";
+            <div className="pc-course-landing__intro">
+              <Link to="/courses" className="pc-back-link">
+                <ArrowLeft size={16} aria-hidden="true" />
+                <span>Back to courses</span>
+              </Link>
+              <div className="pc-course-landing__meta">
+                <Badge variant={course.data.hasActiveAccess ? "filled" : "light"}>
+                  {course.data.hasActiveAccess ? "Access active" : "Available"}
+                </Badge>
+                <span>#{offer?.id.replaceAll("-", " #")}</span>
+              </div>
+              <Title order={1}>{course.data.title}</Title>
+              <Text c="dimmed" size="lg" maw={720}>
+                {course.data.description ||
+                  offer?.summary ||
+                  "A Product Atelier course with protected lessons and private account access."}
+              </Text>
+              <div className="pc-course-landing__actions">
+                {primaryAction}
+                <Button variant="subtle" component="a" href="#contents">
+                  Course Details
+                </Button>
+              </div>
+            </div>
+          </section>
 
-                      const content = (
-                        <Paper
-                          withBorder
-                          p="lg"
-                          className="pc-panel"
-                          style={{
-                            borderLeft: canOpenLesson
-                              ? "3px solid var(--pc-accent)"
-                              : "3px solid var(--pc-border)",
-                          }}
-                        >
-                          <Group justify="space-between" align="start" gap="md">
-                            <Group gap="md" align="start" wrap="nowrap">
-                              <ThemeIcon color={canOpenLesson ? "gold" : "gray"} variant="light">
-                                {canOpenLesson ? <PlayCircle size={18} /> : <Lock size={18} />}
-                              </ThemeIcon>
-                              <div>
-                                <Text fw={800} size="xs" c="dimmed" tt="uppercase">
-                                  Lesson {lesson.position + 1}
-                                </Text>
-                                <Text fw={700}>{lesson.title}</Text>
-                                <Text c="dimmed" size="sm">
-                                  {lessonMeta}
-                                </Text>
-                              </div>
-                            </Group>
-                            <Badge color={badgeColor} variant="light">
-                              {accessLabel}
-                            </Badge>
-                          </Group>
-                        </Paper>
-                      );
+          <section className="pc-course-article">
+            <article>
+              <Text className="pc-eyebrow">What this course teaches</Text>
+              <Title order={2}>A structured path through the work, not scattered tips.</Title>
+              <Text c="dimmed">
+                {offer?.includes.join(", ") ||
+                  "Move through the lessons in order, watch inside the protected player, and use the notes as a reference while you build confidence with the service or strategy."}
+              </Text>
+            </article>
+            <article>
+              <Text className="pc-eyebrow">Who it is for</Text>
+              <Title order={2}>Beauty professionals who want a focused private course space.</Title>
+              <Text c="dimmed">
+                {offer?.audience ||
+                  "This is designed for learners who want clear lesson progression and practical course access, without a public marketplace or generic SaaS dashboard around it."}
+              </Text>
+            </article>
+          </section>
 
-                      return canOpenLesson ? (
-                        <Link
-                          key={lesson.id}
-                          to="/courses/$courseSlug/lessons/$lessonSlug"
-                          params={{ courseSlug, lessonSlug: lesson.slug }}
-                          style={{ color: "inherit", textDecoration: "none" }}
-                        >
-                          {content}
-                        </Link>
-                      ) : (
-                        <div key={lesson.id}>{content}</div>
-                      );
-                    })}
-                  </Stack>
-                )}
-              </Stack>
-            </section>
-          </>
-        ) : (
-          <Paper withBorder p="lg" className="pc-panel">
-            <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
-          </Paper>
-        )}
-      </Stack>
-    </main>
+          <section id="contents" className="pc-course-contents">
+            <div className="pc-course-contents__header">
+              <div>
+                <Text className="pc-eyebrow">Course contents</Text>
+                <Title order={2}>Start with the first available lesson.</Title>
+              </div>
+              <Text c="dimmed">
+                Free previews are open when available. Protected lessons unlock for accounts with
+                granted course access.
+              </Text>
+            </div>
+            {course.data.lessons.length === 0 ? (
+              <EmptyState
+                title="No lessons yet"
+                description="Lessons will appear here when they are available."
+              />
+            ) : (
+              <div className="pc-lesson-list pc-course-contents__list">
+                {course.data.lessons.map((lesson) => {
+                  const canOpenLesson = lesson.isFree || course.data.hasActiveAccess;
+                  const status = lesson.isFree
+                    ? "free"
+                    : course.data.hasActiveAccess
+                      ? "included"
+                      : "locked";
+
+                  return (
+                    <LessonRow
+                      key={lesson.id}
+                      position={lesson.position + 1}
+                      title={lesson.title}
+                      meta={
+                        lesson.durationSeconds
+                          ? `${Math.round(lesson.durationSeconds / 60)} min`
+                          : "Duration pending"
+                      }
+                      status={status}
+                      href={canOpenLesson ? "/courses/$courseSlug/lessons/$lessonSlug" : undefined}
+                      params={canOpenLesson ? { courseSlug, lessonSlug: lesson.slug } : undefined}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </div>
+      ) : (
+        <Surface>
+          <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
+        </Surface>
+      )}
+    </PageShell>
   );
 }

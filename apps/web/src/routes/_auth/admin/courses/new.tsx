@@ -1,9 +1,9 @@
-import { Button, Stack } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
+import { PageHeader, PageShell } from "@/components/ui";
 import { queryClient, trpc } from "@/utils/trpc";
 
 export const Route = createFileRoute("/_auth/admin/courses/new")({
@@ -27,18 +27,19 @@ function NewCourseRoute() {
   );
 
   return (
-    <main className="pc-page-narrow">
-      <Stack gap="lg">
-        <Link to="/admin">
-          <Button variant="subtle">Back to courses</Button>
-        </Link>
-        <CourseForm
-          title="New course"
-          submitLabel="Create course"
-          isSubmitting={createCourse.isPending}
-          onSubmit={(value: CourseFormValue) => createCourse.mutate(value)}
-        />
-      </Stack>
-    </main>
+    <PageShell size="wide">
+      <PageHeader
+        eyebrow="Catalog setup"
+        title="Create course"
+        description="Create the course shell, then add lessons, upload protected videos, and grant access when ready."
+        backTo={{ to: "/admin", label: "Back to admin" }}
+      />
+      <CourseForm
+        title="New course"
+        submitLabel="Create course"
+        isSubmitting={createCourse.isPending}
+        onSubmit={(value: CourseFormValue) => createCourse.mutate(value)}
+      />
+    </PageShell>
   );
 }

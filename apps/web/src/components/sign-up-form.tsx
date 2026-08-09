@@ -1,9 +1,10 @@
-import { Button, Paper, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Button, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
 
+import { FormSection } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
 import Loader from "./loader";
@@ -64,13 +65,11 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
   }
 
   return (
-    <Paper withBorder p="xl" className="pc-panel">
+    <FormSection
+      title="Create account"
+      description="Set up your private Product Atelier learning workspace."
+    >
       <Stack gap="md">
-        <Stack gap={4} ta="center">
-          <Title order={1}>Create account</Title>
-          <Text c="dimmed">Set up access for private course lessons.</Text>
-        </Stack>
-
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -138,9 +137,9 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignIn}>
-          Already have an account? Sign in
+          Already have private access? Sign in
         </Button>
       </Stack>
-    </Paper>
+    </FormSection>
   );
 }

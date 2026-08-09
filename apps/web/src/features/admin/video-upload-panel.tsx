@@ -4,7 +4,6 @@ import {
   Button,
   FileInput,
   Group,
-  Paper,
   Progress,
   Stack,
   Text,
@@ -14,13 +13,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Surface } from "@/components/ui";
 import { queryClient, trpc } from "@/utils/trpc";
 
 const tusChunkSizeBytes = 50 * 1024 * 1024;
 
 function getStatusColor(state: string | undefined, readyToStream: boolean) {
   if (readyToStream || state === "ready") {
-    return "gold";
+    return "atelier";
   }
 
   if (state === "error") {
@@ -209,12 +209,12 @@ export function VideoUploadPanel({
   const status = videoStatus.data?.status;
 
   return (
-    <Paper withBorder p="lg" className="pc-panel">
+    <Surface variant="raised" className="pc-upload-stack">
       <Stack gap="md">
         <div>
           <Group justify="space-between" align="center">
             <Title order={2} size="h4">
-              Video
+              Protected video
             </Title>
             {videoUid ? (
               <Badge
@@ -228,8 +228,8 @@ export function VideoUploadPanel({
           </Group>
           <Text c="dimmed">
             {videoUid
-              ? "Video uploaded. Processing may continue before playback is ready."
-              : "No video uploaded yet."}
+              ? "Video uploaded. Cloudflare Stream processing may continue before playback is ready."
+              : "Upload a video file to attach protected playback to this lesson."}
           </Text>
           {status?.pctComplete ? <Text c="dimmed">Processing: {status.pctComplete}%</Text> : null}
           {status?.errorReasonText ? <Text c="red">{status.errorReasonText}</Text> : null}
@@ -253,7 +253,7 @@ export function VideoUploadPanel({
             Selected {videoFile.name} ({formatBytes(videoFile.size)})
           </Text>
         ) : null}
-        <Alert color="blue" title="Upload note">
+        <Alert color="blue" title="Protected upload note">
           Large videos may take time to upload and process. Keep this tab open until the upload
           completes.
         </Alert>
@@ -280,6 +280,6 @@ export function VideoUploadPanel({
           </Button>
         </Group>
       </Stack>
-    </Paper>
+    </Surface>
   );
 }

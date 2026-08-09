@@ -1,9 +1,10 @@
-import { Badge, Button, Paper, Stack, Table, Text, TextInput, Title } from "@mantine/core";
+import { Badge, Button, Table, Text, TextInput } from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { DataTableShell, PageHeader, PageShell } from "@/components/ui";
 import { trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseId: string) {
@@ -60,112 +61,109 @@ function CourseAccessRoute() {
   const activeUserIds = new Set(access.data?.map((item) => item.userId) ?? []);
 
   return (
-    <main className="pc-page">
-      <Stack gap="xl">
-        <Link to="/admin/courses/$courseId" params={{ courseId }}>
-          <Button variant="subtle">Back to course</Button>
-        </Link>
+    <PageShell size="wide">
+      <PageHeader
+        eyebrow="Access control"
+        title="Course access"
+        description={
+          course.data?.title
+            ? `Grant or revoke private access for ${course.data.title}.`
+            : "Grant or revoke private course access."
+        }
+        backTo={{ to: "/admin/courses/$courseId", params: { courseId }, label: "Back to course" }}
+      />
 
-        <div>
-          <Title order={1}>Course access</Title>
-          <Text c="dimmed">{course.data?.title ?? "Manage course access."}</Text>
-        </div>
+      <div className="pc-admin-grid">
+        <DataTableShell
+          title="Grant access"
+          description="Search accounts and grant this course to selected students."
+        >
+          <TextInput
+            label="Search users"
+            placeholder="Email or name"
+            value={query}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+          />
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>User</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Role</Table.Th>
+                <Table.Th />
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {users.data?.map((user) => {
+                const hasAccess = activeUserIds.has(user.id);
 
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-          <Paper withBorder p="lg" className="pc-panel">
-            <Stack gap="md">
-              <Title order={2} size="h4">
-                Grant access
-              </Title>
-              <TextInput
-                label="Search users"
-                placeholder="Email or name"
-                value={query}
-                onChange={(event) => setQuery(event.currentTarget.value)}
-              />
-              <Table striped highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>User</Table.Th>
-                    <Table.Th>Email</Table.Th>
-                    <Table.Th>Role</Table.Th>
-                    <Table.Th />
+                return (
+                  <Table.Tr key={user.id}>
+                    <Table.Td>{user.name}</Table.Td>
+                    <Table.Td>{user.email}</Table.Td>
+                    <Table.Td>
+                      <Badge variant="light">{user.role ?? "user"}</Badge>
+                    </Table.Td>
+                    <Table.Td className="pc-table-action">
+                      <Button
+                        size="xs"
+                        variant={hasAccess ? "default" : "light"}
+                        disabled={hasAccess || grantAccess.isPending}
+                        onClick={() => grantAccess.mutate({ courseId, userId: user.id })}
+                      >
+                        {hasAccess ? "Granted" : "Grant"}
+                      </Button>
+                    </Table.Td>
                   </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {users.data?.map((user) => {
-                    const hasAccess = activeUserIds.has(user.id);
-                    return (
-                      <Table.Tr key={user.id}>
-                        <Table.Td>{user.name}</Table.Td>
-                        <Table.Td>{user.email}</Table.Td>
-                        <Table.Td>
-                          <Badge variant="light">{user.role ?? "user"}</Badge>
-                        </Table.Td>
-                        <Table.Td>
-                          <Button
-                            size="xs"
-                            variant={hasAccess ? "default" : "light"}
-                            disabled={hasAccess || grantAccess.isPending}
-                            onClick={() => grantAccess.mutate({ courseId, userId: user.id })}
-                          >
-                            {hasAccess ? "Granted" : "Grant"}
-                          </Button>
-                        </Table.Td>
-                      </Table.Tr>
-                    );
-                  })}
-                </Table.Tbody>
-              </Table>
-            </Stack>
-          </Paper>
+                );
+              })}
+            </Table.Tbody>
+          </Table>
+        </DataTableShell>
 
-          <Paper withBorder p="lg" className="pc-panel">
-            <Stack gap="md">
-              <Title order={2} size="h4">
-                Active access
-              </Title>
-              <Table striped highlightOnHover>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>User</Table.Th>
-                    <Table.Th>Email</Table.Th>
-                    <Table.Th>Granted</Table.Th>
-                    <Table.Th />
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {access.data?.map((item) => (
-                    <Table.Tr key={item.id}>
-                      <Table.Td>{item.userName}</Table.Td>
-                      <Table.Td>{item.userEmail}</Table.Td>
-                      <Table.Td>{new Date(item.grantedAt).toLocaleDateString()}</Table.Td>
-                      <Table.Td>
-                        <Button
-                          color="red"
-                          size="xs"
-                          variant="light"
-                          loading={revokeAccess.isPending}
-                          onClick={() => revokeAccess.mutate({ courseId, userId: item.userId })}
-                        >
-                          Revoke
-                        </Button>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                  {access.data?.length === 0 ? (
-                    <Table.Tr>
-                      <Table.Td colSpan={4}>
-                        <Text c="dimmed">No users currently have access.</Text>
-                      </Table.Td>
-                    </Table.Tr>
-                  ) : null}
-                </Table.Tbody>
-              </Table>
-            </Stack>
-          </Paper>
-        </div>
-      </Stack>
-    </main>
+        <DataTableShell
+          title="Active access"
+          description="Review active grants and revoke access when a student should no longer watch this course."
+        >
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>User</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Granted</Table.Th>
+                <Table.Th />
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {access.data?.map((item) => (
+                <Table.Tr key={item.id}>
+                  <Table.Td>{item.userName}</Table.Td>
+                  <Table.Td>{item.userEmail}</Table.Td>
+                  <Table.Td>{new Date(item.grantedAt).toLocaleDateString()}</Table.Td>
+                  <Table.Td className="pc-table-action">
+                    <Button
+                      color="red"
+                      size="xs"
+                      variant="light"
+                      loading={revokeAccess.isPending}
+                      onClick={() => revokeAccess.mutate({ courseId, userId: item.userId })}
+                    >
+                      Revoke
+                    </Button>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+              {access.data?.length === 0 ? (
+                <Table.Tr>
+                  <Table.Td colSpan={4}>
+                    <Text c="dimmed">No users currently have access.</Text>
+                  </Table.Td>
+                </Table.Tr>
+              ) : null}
+            </Table.Tbody>
+          </Table>
+        </DataTableShell>
+      </div>
+    </PageShell>
   );
 }

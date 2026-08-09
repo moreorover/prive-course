@@ -1,15 +1,4 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Group,
-  Paper,
-  Stack,
-  Table,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Badge, Button, Group, Table, Text, Tooltip } from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -17,6 +6,7 @@ import { toast } from "sonner";
 
 import { CourseForm, type CourseFormValue } from "@/components/course-form";
 import { EmptyState } from "@/components/empty-state";
+import { DataTableShell, PageHeader, PageShell, StatusBadge, Surface } from "@/components/ui";
 import { queryClient, trpc } from "@/utils/trpc";
 
 function courseQueryOptions(courseId: string) {
@@ -36,6 +26,14 @@ export const Route = createFileRoute("/_auth/admin/courses/$courseId/")({
     ]);
   },
 });
+
+function courseStatusBadge(status: string) {
+  if (status === "published" || status === "draft" || status === "archived") {
+    return <StatusBadge status={status} />;
+  }
+
+  return <Badge variant="light">{status}</Badge>;
+}
 
 function EditCourseRoute() {
   const { courseId } = Route.useParams();
@@ -97,47 +95,44 @@ function EditCourseRoute() {
   }
 
   return (
-    <main className="pc-page">
-      <Stack gap="xl">
-        <Link to="/admin">
-          <Button variant="subtle">Back to courses</Button>
-        </Link>
+    <PageShell size="wide">
+      <PageHeader
+        eyebrow="Course operations"
+        title={course.data?.title ?? "Edit course"}
+        description="Update catalog metadata, manage lesson order, and open the access controls for this course."
+        backTo={{ to: "/admin", label: "Back to admin" }}
+        actions={
+          <Link to="/admin/courses/$courseId/access" params={{ courseId }}>
+            <Button variant="light">Manage access</Button>
+          </Link>
+        }
+      />
 
-        {course.data ? (
-          <>
-            <Group justify="flex-end">
-              <Link to="/admin/courses/$courseId/access" params={{ courseId }}>
-                <Button variant="light">Manage access</Button>
+      {course.data ? (
+        <div className="pc-admin-stack">
+          <CourseForm
+            title="Edit course"
+            submitLabel="Save changes"
+            isSubmitting={updateCourse.isPending}
+            initialValue={{
+              title: course.data.title,
+              slug: course.data.slug,
+              description: course.data.description ?? "",
+              status: course.data.status,
+            }}
+            onSubmit={(value: CourseFormValue) => updateCourse.mutate({ id: courseId, ...value })}
+          />
+
+          <DataTableShell
+            title="Lessons"
+            description="Create lesson shells, control order, and open each lesson to manage protected video."
+            actions={
+              <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
+                <Button>New lesson</Button>
               </Link>
-            </Group>
-
-            <CourseForm
-              title="Edit course"
-              submitLabel="Save changes"
-              isSubmitting={updateCourse.isPending}
-              initialValue={{
-                title: course.data.title,
-                slug: course.data.slug,
-                description: course.data.description ?? "",
-                status: course.data.status,
-              }}
-              onSubmit={(value: CourseFormValue) => updateCourse.mutate({ id: courseId, ...value })}
-            />
-
-            <Stack gap="md">
-              <Group justify="space-between" align="center">
-                <div>
-                  <Title order={2} size="h4">
-                    Lessons
-                  </Title>
-                  <Text c="dimmed">Create and edit lessons for this course.</Text>
-                </div>
-                <Link to="/admin/courses/$courseId/lessons/new" params={{ courseId }}>
-                  <Button>New lesson</Button>
-                </Link>
-              </Group>
-
-              {lessons.data?.length === 0 ? (
+            }
+            empty={
+              lessons.data?.length === 0 ? (
                 <EmptyState
                   title="No lessons yet"
                   description="Add the first lesson, upload a video, then publish it when it is ready."
@@ -147,81 +142,76 @@ function EditCourseRoute() {
                     </Link>
                   }
                 />
-              ) : (
-                <Paper withBorder p="lg" className="pc-panel">
-                  <Table striped highlightOnHover>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>#</Table.Th>
-                        <Table.Th>Order</Table.Th>
-                        <Table.Th>Title</Table.Th>
-                        <Table.Th>Slug</Table.Th>
-                        <Table.Th>Status</Table.Th>
-                        <Table.Th />
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                      {lessons.data?.map((lesson, index) => (
-                        <Table.Tr key={lesson.id}>
-                          <Table.Td>{lesson.position + 1}</Table.Td>
-                          <Table.Td>
-                            <Group gap="xs" wrap="nowrap">
-                              <Tooltip label="Move up">
-                                <ActionIcon
-                                  aria-label="Move lesson up"
-                                  size="sm"
-                                  variant="subtle"
-                                  disabled={index === 0 || reorderLessons.isPending}
-                                  onClick={() => moveLesson(index, -1)}
-                                >
-                                  <ArrowUp size={16} />
-                                </ActionIcon>
-                              </Tooltip>
-                              <Tooltip label="Move down">
-                                <ActionIcon
-                                  aria-label="Move lesson down"
-                                  size="sm"
-                                  variant="subtle"
-                                  disabled={
-                                    index === (lessons.data?.length ?? 0) - 1 ||
-                                    reorderLessons.isPending
-                                  }
-                                  onClick={() => moveLesson(index, 1)}
-                                >
-                                  <ArrowDown size={16} />
-                                </ActionIcon>
-                              </Tooltip>
-                            </Group>
-                          </Table.Td>
-                          <Table.Td>{lesson.title}</Table.Td>
-                          <Table.Td>{lesson.slug}</Table.Td>
-                          <Table.Td>
-                            <Badge variant="light">{lesson.status}</Badge>
-                          </Table.Td>
-                          <Table.Td>
-                            <Link
-                              to="/admin/courses/$courseId/lessons/$lessonId"
-                              params={{ courseId, lessonId: lesson.id }}
-                            >
-                              <Button size="xs" variant="light">
-                                Edit
-                              </Button>
-                            </Link>
-                          </Table.Td>
-                        </Table.Tr>
-                      ))}
-                    </Table.Tbody>
-                  </Table>
-                </Paper>
-              )}
-            </Stack>
-          </>
-        ) : (
-          <Paper withBorder p="lg" className="pc-panel">
-            <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
-          </Paper>
-        )}
-      </Stack>
-    </main>
+              ) : undefined
+            }
+          >
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Order</Table.Th>
+                  <Table.Th>Title</Table.Th>
+                  <Table.Th>Slug</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                  <Table.Th />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {lessons.data?.map((lesson, index) => (
+                  <Table.Tr key={lesson.id}>
+                    <Table.Td>{lesson.position + 1}</Table.Td>
+                    <Table.Td>
+                      <Group gap="xs" wrap="nowrap">
+                        <Tooltip label="Move up">
+                          <ActionIcon
+                            aria-label="Move lesson up"
+                            size="sm"
+                            variant="subtle"
+                            disabled={index === 0 || reorderLessons.isPending}
+                            onClick={() => moveLesson(index, -1)}
+                          >
+                            <ArrowUp size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label="Move down">
+                          <ActionIcon
+                            aria-label="Move lesson down"
+                            size="sm"
+                            variant="subtle"
+                            disabled={
+                              index === (lessons.data?.length ?? 0) - 1 || reorderLessons.isPending
+                            }
+                            onClick={() => moveLesson(index, 1)}
+                          >
+                            <ArrowDown size={16} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>{lesson.title}</Table.Td>
+                    <Table.Td>{lesson.slug}</Table.Td>
+                    <Table.Td>{courseStatusBadge(lesson.status)}</Table.Td>
+                    <Table.Td className="pc-table-action">
+                      <Link
+                        to="/admin/courses/$courseId/lessons/$lessonId"
+                        params={{ courseId, lessonId: lesson.id }}
+                      >
+                        <Button size="xs" variant="light">
+                          Edit
+                        </Button>
+                      </Link>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </DataTableShell>
+        </div>
+      ) : (
+        <Surface>
+          <Text c="dimmed">{course.isLoading ? "Loading course..." : "Course unavailable."}</Text>
+        </Surface>
+      )}
+    </PageShell>
   );
 }

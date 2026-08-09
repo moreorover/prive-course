@@ -21,11 +21,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
     meta: [
       {
-        title: "prive-course",
+        title: "priauginimas.lt",
       },
       {
         name: "description",
-        content: "prive-course is a web application",
+        content: "Beauty video courses from priauginimas.lt",
       },
     ],
     links: [
@@ -39,24 +39,24 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 const theme = createTheme({
   defaultRadius: "sm",
-  primaryColor: "gold",
+  primaryColor: "atelier",
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
   headings: {
     fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-    fontWeight: "720",
+    fontWeight: "760",
   },
   colors: {
-    gold: [
-      "#fff8e1",
-      "#f7e8b5",
-      "#ecd47e",
-      "#dfbf48",
-      "#d5a73d",
-      "#bd8f31",
-      "#946b25",
-      "#6d4d1d",
-      "#493315",
-      "#281b0b",
+    atelier: [
+      "#f8eee7",
+      "#ecd9cd",
+      "#d9b79f",
+      "#c99474",
+      "#b77856",
+      "#7f4f3b",
+      "#6c4030",
+      "#553126",
+      "#3b211a",
+      "#24130f",
     ],
   },
   components: {
@@ -66,6 +66,26 @@ const theme = createTheme({
       },
     },
     Paper: {
+      defaultProps: {
+        radius: "md",
+      },
+    },
+    TextInput: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    PasswordInput: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    Textarea: {
+      defaultProps: {
+        radius: "sm",
+      },
+    },
+    Select: {
       defaultProps: {
         radius: "sm",
       },
@@ -78,7 +98,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <MantineProvider defaultColorScheme="auto" theme={theme}>
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        <div className="pc-app-root">
           <Header />
           <Outlet />
         </div>

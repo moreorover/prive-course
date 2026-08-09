@@ -1,19 +1,11 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Badge, Button, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Crown, PlayCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { PageShell } from "@/components/ui";
+import { getCourseOffer } from "@/features/marketing/course-offers";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
@@ -29,85 +21,62 @@ function CoursesRoute() {
   const courses = useQuery(publishedCoursesQueryOptions);
 
   return (
-    <main className="pc-page">
-      <Stack gap={48}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-          <Stack gap="md">
-            <Badge color="gold" variant="light" w="fit-content">
-              Course catalog
-            </Badge>
-            <Title order={1} size="3.25rem" lh={1.02}>
-              Choose your next private course
-            </Title>
-            <Text c="dimmed" size="lg" maw={720}>
-              Browse published courses, inspect the lesson outline, and start with free previews
-              before signing in for full access.
-            </Text>
-          </Stack>
-          <Paper withBorder p="lg" className="pc-panel">
-            <Stack gap="sm">
-              <Group gap="sm">
-                <ThemeIcon color="gold" variant="light">
-                  <Crown size={18} />
-                </ThemeIcon>
-                <Text fw={700}>Private learning catalog</Text>
-              </Group>
-              <Text c="dimmed" size="sm">
-                Courses are curated for controlled access, protected playback, and clear preview
-                paths.
-              </Text>
-            </Stack>
-          </Paper>
+    <PageShell size="wide">
+      <section className="pc-catalog">
+        <div className="pc-catalog__intro">
+          <Text className="pc-eyebrow">Courses</Text>
+          <Title order={1}>
+            Deep-dive into practical beauty skills with focused video courses.
+          </Title>
+          <Text c="dimmed" size="lg">
+            Choose the course path that fits the next step in your services or content strategy.
+            Basic + Pro includes the Basic extension foundation.
+          </Text>
         </div>
 
         {courses.data?.length === 0 ? (
           <EmptyState
-            title="No courses yet"
-            description="Courses will appear here when they are available."
+            title="Course releases are being prepared"
+            description="Published courses will appear here as enrollment windows open."
           />
-        ) : null}
+        ) : (
+          <div className="pc-catalog-list">
+            {courses.data?.map((course, index) => {
+              const offer = getCourseOffer(course);
 
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-          {courses.data?.map((course) => (
-            <Paper
-              key={course.id}
-              withBorder
-              p="xl"
-              className="pc-panel"
-              style={{ borderTop: "3px solid var(--pc-accent)" }}
-            >
-              <Stack gap="lg">
-                <Group justify="space-between" align="start" gap="md" wrap="nowrap">
-                  <Stack gap={4}>
-                    <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                      Private course
-                    </Text>
-                    <Title order={2} size="h3">
-                      {course.title}
-                    </Title>
-                  </Stack>
-                </Group>
-                <Text c="dimmed" lineClamp={3}>
-                  {course.description || "No description yet."}
-                </Text>
-                <Group gap="xs">
-                  <Badge leftSection={<BookOpen size={12} />} color="gray" variant="light">
-                    Course details
-                  </Badge>
-                  <Badge leftSection={<PlayCircle size={12} />} color="gold" variant="light">
-                    Free previews where available
-                  </Badge>
-                </Group>
-                <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button variant="light" color="gold" fullWidth>
-                    View course
-                  </Button>
-                </Link>
-              </Stack>
-            </Paper>
-          ))}
-        </SimpleGrid>
-      </Stack>
-    </main>
+              return (
+                <article
+                  className={`pc-catalog-course pc-catalog-course--${offer.emphasis}`}
+                  key={course.id}
+                >
+                  <div className="pc-catalog-course__media" aria-hidden="true">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div className="pc-catalog-course__body">
+                    <div className="pc-catalog-course__meta">
+                      <Badge variant={offer.emphasis === "primary" ? "filled" : "light"}>
+                        {offer.emphasis === "primary" ? "Featured path" : "Available"}
+                      </Badge>
+                      <span>#{offer.id.replaceAll("-", " #")}</span>
+                    </div>
+                    <Title order={2}>{course.title}</Title>
+                    <Text c="dimmed">{course.description || offer.summary}</Text>
+                    <Text className="pc-catalog-course__access">{offer.accessNote}</Text>
+                    <div className="pc-catalog-course__actions">
+                      <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
+                        <Button rightSection={<ArrowRight size={16} />}>Start Learning</Button>
+                      </Link>
+                      <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
+                        <Button variant="subtle">Course Details</Button>
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </PageShell>
   );
 }

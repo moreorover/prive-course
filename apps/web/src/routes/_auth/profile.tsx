@@ -1,7 +1,7 @@
-import { Stack, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { PageHeader, PageShell } from "@/components/ui";
 import { AccountSection } from "@/features/profile/account-section";
 import { loadSessions } from "@/features/profile/auth-profile";
 import { PasskeysSection } from "@/features/profile/passkeys-section";
@@ -22,20 +22,24 @@ function ProfileRoute() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
-      <Stack gap="lg">
-        <div>
-          <Title order={1}>Profile</Title>
-          <Text c="dimmed">{session.data?.user.email}</Text>
-        </div>
-
+    <PageShell>
+      <PageHeader
+        eyebrow="Account workspace"
+        title="Profile and security"
+        description={
+          session.data?.user.email
+            ? `${session.data.user.email} controls course access, passkeys, passwords, and active sessions.`
+            : "Manage your Product Atelier account security."
+        }
+      />
+      <div className="pc-profile-stack">
         {session.data ? (
           <AccountSection session={session.data} onRefetch={session.refetch} />
         ) : null}
         <PasswordSection onSessionsChanged={sessions.refetch} />
         <PasskeysSection data={passkeys.data ?? []} onRefetch={passkeys.refetch} />
         <SessionsSection data={sessions.data ?? []} onRefetch={sessions.refetch} />
-      </Stack>
-    </main>
+      </div>
+    </PageShell>
   );
 }

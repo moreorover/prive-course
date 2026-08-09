@@ -1,12 +1,14 @@
-import { Button, SimpleGrid, Stack, Text, TextInput, Title } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { Badge, Button, Text, Title } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, AtSign, Mail, Phone } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowRight, Mail, Sparkles } from "lucide-react";
 
-import { EmptyState } from "@/components/empty-state";
-import { CourseCard, FormSection, PageHeader, PageShell, StatusBadge } from "@/components/ui";
+import { CourseLadder } from "@/features/marketing/course-ladder";
+import { COURSE_OFFERS, OUTCOME_POINTS } from "@/features/marketing/course-offers";
+import { FinalCta } from "@/features/marketing/final-cta";
+import { OfferDetailBlocks } from "@/features/marketing/offer-detail-blocks";
+import { PlatformTrust } from "@/features/marketing/platform-trust";
+import { SubscribeForm } from "@/features/marketing/subscribe-form";
 import { trpc } from "@/utils/trpc";
 
 const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
@@ -20,142 +22,106 @@ export const Route = createFileRoute("/")({
 
 function HomeComponent() {
   const courses = useQuery(publishedCoursesQueryOptions);
-  const courseCards = courses.data ?? [];
-  const featuredCourse = courseCards[0];
-  const visibleCourses = courseCards.slice(0, 4);
-  const form = useForm({
-    initialValues: {
-      email: "",
-      fullName: "",
-      instagram: "",
-      phone: "",
-    },
-    validate: {
-      email: (value) =>
-        /^\S+@\S+\.\S+$/.test(value.trim()) ? null : "Enter a valid email address",
-    },
-  });
+  const publishedCourseCount = courses.data?.length ?? 0;
 
   return (
-    <PageShell>
-      <div className="pc-home-layout">
-        <section className="pc-home-hero">
-          <div className="pc-home-hero__copy">
-            <Title order={1}>Private beauty courses, taught with care.</Title>
-            <Text c="dimmed" size="lg" maw={620}>
-              Learn protected salon techniques through focused lessons, clear previews, and
-              access-managed course libraries.
-            </Text>
-            <div className="pc-home-hero__actions">
-              <Link to="/courses">
-                <Button size="md" rightSection={<ArrowRight size={18} />}>
-                  View courses
-                </Button>
-              </Link>
-              <a href="#updates">
-                <Button size="md" variant="light" leftSection={<Mail size={18} />}>
-                  Course updates
-                </Button>
-              </a>
+    <main className="pc-home-page">
+      <div className="pc-page-shell pc-page-shell--wide">
+        <div className="pc-home-layout">
+          <section className="pc-home-hero">
+            <div className="pc-home-hero__copy">
+              <Badge variant="light" size="lg" leftSection={<Sparkles size={15} />}>
+                Private beauty business courses
+              </Badge>
+              <Title order={1}>Build sharper beauty services.</Title>
+              <Text c="dimmed" size="xl" maw={680}>
+                Product Atelier brings hair extension technique and social media strategy into one
+                private learning system for stylists ready to raise the quality, value, and
+                visibility of their work.
+              </Text>
+              <div className="pc-home-hero__actions">
+                <Link to="/courses">
+                  <Button size="md" rightSection={<ArrowRight size={18} />}>
+                    View courses
+                  </Button>
+                </Link>
+                <a href="#updates">
+                  <Button size="md" variant="light" leftSection={<Mail size={18} />}>
+                    Get updates
+                  </Button>
+                </a>
+              </div>
             </div>
-          </div>
 
-          {featuredCourse ? (
-            <CourseCard
-              variant="featured"
-              title={featuredCourse.title}
-              description={featuredCourse.description}
-              href="/courses/$courseSlug"
-              params={{ courseSlug: featuredCourse.slug }}
-              actionLabel="Open course"
-              meta={<StatusBadge status="preview" />}
-            />
-          ) : (
-            <EmptyState
-              title="New classes are being prepared"
-              description="Published courses will appear here when they are ready."
-            />
-          )}
-        </section>
+            <aside className="pc-home-hero__panel" aria-label="Product Atelier course paths">
+              <div className="pc-home-hero__panel-header">
+                <div>
+                  <Text className="pc-eyebrow">Three-course system</Text>
+                  <Title order={2}>Technique first. Strategy next.</Title>
+                </div>
+                <Badge variant="outline">{publishedCourseCount || 3} courses</Badge>
+              </div>
 
-        <section>
-          <PageHeader
-            title="Available courses"
-            description="A focused course library for private salon training."
-          />
-          {courseCards.length === 0 ? (
-            <EmptyState
-              title="No courses yet"
-              description="The course menu will open as soon as the first class is published."
-            />
-          ) : (
-            <div className="pc-course-grid">
-              {visibleCourses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  title={course.title}
-                  description={course.description}
-                  href="/courses/$courseSlug"
-                  params={{ courseSlug: course.slug }}
-                  actionLabel="Open course"
-                  meta={<StatusBadge status="preview" />}
-                />
+              <div className="pc-home-hero__mini-ladder">
+                {COURSE_OFFERS.map((offer, index) => (
+                  <article
+                    className={`pc-home-hero__mini-course pc-home-hero__mini-course--${offer.emphasis}`}
+                    key={offer.id}
+                  >
+                    <span className="pc-home-hero__mini-index">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <Text fw={800}>{offer.shortTitle}</Text>
+                      <Text data-dimmed size="sm">
+                        {offer.accessNote}
+                      </Text>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </aside>
+          </section>
+
+          <CourseLadder />
+
+          <section className="pc-marketing-section pc-outcomes">
+            <div className="pc-marketing-section__header">
+              <Text className="pc-eyebrow">What this helps you change</Text>
+              <Title order={2}>Skill is only useful when it becomes a clear offer.</Title>
+              <Text c="dimmed" size="lg">
+                These courses are structured around practical progress: better services, stronger
+                client confidence, and content that makes your work easier to find.
+              </Text>
+            </div>
+            <div className="pc-outcomes__list">
+              {OUTCOME_POINTS.map((point) => (
+                <article className="pc-outcome" key={point.title}>
+                  <Title order={3}>{point.title}</Title>
+                  <Text c="dimmed">{point.description}</Text>
+                </article>
               ))}
             </div>
-          )}
-        </section>
+          </section>
 
-        <section id="updates">
-          <FormSection
-            title="Get course updates"
-            description="Leave your details for new course releases and studio updates."
-          >
-            <form
-              onSubmit={form.onSubmit(() => {
-                toast.success("Thank you, your details have been added for course updates.");
-                form.reset();
-              })}
-            >
-              <Stack gap="md">
-                <TextInput
-                  label="Email"
-                  placeholder="you@example.com"
-                  type="email"
-                  leftSection={<Mail size={16} />}
-                  key={form.key("email")}
-                  {...form.getInputProps("email")}
-                />
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                  <TextInput
-                    label="Full name"
-                    placeholder="Your name"
-                    key={form.key("fullName")}
-                    {...form.getInputProps("fullName")}
-                  />
-                  <TextInput
-                    label="Instagram"
-                    placeholder="@yourhandle"
-                    leftSection={<AtSign size={16} />}
-                    key={form.key("instagram")}
-                    {...form.getInputProps("instagram")}
-                  />
-                </SimpleGrid>
-                <TextInput
-                  label="Phone"
-                  placeholder="+370"
-                  type="tel"
-                  leftSection={<Phone size={16} />}
-                  key={form.key("phone")}
-                  {...form.getInputProps("phone")}
-                />
-                <Button type="submit" size="md">
-                  Join the list
-                </Button>
-              </Stack>
-            </form>
-          </FormSection>
-        </section>
+          <OfferDetailBlocks />
+
+          <section className="pc-subscribe" id="updates">
+            <div>
+              <Text className="pc-eyebrow">Stay close to new releases</Text>
+              <Title order={2}>Get course updates before the next enrollment window.</Title>
+              <Text c="dimmed" size="lg">
+                Join the Product Atelier update list for course release notes, private access
+                windows, and new lesson announcements.
+              </Text>
+            </div>
+            <SubscribeForm />
+          </section>
+
+          <PlatformTrust />
+          <FinalCta />
+        </div>
       </div>
-    </PageShell>
+    </main>
   );
 }

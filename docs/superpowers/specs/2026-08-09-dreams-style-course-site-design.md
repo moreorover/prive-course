@@ -48,15 +48,24 @@ Purpose: help the visitor choose one course path.
 
 Structure:
 
-- Short page intro.
-- Three course entries:
-  - Hair Extensions Course - Basic.
-  - Hair Extensions Course - Basic + Pro.
-  - Social Media Marketing Strategy.
+- Dark, focused course catalog similar to Dreams of Code.
+- Short page intro: “Deep-dive into practical beauty skills with focused video courses.”
+- Three media-backed course cards with:
+  - Course image or image slot.
+  - Availability or emphasis label.
+  - Course title.
+  - One-sentence description.
+  - Topic tags.
+  - Primary action: `Start Learning`.
+  - Secondary action: `Course Details`.
 - Basic + Pro should be visibly marked as the expanded extension path and should say that it includes Basic.
 - Each entry links to the course page.
 
-Avoid a generic three-card grid if the cards all have equal weight.
+Avoid:
+
+- Equal-weight generic cards with only text.
+- Old course-list structure with header, cards, and repeated dashboard styling.
+- Catalog filters or marketplace controls.
 
 ### Individual Course Page
 
@@ -64,14 +73,22 @@ Purpose: explain one course before the lesson list.
 
 Structure:
 
-- Course title.
-- Teacher framing.
-- What this course teaches.
-- Who it is for.
-- Lesson outline.
-- Access or preview CTA.
+- Large course media banner at the top.
+- Availability label and topic tags near the course title.
+- Course title and direct description.
+- Primary action: `Start Learning`.
+- Secondary action: `Back to Courses`.
+- Article-like sections:
+  - What this course teaches.
+  - Who it is for.
+  - Course contents.
+- Course contents should feel like the Dreams of Code course detail pattern, not a lesson table with an access summary card.
 
-The course page should not look like a SaaS product detail page with platform metrics.
+The course page should not look like:
+
+- A SaaS product detail page with platform metrics.
+- A two-column “content plus sticky access card” layout.
+- The old `PageHeader` plus lesson list plus side card structure.
 
 ### Lesson Page
 
@@ -80,12 +97,19 @@ Purpose: let the user watch the video and read lesson notes.
 Structure:
 
 - Compact course and lesson context.
-- Video player as the primary surface.
-- Lesson description or notes below the video.
-- Simple lesson list and previous/next navigation.
+- Video player as the dominant full-width surface.
+- Lesson description or notes directly below the video, like a course article.
+- Next lesson block below the notes.
+- Compact course contents strip below the main content.
 - Locked state when access is missing.
 
 The lesson page should feel like a quiet learning view, not a marketing page.
+
+Avoid:
+
+- Persistent right sidebar card competing with the video.
+- Repeating previous/next controls above and below the player.
+- Dashboard-like lesson queue panels on the public learning surface.
 
 ## Content Boundaries
 

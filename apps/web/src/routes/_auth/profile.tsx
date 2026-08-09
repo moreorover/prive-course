@@ -24,8 +24,13 @@ function ProfileRoute() {
   return (
     <PageShell>
       <PageHeader
-        title="Profile"
-        description={session.data?.user.email ?? "Manage your account security."}
+        eyebrow="Account workspace"
+        title="Profile and security"
+        description={
+          session.data?.user.email
+            ? `${session.data.user.email} controls course access, passkeys, passwords, and active sessions.`
+            : "Manage your Product Atelier account security."
+        }
       />
       <div className="pc-profile-stack">
         {session.data ? (

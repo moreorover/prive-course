@@ -65,7 +65,10 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
   }
 
   return (
-    <FormSection title="Create account" description="Set up access for private course lessons.">
+    <FormSection
+      title="Create account"
+      description="Set up your private Product Atelier learning workspace."
+    >
       <Stack gap="md">
         <form
           onSubmit={(e) => {
@@ -134,7 +137,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignIn}>
-          Already have an account? Sign in
+          Already have private access? Sign in
         </Button>
       </Stack>
     </FormSection>

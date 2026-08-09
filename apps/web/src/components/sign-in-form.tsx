@@ -73,7 +73,10 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
   }
 
   return (
-    <FormSection title="Welcome back" description="Continue your private course access.">
+    <FormSection
+      title="Welcome back"
+      description="Continue into your Product Atelier course library."
+    >
       <Stack gap="md">
         <Button type="button" fullWidth loading={isPasskeyPending} onClick={signInWithPasskey}>
           {isPasskeyPending ? "Waiting for passkey..." : "Sign in with passkey"}
@@ -132,7 +135,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         </form>
 
         <Button variant="subtle" onClick={onSwitchToSignUp}>
-          Need an account? Sign up
+          Create a private learning account
         </Button>
       </Stack>
     </FormSection>

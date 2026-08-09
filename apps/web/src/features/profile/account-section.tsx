@@ -45,7 +45,10 @@ export function AccountSection({
   }
 
   return (
-    <FormSection title="Account">
+    <FormSection
+      title="Account identity"
+      description="Keep the name attached to your private course profile current."
+    >
       <form onSubmit={form.onSubmit(updateProfile)}>
         <Stack gap="md">
           <TextInput label="Name" key={form.key("name")} {...form.getInputProps("name")} />

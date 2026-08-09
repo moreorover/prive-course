@@ -74,7 +74,7 @@ export function PasskeysSection({
   return (
     <DataTableShell
       title="Passkeys"
-      description="Manage passkeys for this account."
+      description="Use passkeys for fast, secure access to the private course workspace."
       actions={
         <Button loading={isAdding} onClick={createPasskey}>
           Add passkey

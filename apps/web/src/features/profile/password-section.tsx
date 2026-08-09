@@ -49,7 +49,10 @@ export function PasswordSection({
   }
 
   return (
-    <FormSection title="Password">
+    <FormSection
+      title="Password"
+      description="Change your password and revoke other sessions after the update."
+    >
       <form onSubmit={form.onSubmit(changePassword)}>
         <Stack gap="md">
           <PasswordInput

@@ -48,7 +48,7 @@ export function SessionsSection({
   return (
     <DataTableShell
       title="Sessions"
-      description="View and revoke active sessions."
+      description="Review where this account is signed in and revoke anything you do not recognize."
       actions={
         <Button variant="light" onClick={revokeOtherSessions}>
           Revoke other sessions

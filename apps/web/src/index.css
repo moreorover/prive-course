@@ -919,6 +919,43 @@ a:hover {
   margin-block: clamp(1rem, 6vw, 4rem);
 }
 
+.pc-auth-layout {
+  min-height: min(44rem, calc(100dvh - 5rem));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
+  gap: clamp(1.5rem, 6vw, 4rem);
+  align-items: center;
+}
+
+.pc-auth-story {
+  display: grid;
+  gap: 1rem;
+}
+
+.pc-auth-story h1 {
+  max-width: 10ch;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.94;
+  letter-spacing: 0;
+}
+
+.pc-auth-story__points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.pc-auth-story__points .pc-surface {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+}
+
+.pc-auth-story__points svg {
+  color: var(--pc-accent);
+}
+
 .pc-profile-stack {
   display: grid;
   gap: 1rem;
@@ -1007,6 +1044,7 @@ a:hover {
 
 @media (max-width: 64rem) {
   .pc-home-hero,
+  .pc-auth-layout,
   .pc-ladder,
   .pc-outcomes,
   .pc-offer,
@@ -1033,6 +1071,10 @@ a:hover {
   .pc-final-cta__actions,
   .pc-ladder__action {
     justify-content: flex-start;
+  }
+
+  .pc-auth-story h1 {
+    max-width: 12ch;
   }
 
   .pc-lesson-sidebar {
@@ -1063,6 +1105,10 @@ a:hover {
   .pc-home-hero__actions a,
   .pc-home-hero__actions button {
     width: 100%;
+  }
+
+  .pc-auth-story__points {
+    grid-template-columns: 1fr;
   }
 
   .pc-course-grid {

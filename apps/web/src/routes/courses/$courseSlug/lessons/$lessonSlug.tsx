@@ -1,4 +1,5 @@
-import { Badge, Button, Text, Title } from "@mantine/core";
+import { AppShell, Badge, Burger, Button, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, type ErrorComponentProps } from "@tanstack/react-router";
 import { ArrowLeft, LockKeyhole } from "lucide-react";
@@ -75,77 +76,108 @@ function LessonError({ error }: ErrorComponentProps) {
 function LessonRoute() {
   const { courseSlug, lessonSlug } = Route.useParams();
   const lesson = useQuery(lessonQueryOptions(courseSlug, lessonSlug));
+  const [navbarOpened, { close: closeNavbar, toggle: toggleNavbar }] = useDisclosure(false);
 
   return (
     <PageShell size="full" tone="player">
       {lesson.data ? (
-        <div className="pc-learning-workspace">
-          <section className="pc-learning-stage">
-            <div className="pc-learning-rail">
-              <Link to="/courses/$courseSlug" params={{ courseSlug }} className="pc-back-link">
-                <ArrowLeft size={16} aria-hidden="true" />
-                <span>Back to course</span>
-              </Link>
-              <div className="pc-learning-rail__content">
-                <div>
-                  <Text className="pc-eyebrow">Learning workspace</Text>
-                  <Title order={1}>{lesson.data.lesson.title}</Title>
-                  <Text c="dimmed">{lesson.data.course.title}</Text>
-                </div>
-                <div className="pc-learning-rail__meta">
-                  {lesson.data.lesson.isFree ? (
-                    <Badge color="green" variant="light">
-                      Free preview
-                    </Badge>
-                  ) : (
-                    <Badge variant="light">Protected playback</Badge>
-                  )}
-                </div>
-              </div>
-            </div>
+        <AppShell
+          className="pc-learning-appshell"
+          navbar={{
+            width: 340,
+            breakpoint: "md",
+            collapsed: { mobile: !navbarOpened },
+          }}
+          padding={0}
+        >
+          <AppShell.Navbar p="md" className="pc-learning-navbar">
+            <LessonList
+              courseSlug={courseSlug}
+              lessons={lesson.data.navigation.lessons}
+              onNavigate={closeNavbar}
+            />
+          </AppShell.Navbar>
 
-            <div className="pc-learning-stage__panel">
-              <div className="pc-learning-stage__header">
-                <div>
-                  <Text className="pc-eyebrow">Lesson player</Text>
-                  <Text c="dimmed" size="sm">
-                    Watch inside the private Product Atelier workspace.
-                  </Text>
-                </div>
-                <div className="pc-learning-stage__nav">
-                  <LessonNavControls
-                    courseSlug={courseSlug}
-                    previousLesson={lesson.data.navigation.previousLesson}
-                    nextLesson={lesson.data.navigation.nextLesson}
+          <AppShell.Main className="pc-learning-main">
+            <section className="pc-learning-stage">
+              <div className="pc-learning-rail">
+                <Link to="/courses/$courseSlug" params={{ courseSlug }} className="pc-back-link">
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>Back to course</span>
+                </Link>
+                <div className="pc-learning-rail__content">
+                  <Burger
+                    aria-label="Toggle lesson list"
+                    hiddenFrom="md"
+                    onClick={toggleNavbar}
+                    opened={navbarOpened}
+                    size="sm"
                   />
+                  <div>
+                    <Text className="pc-eyebrow">Learning workspace</Text>
+                    <Title order={1}>{lesson.data.lesson.title}</Title>
+                    <Text c="dimmed">{lesson.data.course.title}</Text>
+                  </div>
+                  <div className="pc-learning-rail__meta">
+                    {lesson.data.lesson.isFree ? (
+                      <Badge color="green" variant="light">
+                        Free preview
+                      </Badge>
+                    ) : (
+                      <Badge variant="light">Protected playback</Badge>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <LessonPlayer
-                key={lesson.data.lesson.id}
-                lessonId={lesson.data.lesson.id}
-                videoUid={lesson.data.lesson.videoUid}
-                durationSeconds={lesson.data.lesson.durationSeconds}
-                initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
-                isCompleted={Boolean(lesson.data.progress?.completedAt)}
-                onProgressSaved={() =>
-                  queryClient.invalidateQueries({
-                    queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
-                  })
-                }
-              />
-            </div>
+              <div className="pc-learning-stage__panel">
+                <div className="pc-learning-stage__header">
+                  <div>
+                    <Text className="pc-eyebrow">Lesson player</Text>
+                    <Text c="dimmed" size="sm">
+                      Watch inside the private Product Atelier workspace.
+                    </Text>
+                  </div>
+                </div>
 
-            {lesson.data.lesson.description ? (
-              <Surface padding="md" className="pc-learning-notes">
-                <Text className="pc-eyebrow">Lesson notes</Text>
-                <Text>{lesson.data.lesson.description}</Text>
+                <LessonPlayer
+                  key={lesson.data.lesson.id}
+                  lessonId={lesson.data.lesson.id}
+                  videoUid={lesson.data.lesson.videoUid}
+                  durationSeconds={lesson.data.lesson.durationSeconds}
+                  initialProgressSeconds={lesson.data.progress?.progressSeconds ?? 0}
+                  isCompleted={Boolean(lesson.data.progress?.completedAt)}
+                  onProgressSaved={() =>
+                    queryClient.invalidateQueries({
+                      queryKey: trpc.courses.lessonBySlug.queryKey({ courseSlug, lessonSlug }),
+                    })
+                  }
+                />
+              </div>
+
+              {lesson.data.lesson.description ? (
+                <Surface padding="md" className="pc-learning-notes">
+                  <Text className="pc-eyebrow">Lesson notes</Text>
+                  <Text>{lesson.data.lesson.description}</Text>
+                </Surface>
+              ) : null}
+
+              <Surface padding="md" className="pc-learning-next">
+                <div>
+                  <Text className="pc-eyebrow">Next step</Text>
+                  <Title order={2} size="h3">
+                    Continue through the course
+                  </Title>
+                </div>
+                <LessonNavControls
+                  courseSlug={courseSlug}
+                  previousLesson={lesson.data.navigation.previousLesson}
+                  nextLesson={lesson.data.navigation.nextLesson}
+                />
               </Surface>
-            ) : null}
-          </section>
-
-          <LessonList courseSlug={courseSlug} lessons={lesson.data.navigation.lessons} />
-        </div>
+            </section>
+          </AppShell.Main>
+        </AppShell>
       ) : (
         <Surface>
           <Text c="dimmed">{lesson.isLoading ? "Loading lesson..." : "Lesson unavailable."}</Text>

@@ -16,11 +16,6 @@ export type OutcomePoint = {
   description: string;
 };
 
-export type PlatformTrustPoint = {
-  title: string;
-  description: string;
-};
-
 export const COURSE_OFFERS: CourseOffer[] = [
   {
     id: "extensions-basic",
@@ -71,6 +66,20 @@ export const COURSE_OFFERS: CourseOffer[] = [
   },
 ];
 
+export function getCourseOffer(course: { slug?: string; title: string }) {
+  const normalized = `${course.slug ?? ""} ${course.title}`.toLowerCase();
+
+  if (normalized.includes("pro")) {
+    return COURSE_OFFERS.find((offer) => offer.id === "extensions-pro") ?? COURSE_OFFERS[1];
+  }
+
+  if (normalized.includes("social") || normalized.includes("marketing")) {
+    return COURSE_OFFERS.find((offer) => offer.id === "social-strategy") ?? COURSE_OFFERS[2];
+  }
+
+  return COURSE_OFFERS.find((offer) => offer.id === "extensions-basic") ?? COURSE_OFFERS[0];
+}
+
 export const OUTCOME_POINTS: OutcomePoint[] = [
   {
     title: "Build service confidence",
@@ -86,21 +95,5 @@ export const OUTCOME_POINTS: OutcomePoint[] = [
     title: "Create demand online",
     description:
       "Turn salon skill into content that makes the offer visible before a client books.",
-  },
-];
-
-export const PLATFORM_TRUST_POINTS: PlatformTrustPoint[] = [
-  {
-    title: "Private course access",
-    description: "Students see only the courses granted to their account.",
-  },
-  {
-    title: "Protected lesson playback",
-    description:
-      "Lessons stay inside the private learning experience instead of public file links.",
-  },
-  {
-    title: "Focused learning library",
-    description: "Granted courses, lessons, and progress live in one clean student workspace.",
   },
 ];

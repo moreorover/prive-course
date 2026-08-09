@@ -1,4 +1,3 @@
-export * from "./course-card";
 export * from "./data-table-shell";
 export * from "./form-section";
 export * from "./lesson-row";

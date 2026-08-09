@@ -11,6 +11,7 @@ export type LessonRowProps = {
   className?: string;
   href?: LinkProps["to"];
   meta?: ReactNode;
+  onClick?: () => void;
   params?: LinkProps["params"];
   position: number;
   status: ProductStatus;
@@ -22,6 +23,7 @@ export function LessonRow({
   className,
   href,
   meta,
+  onClick,
   params,
   position,
   status,
@@ -52,7 +54,7 @@ export function LessonRow({
   );
 
   return href ? (
-    <Link to={href} params={params} className="pc-lesson-row-link">
+    <Link to={href} params={params} className="pc-lesson-row-link" onClick={onClick}>
       {row}
     </Link>
   ) : (

@@ -2,7 +2,7 @@ import { Badge, Button, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { LessonRow, Surface } from "@/components/ui";
+import { LessonRow } from "@/components/ui";
 
 export type NavigationLesson = {
   id: string;
@@ -18,17 +18,19 @@ export type NavigationLesson = {
 export function LessonList({
   courseSlug,
   lessons,
+  onNavigate,
 }: {
   courseSlug: string;
   lessons: NavigationLesson[];
+  onNavigate?: () => void;
 }) {
   return (
-    <Surface padding="md" className="pc-lesson-sidebar pc-lesson-queue">
+    <nav className="pc-lesson-sidebar pc-lesson-queue" aria-label="Course lessons">
       <div className="pc-lesson-sidebar__header">
         <div>
-          <Text className="pc-eyebrow">Learning queue</Text>
+          <Text className="pc-eyebrow">Course lessons</Text>
           <Title order={2} size="h4">
-            Course lessons
+            All lessons
           </Title>
         </div>
         <Badge variant="light">{lessons.length}</Badge>
@@ -50,6 +52,7 @@ export function LessonList({
                 ? undefined
                 : "/courses/$courseSlug/lessons/$lessonSlug"
             }
+            onClick={navigationLesson.accessState === "locked" ? undefined : onNavigate}
             params={
               navigationLesson.accessState === "locked"
                 ? undefined
@@ -59,7 +62,7 @@ export function LessonList({
           />
         ))}
       </div>
-    </Surface>
+    </nav>
   );
 }
 

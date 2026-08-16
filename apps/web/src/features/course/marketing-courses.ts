@@ -2,7 +2,7 @@ export type MarketingCourse = {
   description: string;
   duration: string;
   imageClass: string;
-  isComingSoon?: boolean;
+  isAvailable: boolean;
   lessonCount: number;
   level: string;
   lessons: Array<{
@@ -10,6 +10,7 @@ export type MarketingCourse = {
     duration: string;
     title: string;
   }>;
+  price: string;
   slug: string;
   title: string;
 };
@@ -20,6 +21,7 @@ export const marketingCourses = [
       "Build a clear foundation in consultations, sectioning, placement, blending, maintenance, and finishing.",
     duration: "6 hours",
     imageClass: "pc-thumb-fundamentals",
+    isAvailable: true,
     lessonCount: 36,
     level: "Beginner",
     lessons: [
@@ -39,6 +41,7 @@ export const marketingCourses = [
         title: "Blend and styling finish",
       },
     ],
+    price: "$299",
     slug: "hair-extensions-fundamentals",
     title: "Hair Extensions Fundamentals",
   },
@@ -47,6 +50,7 @@ export const marketingCourses = [
       "Refine mapping, clean paneling, comfortable placement, move-ups, removal, and natural blend strategy.",
     duration: "4.5 hours",
     imageClass: "pc-thumb-tape",
+    isAvailable: true,
     lessonCount: 28,
     level: "Intermediate",
     lessons: [
@@ -66,6 +70,7 @@ export const marketingCourses = [
         title: "Move-ups and removal",
       },
     ],
+    price: "$249",
     slug: "tape-in-extensions-masterclass",
     title: "Tape-In Extensions Masterclass",
   },
@@ -74,7 +79,7 @@ export const marketingCourses = [
       "Guide clients through expectations, home care, maintenance timing, and long-term extension health.",
     duration: "3 hours",
     imageClass: "pc-thumb-aftercare",
-    isComingSoon: true,
+    isAvailable: false,
     lessonCount: 18,
     level: "All levels",
     lessons: [
@@ -94,6 +99,7 @@ export const marketingCourses = [
         title: "Maintenance planning",
       },
     ],
+    price: "$149",
     slug: "client-consultation-and-aftercare",
     title: "Client Consultation and Aftercare",
   },

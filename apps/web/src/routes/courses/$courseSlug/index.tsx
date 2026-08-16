@@ -44,15 +44,21 @@ function CourseDetailRoute() {
             </Title>
             <Text>{course.description}</Text>
             <Group gap="sm">
-              <Link to="/login">
-                <Button
-                  className="pc-button-primary"
-                  leftSection={<PlayCircle size={18} />}
-                  radius="xl"
-                >
-                  Sign in for access
+              {course.isAvailable ? (
+                <Link to="/login">
+                  <Button
+                    className="pc-button-primary"
+                    leftSection={<PlayCircle size={18} />}
+                    radius="xl"
+                  >
+                    Sign in for access
+                  </Button>
+                </Link>
+              ) : (
+                <Button className="pc-button-disabled" disabled radius="xl">
+                  Coming Soon
                 </Button>
-              </Link>
+              )}
               <a className="pc-button-secondary" href="#lessons">
                 View Outline
               </a>
@@ -77,8 +83,12 @@ function CourseDetailRoute() {
               <strong>{course.duration}</strong>
             </div>
             <div className="pc-access-row">
-              <span>Access</span>
-              <strong>Manual grant</strong>
+              <span>Price</span>
+              <strong>{course.price}</strong>
+            </div>
+            <div className="pc-access-row">
+              <span>Availability</span>
+              <strong>{course.isAvailable ? "Available" : "Coming soon"}</strong>
             </div>
           </aside>
         </div>

@@ -35,7 +35,7 @@ function CoursesRoute() {
           {marketingCourses.map((course) => (
             <article
               className={
-                course.isComingSoon ? "pc-course-card pc-course-card-soon" : "pc-course-card"
+                !course.isAvailable ? "pc-course-card pc-course-card-soon" : "pc-course-card"
               }
               key={course.slug}
             >
@@ -44,12 +44,12 @@ function CoursesRoute() {
                 className={`pc-course-thumb ${course.imageClass}`}
                 role="img"
               >
-                {course.isComingSoon ? <span>Coming Soon</span> : null}
+                {!course.isAvailable ? <span>Coming Soon</span> : null}
               </div>
               <div className="pc-course-body">
                 <div className="pc-course-topline">
-                  <Badge className={course.isComingSoon ? "pc-status-soon" : "pc-status-available"}>
-                    {course.isComingSoon ? "Coming Soon" : "Available"}
+                  <Badge className={!course.isAvailable ? "pc-status-soon" : "pc-status-available"}>
+                    {course.isAvailable ? "Available" : "Coming Soon"}
                   </Badge>
                   <span>{course.level}</span>
                 </div>
@@ -64,8 +64,12 @@ function CoursesRoute() {
                     <span>Duration</span>
                     <strong>{course.duration}</strong>
                   </div>
+                  <div>
+                    <span>Price</span>
+                    <strong>{course.price}</strong>
+                  </div>
                 </div>
-                {course.isComingSoon ? (
+                {!course.isAvailable ? (
                   <Button className="pc-button-disabled" disabled fullWidth radius="xl">
                     Notify Me
                   </Button>

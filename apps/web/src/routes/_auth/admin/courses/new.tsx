@@ -27,7 +27,7 @@ function NewCourseRoute() {
   );
 
   return (
-    <main className="pc-page-narrow">
+    <div className="pc-page-narrow">
       <Stack gap="lg">
         <Link to="/admin">
           <Button variant="subtle">Back to courses</Button>
@@ -39,6 +39,6 @@ function NewCourseRoute() {
           onSubmit={(value: CourseFormValue) => createCourse.mutate(value)}
         />
       </Stack>
-    </main>
+    </div>
   );
 }

@@ -89,29 +89,15 @@ a:hover {
   color: var(--pc-muted);
 }
 
-.pc-app-shell {
-  min-height: 100dvh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
 .pc-site-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
   border-bottom: 1px solid var(--pc-border);
+  background: color-mix(in srgb, var(--pc-panel) 88%, transparent);
   backdrop-filter: blur(16px);
 }
 
 .pc-header-inner {
   width: min(100% - 1rem, 73.75rem);
-  min-height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
   margin-inline: auto;
-  padding-block: 0.55rem;
 }
 
 .pc-header-main {
@@ -145,6 +131,10 @@ a:hover {
   font-size: 0.9rem;
 }
 
+.pc-nav-desktop {
+  display: flex;
+}
+
 .pc-nav a {
   text-decoration: none;
 }
@@ -157,6 +147,40 @@ a:hover {
 .pc-nav-button:hover {
   color: var(--pc-text);
   background: var(--pc-smoke);
+}
+
+.pc-mobile-burger {
+  color: var(--pc-text);
+}
+
+.pc-mobile-navbar {
+  background: var(--pc-panel);
+}
+
+.pc-mobile-nav {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pc-mobile-nav a {
+  text-decoration: none;
+}
+
+.pc-mobile-nav .pc-nav-button {
+  width: 100%;
+  min-height: 46px;
+  justify-content: flex-start;
+  border-radius: 0.9rem;
+  padding-inline: 0.85rem;
+  color: var(--pc-text);
+  font-size: 0.98rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.pc-mobile-nav a[aria-current="page"] .pc-nav-button {
+  background: var(--pc-blush);
+  color: var(--pc-accent-strong);
 }
 
 .pc-marketing-page {
@@ -775,9 +799,7 @@ a:hover {
   }
 
   .pc-header-inner {
-    min-height: 62px;
     gap: 0.55rem;
-    padding-block: 0.45rem;
   }
 
   .pc-header-main {
@@ -796,6 +818,10 @@ a:hover {
   .pc-nav-button {
     min-height: 34px;
     padding-inline: 0.44rem;
+  }
+
+  .pc-nav-desktop {
+    display: none;
   }
 
   .pc-header-actions {

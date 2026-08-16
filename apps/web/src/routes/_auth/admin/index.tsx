@@ -18,7 +18,7 @@ function AdminCourses() {
   const courses = useQuery(coursesQueryOptions);
 
   return (
-    <main className="pc-page">
+    <div className="pc-page">
       <Stack gap="xl">
         <Group justify="space-between" align="end">
           <div>
@@ -78,6 +78,6 @@ function AdminCourses() {
           )}
         </Stack>
       </Stack>
-    </main>
+    </div>
   );
 }

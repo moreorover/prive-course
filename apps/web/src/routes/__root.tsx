@@ -1,5 +1,6 @@
-import { MantineProvider, createTheme } from "@mantine/core";
+import { AppShell, MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
+import { useDisclosure } from "@mantine/hooks";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/react-router";
@@ -74,14 +75,33 @@ const theme = createTheme({
 });
 
 function RootComponent() {
+  const [mobileNavOpened, { close: closeMobileNav, toggle: toggleMobileNav }] =
+    useDisclosure(false);
+
   return (
     <>
       <HeadContent />
       <MantineProvider defaultColorScheme="auto" theme={theme}>
-        <div className="pc-app-shell">
-          <Header />
-          <Outlet />
-        </div>
+        <AppShell
+          className="pc-app-shell"
+          header={{ height: { base: 62, sm: 68 } }}
+          navbar={{
+            width: 280,
+            breakpoint: "sm",
+            collapsed: { mobile: !mobileNavOpened, desktop: true },
+          }}
+          padding={0}
+          withBorder={false}
+        >
+          <Header
+            mobileNavOpened={mobileNavOpened}
+            onMobileNavClose={closeMobileNav}
+            onMobileNavToggle={toggleMobileNav}
+          />
+          <AppShell.Main>
+            <Outlet />
+          </AppShell.Main>
+        </AppShell>
         <Toaster richColors />
       </MantineProvider>
       <TanStackRouterDevtools position="bottom-left" />

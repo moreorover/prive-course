@@ -31,7 +31,7 @@ function HomeComponent() {
   const featuredCourse = marketingCourses[0];
 
   return (
-    <main className="pc-marketing-page">
+    <div className="pc-marketing-page">
       <section className="pc-hero pc-section-shell">
         <div className="pc-hero-copy">
           <Badge className="pc-eyebrow" variant="transparent">
@@ -271,6 +271,6 @@ function HomeComponent() {
           </Button>
         </Link>
       </section>
-    </main>
+    </div>
   );
 }

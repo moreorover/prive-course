@@ -60,7 +60,7 @@ function CourseAccessRoute() {
   const activeUserIds = new Set(access.data?.map((item) => item.userId) ?? []);
 
   return (
-    <main className="pc-page">
+    <div className="pc-page">
       <Stack gap="xl">
         <Link to="/admin/courses/$courseId" params={{ courseId }}>
           <Button variant="subtle">Back to course</Button>
@@ -166,6 +166,6 @@ function CourseAccessRoute() {
           </Paper>
         </div>
       </Stack>
-    </main>
+    </div>
   );
 }

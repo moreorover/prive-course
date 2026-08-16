@@ -21,7 +21,7 @@ function CourseDetailRoute() {
   const { course } = Route.useLoaderData();
 
   return (
-    <main className="pc-marketing-page">
+    <div className="pc-marketing-page">
       <section className="pc-course-detail pc-section-shell">
         <Link to="/courses">
           <Button
@@ -123,6 +123,6 @@ function CourseDetailRoute() {
           </Button>
         </Link>
       </section>
-    </main>
+    </div>
   );
 }

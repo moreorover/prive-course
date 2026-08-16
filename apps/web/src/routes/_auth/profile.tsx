@@ -22,7 +22,7 @@ function ProfileRoute() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8">
       <Stack gap="lg">
         <div>
           <Title order={1}>Profile</Title>
@@ -36,6 +36,6 @@ function ProfileRoute() {
         <PasskeysSection data={passkeys.data ?? []} onRefetch={passkeys.refetch} />
         <SessionsSection data={sessions.data ?? []} onRefetch={sessions.refetch} />
       </Stack>
-    </main>
+    </div>
   );
 }

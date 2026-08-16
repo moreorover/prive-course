@@ -36,7 +36,7 @@ function NewLessonRoute() {
   );
 
   return (
-    <main className="pc-page-narrow">
+    <div className="pc-page-narrow">
       <Stack gap="lg">
         <Link to="/admin/courses/$courseId" params={{ courseId }}>
           <Button variant="subtle">Back to course</Button>
@@ -60,6 +60,6 @@ function NewLessonRoute() {
           }
         />
       </Stack>
-    </main>
+    </div>
   );
 }

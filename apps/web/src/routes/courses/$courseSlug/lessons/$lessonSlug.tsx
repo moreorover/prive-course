@@ -32,7 +32,7 @@ function LessonError({ error }: ErrorComponentProps) {
 
   if (!isCourseAccessError(error)) {
     return (
-      <main className="pc-page">
+      <div className="pc-page">
         <Stack gap="lg">
           <Link to="/courses/$courseSlug" params={{ courseSlug }}>
             <Button variant="subtle">Back to course</Button>
@@ -48,12 +48,12 @@ function LessonError({ error }: ErrorComponentProps) {
             </Stack>
           </Paper>
         </Stack>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="pc-page">
+    <div className="pc-page">
       <Stack gap="lg">
         <Link to="/courses/$courseSlug" params={{ courseSlug }}>
           <Button variant="subtle">Back to course</Button>
@@ -86,7 +86,7 @@ function LessonError({ error }: ErrorComponentProps) {
           </Stack>
         </Paper>
       </Stack>
-    </main>
+    </div>
   );
 }
 
@@ -95,7 +95,7 @@ function LessonRoute() {
   const lesson = useQuery(lessonQueryOptions(courseSlug, lessonSlug));
 
   return (
-    <main className="pc-page">
+    <div className="pc-page">
       <Stack gap="xl">
         <Link to="/courses/$courseSlug" params={{ courseSlug }}>
           <Button variant="subtle">Back to course</Button>
@@ -157,6 +157,6 @@ function LessonRoute() {
           </Paper>
         )}
       </Stack>
-    </main>
+    </div>
   );
 }

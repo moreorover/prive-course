@@ -10,7 +10,7 @@ export const Route = createFileRoute("/courses/")({
 
 function CoursesRoute() {
   return (
-    <main className="pc-marketing-page">
+    <div className="pc-marketing-page">
       <section className="pc-catalog-hero pc-section-shell">
         <div className="pc-catalog-intro">
           <Badge className="pc-eyebrow" variant="transparent">
@@ -101,6 +101,6 @@ function CoursesRoute() {
           </Link>
         </Group>
       </section>
-    </main>
+    </div>
   );
 }

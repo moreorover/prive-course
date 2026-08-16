@@ -1,6 +1,6 @@
 import { Badge, Button, Group, SimpleGrid, Text, Title } from "@mantine/core";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpen, PlayCircle, Scissors, Sparkles } from "lucide-react";
+import { BookOpen, Scissors, Sparkles } from "lucide-react";
 
 import { marketingCourses } from "@/features/course/marketing-courses";
 

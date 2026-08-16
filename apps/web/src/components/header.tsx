@@ -17,33 +17,27 @@ export default function Header() {
   return (
     <Box
       component="header"
-      className="border-b"
+      className="pc-site-header"
       style={{
         background: "color-mix(in srgb, var(--pc-panel) 88%, transparent)",
         borderColor: "var(--pc-border)",
-        backdropFilter: "blur(8px)",
       }}
     >
-      <div
-        className="mx-auto flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between"
-        style={{ width: "min(100% - 1rem, 72rem)" }}
-      >
-        <Group gap="lg" wrap="nowrap">
-          <Link to="/" className="no-underline">
+      <div className="pc-header-inner">
+        <Group className="pc-header-main" gap="lg" wrap="nowrap">
+          <Link to="/" className="pc-brand">
+            <span aria-hidden className="pc-brand-mark" />
             <div>
-              <Text fw={800} lh={1}>
+              <Text fw={900} lh={1}>
                 Prive Course
-              </Text>
-              <Text size="xs" c="dimmed">
-                Private video learning
               </Text>
             </div>
           </Link>
-          <nav className="flex flex-wrap gap-2 text-sm">
+          <nav className="pc-nav">
             {links.map(({ to, label }) => {
               return (
                 <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
-                  <Button component="span" size="xs" variant="subtle">
+                  <Button className="pc-nav-button" component="span" size="xs" variant="subtle">
                     {label}
                   </Button>
                 </Link>
@@ -51,7 +45,7 @@ export default function Header() {
             })}
           </nav>
         </Group>
-        <Group gap="xs" wrap="nowrap">
+        <Group className="pc-header-actions" gap="xs" wrap="nowrap">
           <ModeToggle />
           <UserMenu />
         </Group>

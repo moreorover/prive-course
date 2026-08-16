@@ -40,7 +40,7 @@ function EditLessonRoute() {
     }),
   );
   return (
-    <main className="pc-page-narrow">
+    <div className="pc-page-narrow">
       <Stack gap="xl">
         <Link to="/admin/courses/$courseId" params={{ courseId }}>
           <Button variant="subtle">Back to course</Button>
@@ -74,6 +74,6 @@ function EditLessonRoute() {
           </Paper>
         )}
       </Stack>
-    </main>
+    </div>
   );
 }

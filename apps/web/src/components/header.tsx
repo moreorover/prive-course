@@ -1,4 +1,4 @@
-import { Box, Button, Group, Text } from "@mantine/core";
+import { AppShell, Burger, Button, Group, Text } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
@@ -6,7 +6,17 @@ import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
-export default function Header() {
+type HeaderProps = {
+  mobileNavOpened: boolean;
+  onMobileNavClose: () => void;
+  onMobileNavToggle: () => void;
+};
+
+export default function Header({
+  mobileNavOpened,
+  onMobileNavClose,
+  onMobileNavToggle,
+}: HeaderProps) {
   const { data: session } = authClient.useSession();
   const links = [
     { to: "/", label: "Home" },
@@ -14,48 +24,47 @@ export default function Header() {
     ...(session?.user.role === "admin" ? [{ to: "/admin", label: "Admin" }] : []),
   ] as const;
 
+  const navLinks = links.map(({ to, label }) => (
+    <Link key={to} to={to} activeProps={{ "aria-current": "page" }} onClick={onMobileNavClose}>
+      <Button className="pc-nav-button" component="span" size="xs" variant="subtle">
+        {label}
+      </Button>
+    </Link>
+  ));
+
   return (
-    <Box
-      component="header"
-      className="border-b"
-      style={{
-        background: "color-mix(in srgb, var(--pc-panel) 88%, transparent)",
-        borderColor: "var(--pc-border)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
-      <div
-        className="mx-auto flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between"
-        style={{ width: "min(100% - 1rem, 72rem)" }}
-      >
-        <Group gap="lg" wrap="nowrap">
-          <Link to="/" className="no-underline">
-            <div>
-              <Text fw={800} lh={1}>
-                Prive Course
-              </Text>
-              <Text size="xs" c="dimmed">
-                Private video learning
-              </Text>
-            </div>
-          </Link>
-          <nav className="flex flex-wrap gap-2 text-sm">
-            {links.map(({ to, label }) => {
-              return (
-                <Link key={to} to={to} activeProps={{ "aria-current": "page" }}>
-                  <Button component="span" size="xs" variant="subtle">
-                    {label}
-                  </Button>
-                </Link>
-              );
-            })}
-          </nav>
+    <>
+      <AppShell.Header className="pc-site-header">
+        <Group className="pc-header-inner" h="100%" justify="space-between" px="md" wrap="nowrap">
+          <Group className="pc-header-main" gap="lg" wrap="nowrap">
+            <Burger
+              aria-label="Toggle navigation"
+              className="pc-mobile-burger"
+              hiddenFrom="sm"
+              onClick={onMobileNavToggle}
+              opened={mobileNavOpened}
+              size="sm"
+            />
+            <Link to="/" className="pc-brand" onClick={onMobileNavClose}>
+              <span aria-hidden className="pc-brand-mark" />
+              <div>
+                <Text fw={900} lh={1}>
+                  Prive Course
+                </Text>
+              </div>
+            </Link>
+            <nav className="pc-nav pc-nav-desktop">{navLinks}</nav>
+          </Group>
+          <Group className="pc-header-actions" gap="xs" wrap="nowrap">
+            <ModeToggle />
+            <UserMenu />
+          </Group>
         </Group>
-        <Group gap="xs" wrap="nowrap">
-          <ModeToggle />
-          <UserMenu />
-        </Group>
-      </div>
-    </Box>
+      </AppShell.Header>
+
+      <AppShell.Navbar className="pc-mobile-navbar" p="md">
+        <nav className="pc-mobile-nav">{navLinks}</nav>
+      </AppShell.Navbar>
+    </>
   );
 }

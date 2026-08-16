@@ -97,7 +97,7 @@ function EditCourseRoute() {
   }
 
   return (
-    <main className="pc-page">
+    <div className="pc-page">
       <Stack gap="xl">
         <Link to="/admin">
           <Button variant="subtle">Back to courses</Button>
@@ -222,6 +222,6 @@ function EditCourseRoute() {
           </Paper>
         )}
       </Stack>
-    </main>
+    </div>
   );
 }

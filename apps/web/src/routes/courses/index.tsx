@@ -1,113 +1,106 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { Badge, Button, Group, Text, Title } from "@mantine/core";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { BookOpen, Crown, PlayCircle } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 
-import { EmptyState } from "@/components/empty-state";
-import { trpc } from "@/utils/trpc";
-
-const publishedCoursesQueryOptions = trpc.courses.listPublished.queryOptions();
+import { marketingCourses } from "@/features/course/marketing-courses";
 
 export const Route = createFileRoute("/courses/")({
   component: CoursesRoute,
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(publishedCoursesQueryOptions);
-  },
 });
 
 function CoursesRoute() {
-  const courses = useQuery(publishedCoursesQueryOptions);
-
   return (
-    <main className="pc-page">
-      <Stack gap={48}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-          <Stack gap="md">
-            <Badge color="gold" variant="light" w="fit-content">
-              Course catalog
-            </Badge>
-            <Title order={1} size="3.25rem" lh={1.02}>
-              Choose your next private course
-            </Title>
-            <Text c="dimmed" size="lg" maw={720}>
-              Browse published courses, inspect the lesson outline, and start with free previews
-              before signing in for full access.
-            </Text>
-          </Stack>
-          <Paper withBorder p="lg" className="pc-panel">
-            <Stack gap="sm">
-              <Group gap="sm">
-                <ThemeIcon color="gold" variant="light">
-                  <Crown size={18} />
-                </ThemeIcon>
-                <Text fw={700}>Private learning catalog</Text>
-              </Group>
-              <Text c="dimmed" size="sm">
-                Courses are curated for controlled access, protected playback, and clear preview
-                paths.
-              </Text>
-            </Stack>
-          </Paper>
+    <div className="pc-marketing-page">
+      <section className="pc-catalog-hero pc-section-shell">
+        <div className="pc-catalog-intro">
+          <Badge className="pc-eyebrow" variant="transparent">
+            Course Catalog
+          </Badge>
+          <Title className="pc-display-title" order={1}>
+            Choose the next technique to strengthen your salon work
+          </Title>
+          <Text>
+            Each Prive Course is built for focused video learning, practical review, and confident
+            client application.
+          </Text>
         </div>
+      </section>
 
-        {courses.data?.length === 0 ? (
-          <EmptyState
-            title="No courses yet"
-            description="Courses will appear here when they are available."
-          />
-        ) : null}
-
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-          {courses.data?.map((course) => (
-            <Paper
-              key={course.id}
-              withBorder
-              p="xl"
-              className="pc-panel"
-              style={{ borderTop: "3px solid var(--pc-accent)" }}
+      <section className="pc-section-shell pc-section-block">
+        <div className="pc-course-grid">
+          {marketingCourses.map((course) => (
+            <article
+              className={
+                !course.isAvailable ? "pc-course-card pc-course-card-soon" : "pc-course-card"
+              }
+              key={course.slug}
             >
-              <Stack gap="lg">
-                <Group justify="space-between" align="start" gap="md" wrap="nowrap">
-                  <Stack gap={4}>
-                    <Text size="xs" tt="uppercase" fw={800} c="dimmed">
-                      Private course
-                    </Text>
-                    <Title order={2} size="h3">
-                      {course.title}
-                    </Title>
-                  </Stack>
-                </Group>
-                <Text c="dimmed" lineClamp={3}>
-                  {course.description || "No description yet."}
-                </Text>
-                <Group gap="xs">
-                  <Badge leftSection={<BookOpen size={12} />} color="gray" variant="light">
-                    Course details
+              <div
+                aria-label={`${course.title} thumbnail placeholder`}
+                className={`pc-course-thumb ${course.imageClass}`}
+                role="img"
+              >
+                {!course.isAvailable ? <span>Coming Soon</span> : null}
+              </div>
+              <div className="pc-course-body">
+                <div className="pc-course-topline">
+                  <Badge className={!course.isAvailable ? "pc-status-soon" : "pc-status-available"}>
+                    {course.isAvailable ? "Available" : "Coming Soon"}
                   </Badge>
-                  <Badge leftSection={<PlayCircle size={12} />} color="gold" variant="light">
-                    Free previews where available
-                  </Badge>
-                </Group>
-                <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
-                  <Button variant="light" color="gold" fullWidth>
-                    View course
+                  <span>{course.level}</span>
+                </div>
+                <Title order={2}>{course.title}</Title>
+                <Text>{course.description}</Text>
+                <div className="pc-meta-list">
+                  <div>
+                    <span>Lessons</span>
+                    <strong>{course.lessonCount}</strong>
+                  </div>
+                  <div>
+                    <span>Duration</span>
+                    <strong>{course.duration}</strong>
+                  </div>
+                  <div>
+                    <span>Price</span>
+                    <strong>{course.price}</strong>
+                  </div>
+                </div>
+                {!course.isAvailable ? (
+                  <Button className="pc-button-disabled" disabled fullWidth radius="xl">
+                    Notify Me
                   </Button>
-                </Link>
-              </Stack>
-            </Paper>
+                ) : (
+                  <Link to="/courses/$courseSlug" params={{ courseSlug: course.slug }}>
+                    <Button className="pc-button-primary" fullWidth radius="xl">
+                      View Course
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </article>
           ))}
-        </SimpleGrid>
-      </Stack>
-    </main>
+        </div>
+      </section>
+
+      <section className="pc-catalog-band pc-section-shell" aria-labelledby="catalog-band-heading">
+        <div>
+          <Title order={2} id="catalog-band-heading">
+            Not sure where to start?
+          </Title>
+          <Text>
+            Begin with fundamentals, then move into method-specific training as your client book
+            grows.
+          </Text>
+        </div>
+        <Group gap="sm">
+          <GraduationCap aria-hidden size={22} strokeWidth={1.7} />
+          <Link to="/courses/$courseSlug" params={{ courseSlug: marketingCourses[0].slug }}>
+            <Button className="pc-button-light" radius="xl">
+              Start Here
+            </Button>
+          </Link>
+        </Group>
+      </section>
+    </div>
   );
 }

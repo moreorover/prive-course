@@ -588,9 +588,7 @@ a:hover {
 
 .pc-catalog-hero {
   min-height: min(680px, calc(100dvh - 68px));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.45fr);
-  gap: clamp(1.5rem, 5vw, 4rem);
+  display: flex;
   align-items: end;
   padding-block: clamp(2.5rem, 8vw, 5rem);
 }

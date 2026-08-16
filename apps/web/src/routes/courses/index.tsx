@@ -24,10 +24,6 @@ function CoursesRoute() {
             client application.
           </Text>
         </div>
-        <div className="pc-catalog-note">
-          <span>{marketingCourses.length} courses</span>
-          <strong>Structured paths for hair extension education</strong>
-        </div>
       </section>
 
       <section className="pc-section-shell pc-section-block">

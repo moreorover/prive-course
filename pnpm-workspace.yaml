@@ -7,21 +7,21 @@ allowBuilds:
   workerd: true
 catalog:
   dotenv: ^17.4.2
-  zod: ^4.4.3
+  zod: ^4.5.2
   typescript: ^7.0.2
-  "@types/node": ^26.1.2
-  "@cloudflare/workers-types": ^5.20260801.1
-  hono: ^4.12.33
+  "@types/node": ^26.4.0
+  "@cloudflare/workers-types": ^5.20260829.1
+  hono: ^4.13.5
   "@trpc/server": ^11.18.0
-  better-auth: ^1.6.25
+  better-auth: ^1.7.2
   alchemy: ^0.94.0
-  lucide-react: ^1.28.0
+  lucide-react: ^1.35.0
   react: ^19.2.8
   react-dom: ^19.2.8
-  sonner: ^2.0.7
+  sonner: ^2.0.8
   "@trpc/client": ^11.18.0
   "@types/react": ^19.2.18
-  "@types/react-dom": ^19.2.4
+  "@types/react-dom": ^19.2.5
   tailwindcss: ^4.3.3
 minimumReleaseAgeExclude:
   - deslop-js@0.7.4

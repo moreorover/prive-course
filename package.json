@@ -44,13 +44,13 @@
     "@prive-course/config": "workspace:*",
     "@types/node": "catalog:",
     "alchemy": "catalog:",
-    "knip": "^6.31.0",
-    "react-doctor": "^0.9.3",
+    "knip": "^6.33.0",
+    "react-doctor": "^0.9.12",
     "typescript": "catalog:",
     "vite-plus": "0.2.2"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@0.2.2"
   },
-  "packageManager": "pnpm@11.19.0"
+  "packageManager": "pnpm@11.24.0"
 }

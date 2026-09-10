@@ -34,8 +34,8 @@ catalogs:
       specifier: ^17.4.2
       version: 17.4.2
     hono:
-      specifier: ^4.12.33
-      version: 4.13.1
+      specifier: ^4.13.5
+      version: 4.13.7
     lucide-react:
       specifier: ^1.28.0
       version: 1.30.0
@@ -95,7 +95,7 @@ importers:
     dependencies:
       '@hono/trpc-server':
         specifier: ^0.4.2
-        version: 0.4.2(@trpc/server@11.18.0(typescript@7.0.2))(hono@4.13.1)
+        version: 0.4.2(@trpc/server@11.18.0(typescript@7.0.2))(hono@4.13.7)
       '@prive-course/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -110,7 +110,7 @@ importers:
         version: 11.18.0(typescript@7.0.2)
       hono:
         specifier: 'catalog:'
-        version: 4.13.1
+        version: 4.13.7
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 'catalog:'
@@ -251,7 +251,7 @@ importers:
         version: link:../config
       hono:
         specifier: 'catalog:'
-        version: 4.13.1
+        version: 4.13.7
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -4150,8 +4150,8 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.13.1:
-    resolution: {integrity: sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw==}
+  hono@4.13.7:
+    resolution: {integrity: sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@6.1.1:
@@ -6259,10 +6259,10 @@ snapshots:
 
   '@hexagon/base64@1.1.28': {}
 
-  '@hono/trpc-server@0.4.2(@trpc/server@11.18.0(typescript@7.0.2))(hono@4.13.1)':
+  '@hono/trpc-server@0.4.2(@trpc/server@11.18.0(typescript@7.0.2))(hono@4.13.7)':
     dependencies:
       '@trpc/server': 11.18.0(typescript@7.0.2)
-      hono: 4.13.1
+      hono: 4.13.7
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -8607,7 +8607,7 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.13.1: {}
+  hono@4.13.7: {}
 
   hookable@6.1.1: {}
 
